@@ -65,31 +65,31 @@ export default function OrganizerNotifications() {
                         <div className="flex bg-[#272727] rounded-xl p-1 border border-[#333]">
                             <button 
                                 onClick={() => setActiveTab("all")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 All
                             </button>
                             <button 
                                 onClick={() => setActiveTab("unread")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "unread" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "unread" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 Unread {unreadCount > 0 && `(${unreadCount})`}
                             </button>
                             <button 
                                 onClick={() => setActiveTab("transaction")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "transaction" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "transaction" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 Transactions
                             </button>
                             <button 
                                 onClick={() => setActiveTab("system")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "system" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "system" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 System
                             </button>
                             <button 
                                 onClick={() => setActiveTab("promo")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "promo" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "promo" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 Promo
                             </button>

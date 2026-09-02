@@ -29,7 +29,7 @@ export default function TicketsPage() {
                         </div>
                         <div className="bg-[#272727] rounded-xl p-4 border border-[#333]">
                             <p className="text-sm text-gray-400">Sold</p>
-                            <p className="text-2xl font-bold text-green-400">1,225</p>
+                            <p className="text-2xl font-bold text-blue-400">1,225</p>
                         </div>
                         <div className="bg-[#272727] rounded-xl p-4 border border-[#333]">
                             <p className="text-sm text-gray-400">Available</p>
