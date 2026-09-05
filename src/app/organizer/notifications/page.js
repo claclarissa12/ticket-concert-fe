@@ -128,14 +128,7 @@ export default function OrganizerNotifications() {
                                             <p className={`text-sm mt-1 ${!notification.read ? 'text-gray-300' : 'text-gray-400'}`}>
                                                 {notification.message}
                                             </p>
-                                            <div className="flex items-center gap-4 mt-3">
-                                                <button className="text-xs text-[#FBADCC] hover:underline">
-                                                    Mark as Read
-                                                </button>
-                                                <button className="text-xs text-gray-400 hover:text-white transition-colors">
-                                                    Archive
-                                                </button>
-                                            </div>
+                                           
                                         </div>
                                     </div>
                                 </div>

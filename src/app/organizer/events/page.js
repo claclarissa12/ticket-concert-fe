@@ -20,7 +20,6 @@ export default function OrganizerEvents() {
         switch(status) {
             case "Active": return "bg-green-500/20 text-green-400"
             case "Draft": return "bg-yellow-500/20 text-yellow-400"
-            case "Upcoming": return "bg-blue-500/20 text-blue-400"
             case "Ended": return "bg-gray-500/20 text-gray-400"
             default: return "bg-gray-500/20 text-gray-400"
         }
@@ -72,7 +71,6 @@ export default function OrganizerEvents() {
                             <option>All Status</option>
                             <option>Active</option>
                             <option>Draft</option>
-                            <option>Upcoming</option>
                             <option>Ended</option>
                         </select>
                         <select className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] outline-none focus:border-[#FBADCC] transition-colors text-sm">

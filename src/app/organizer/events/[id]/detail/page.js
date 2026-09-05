@@ -11,7 +11,7 @@ export default function DetailEvent() {
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                         <div>
-                            <div className="flex items-center gap-3">
+                            <div class  Name="flex items-center gap-3">
                                 <Link href="/organizer/events" className="text-gray-400 hover:text-white transition-colors">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
