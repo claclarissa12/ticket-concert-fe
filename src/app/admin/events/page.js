@@ -18,7 +18,7 @@ export default function SuperAdminEvents() {
     ]
 
     const getStatusColor = (status) => {
-        switch(status) {
+        switch (status) {
             case "Active": return "bg-green-500/20 text-green-400"
             case "Upcoming": return "bg-blue-500/20 text-blue-400"
             case "Draft": return "bg-yellow-500/20 text-yellow-400"
@@ -28,7 +28,7 @@ export default function SuperAdminEvents() {
 
     const filteredEvents = events.filter(event => {
         const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             event.organizer.toLowerCase().includes(searchTerm.toLowerCase())
+            event.organizer.toLowerCase().includes(searchTerm.toLowerCase())
         if (activeTab === "all") return matchesSearch
         return matchesSearch && event.status === activeTab
     })
@@ -61,59 +61,83 @@ export default function SuperAdminEvents() {
                         <input type="text" placeholder="Search events..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors text-sm flex-1 min-w-[200px]" />
                     </div>
 
-                    {/* 1 Column Full Width */}
-                    <div className="space-y-4">
-                        {filteredEvents.map((event) => (
-                            <div key={event.id} className="bg-[#272727] rounded-2xl overflow-hidden border border-[#333] hover:border-[#FBADCC]/30 transition-all hover:scale-[1.005]">
-                                <div className="flex flex-col sm:flex-row gap-5 p-5">
-                                    <img src={event.image} className="w-full sm:w-48 h-48 rounded-xl object-cover flex-shrink-0" />
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex flex-wrap items-start justify-between gap-2">
-                                            <h3 className="text-xl font-bold">{event.name}</h3>
-                                            <span className={`text-xs px-3 py-1 rounded-full ${getStatusColor(event.status)}`}>
-                                                {event.status}
-                                            </span>
-                                        </div>
-                                        <p className="text-sm text-gray-400 mt-1">{event.organizer}</p>
-                                        <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-400">
-                                            <span className="flex items-center gap-1">📅 {event.date}</span>
-                                            <span className="flex items-center gap-1">📍 {event.location}</span>
-                                            <span className="flex items-center gap-1">🎵 {event.category}</span>
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-                                            <div className="bg-[#1a1a1a] rounded-xl p-3 text-center">
-                                                <p className="text-xs text-gray-400">Tickets</p>
-                                                <p className="text-lg font-bold">{event.sold}/{event.tickets}</p>
+                    {/* List */}
+                    <div className="divide-y divide-[#222] border-y border-[#222]">
+                        {filteredEvents.map(event => {
+                            const pct = Math.round((event.sold / event.tickets) * 100)
+                            return (
+                                <div key={event.id} className="py-5 hover:bg-[#181818] transition-colors -mx-3 px-3 rounded-lg">
+                                    <div className="flex flex-col sm:flex-row gap-4">
+                                        <img
+                                            src={event.image}
+                                            alt={event.name}
+                                            className="w-full sm:w-32 h-32 rounded-lg object-cover flex-shrink-0 grayscale-[30%]"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div className="min-w-0">
+                                                    <h3 className="font-medium truncate">{event.name}</h3>
+                                                    <p className="text-xs text-neutral-500 mt-0.5">
+                                                        {event.organizer} · {event.category}
+                                                    </p>
+                                                </div>
+                                                <span className={`text-[11px] px-2 py-0.5 rounded font-medium ${getStatusColor(event.status)}`}>
+                                                    {event.status}
+                                                </span>
                                             </div>
-                                            <div className="bg-[#1a1a1a] rounded-xl p-3 text-center">
-                                                <p className="text-xs text-gray-400">Revenue</p>
-                                                <p className="text-lg font-bold text-[#FBADCC]">{event.revenue}</p>
-                                            </div>
-                                            <div className="bg-[#1a1a1a] rounded-xl p-3 text-center">
-                                                <p className="text-xs text-gray-400">Attendance</p>
-                                                <p className="text-lg font-bold text-green-400">{Math.round((event.sold / event.tickets) * 100)}%</p>
-                                            </div>
-                                        </div>
 
-                                        <div className="w-full bg-[#1a1a1a] rounded-full h-2 mt-4">
-                                            <div className="bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] rounded-full h-2 transition-all" style={{ width: `${(event.sold / event.tickets) * 100}%` }}></div>
-                                        </div>
+                                            <p className="text-xs text-neutral-500 mt-2">
+                                                {event.date} · {event.location}
+                                            </p>
 
-                                        <div className="flex gap-3 mt-4">
-                                            <button className="px-5 py-2 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#333] transition-colors">
-                                                Detail
-                                            </button>
-                                            <button className="px-5 py-2 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#333] transition-colors">
-                                                Suspend
-                                            </button>
+                                            {/* Stats inline */}
+                                            <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-3 text-xs text-neutral-400">
+                                                <span>
+                                                    Tiket terjual{" "}
+                                                    <span className="text-white font-medium">{event.sold}</span>
+                                                    <span className="text-neutral-600">/{event.tickets}</span>
+                                                </span>
+                                                <span>
+                                                    Revenue{" "}
+                                                    <span className="text-white font-medium">{event.revenue}</span>
+                                                </span>
+                                                <span>
+                                                    Kehadiran{" "}
+                                                    <span className={pct > 50 ? "text-emerald-400" : "text-amber-400"}>
+                                                        {pct}%
+                                                    </span>
+                                                </span>
+                                            </div>
+
+                                            {/* Progress tipis */}
+                                            <div className="w-full bg-[#222] rounded-full h-1 mt-3">
+                                                <div
+                                                    className={`h-1 rounded-full ${pct > 50 ? "bg-emerald-500/60" : "bg-amber-500/60"}`}
+                                                    style={{ width: `${pct}%` }}
+                                                />
+                                            </div>
+
+                                            <div className="flex gap-2 mt-3">
+                                                <button className="text-xs px-3 py-1.5 rounded-md border border-[#2a2a2a] hover:border-[#444] hover:bg-[#1f1f1f] transition-colors">
+                                                    Detail
+                                                </button>
+                                                <button className="text-xs px-3 py-1.5 rounded-md border border-transparent text-neutral-500 hover:text-red-400 hover:border-red-400/30 transition-colors">
+                                                    Suspend
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
 
+                    {/* Empty state — cukup satu */}
+                    {filteredEvents.length === 0 && (
+                        <div className="text-center py-20">
+                            <p className="text-neutral-500 text-sm">Tidak ada event yang cocok dengan filter kamu.</p>
+                        </div>
+                    )}
                     {filteredEvents.length === 0 && (
                         <div className="text-center py-16">
                             <div className="text-6xl mb-4">📅</div>

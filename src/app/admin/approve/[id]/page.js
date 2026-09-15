@@ -235,21 +235,7 @@ export default function SuperAdminDetailAjuan() {
                                 </div>
                             </div>
 
-                            {/* Activity Log */}
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <h2 className="text-lg font-semibold mb-4">Activity Log</h2>
-                                <div className="space-y-3">
-                                    {eventData.activityLog.map((log, index) => (
-                                        <div key={index} className="flex items-start gap-3 p-2">
-                                            <div className="w-2 h-2 rounded-full bg-[#FBADCC] mt-1.5"></div>
-                                            <div>
-                                                <p className="text-sm">{log.action}</p>
-                                                <p className="text-xs text-gray-400">{log.date}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                     
                         </div>
                     </div>
                 </div>
