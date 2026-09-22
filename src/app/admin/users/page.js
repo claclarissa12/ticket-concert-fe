@@ -66,9 +66,12 @@ export default function SuperAdminUsers() {
                                 </svg>
                                 Export
                             </button>
-                            <button className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
-                                + Add User
-                            </button>
+                            <a href="/admin/users/create">
+
+                                <button className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
+                                    + Add User
+                                </button>
+                            </a>
                         </div>
                     </div>
 
@@ -86,7 +89,7 @@ export default function SuperAdminUsers() {
                             >
                                 Active
                             </button>
-                            
+
                             <button
                                 onClick={() => setActiveTab("suspended")}
                                 className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "suspended" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
