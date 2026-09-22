@@ -56,8 +56,9 @@ export default function SidebarAdmin() {
             href: "/admin/eoApprove",
             label: "Approve Form Register EO",
             icon: (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    fill="currentColor" viewBox="0 0 24 24" >
+                    <path d="M4 8c0 2.28 1.72 4 4 4s4-1.72 4-4-1.72-4-4-4-4 1.72-4 4m6 0c0 1.18-.82 2-2 2s-2-.82-2-2 .82-2 2-2 2 .82 2 2M3 20h10c.55 0 1-.45 1-1v-1c0-2.76-2.24-5-5-5H7c-2.76 0-5 2.24-5 5v1c0 .55.45 1 1 1m4-5h2c1.65 0 3 1.35 3 3H4c0-1.65 1.35-3 3-3m5.29-3.29 3 3c.2.2.45.29.71.29s.51-.1.71-.29l5-5L20.3 8.3l-4.29 4.29-2.29-2.29-1.41 1.41Z"></path>
                 </svg>
             )
         },
@@ -71,54 +72,50 @@ export default function SidebarAdmin() {
             )
         }
     ]
-
     return (
-        <div className="w-64 h-screen bg-[#1a1a1a] border-r border-[#272727] flex flex-col sticky top-0">
-            <div className="p-6 border-b border-[#272727] flex-shrink-0">
-                <h1 className="text-xl font-bold">
-                    Admin<span className="text-[#E21D8F]">.COM</span>
-                </h1>
-                <p className="text-xs text-gray-500 mt-1">Super Admin</p>
+        <div className="w-64 h-screen sticky top-0 bg-[#0d0d0d] border-r border-[#1a1a1a] flex flex-col">
+            <div className="px-5 py-4 border-b border-[#1a1a1a]">
+                <div className="flex items-center gap-2.5">
+
+                    <h1 className="text-xl font-semibold text-white">
+                        Ticket<span className="text-[#FBADCC]">.COM</span>
+                    </h1>
+                </div>
             </div>
 
-            <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+            <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
                 {menuItems.map((item) => {
                     const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
-                    
+
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
                             className={`
-                                flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200
-                                ${isActive 
-                                    ? 'bg-[#FBADCC]/10 text-[#FBADCC] border border-[#FBADCC]/20' 
-                                    : 'text-gray-400 hover:text-white hover:bg-[#272727]'
+                                flex items-center gap-3 px-3 py-3.5 rounded-md text-sm transition-colors
+                                ${isActive
+                                    ? 'bg-[#FBADCC]/20 text-[#FBADCC]'
+                                    : 'text-gray-500 hover:text-gray-300 hover:bg-[#1a1a1a]'
                                 }
                             `}
                         >
-                            <span className={isActive ? 'text-[#FBADCC]' : 'text-gray-400'}>
+                            <span className={`${isActive ? 'text-pink-400' : 'text-gray-600'}`}>
                                 {item.icon}
                             </span>
-                            <span className="font-medium">{item.label}</span>
-                            {isActive && (
-                                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#FBADCC]"></span>
-                            )}
+                            <span>{item.label}</span>
                         </Link>
                     )
                 })}
             </nav>
 
-            <div className="p-4 border-t border-[#272727] flex-shrink-0">
-                <div className="bg-[#272727] rounded-xl p-3">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] flex items-center justify-center text-black font-bold text-sm">
-                            SA
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold truncate">Super Admin</p>
-                            <p className="text-xs text-gray-500 truncate">admin@ticket.com</p>
-                        </div>
+            <div className="px-3 py-3 border-t border-[#1a1a1a]">
+                <div className="flex items-center gap-3 px-2 py-2 rounded-md">
+                    <div className="w-8 h-8 rounded-full bg-[#FBADCC] flex items-center justify-center text-white font-semibold text-xs">
+                        EO
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white truncate">SuperAdmin</p>
+                        <p className="text-xs text-gray-500 truncate">admin@superadmin.com</p>
                     </div>
                 </div>
             </div>

@@ -8,7 +8,6 @@ export default function SuperAdminDetailAjuan() {
     const params = useParams()
     const id = params.id
 
-    // Data dummy - nanti diganti dengan fetch dari API
     const eventData = {
         id: 1,
         name: "Nassar Tour 2026",
@@ -48,7 +47,7 @@ export default function SuperAdminDetailAjuan() {
     }
 
     const getStatusColor = (status) => {
-        switch(status) {
+        switch (status) {
             case "Pending": return "bg-yellow-500/20 text-yellow-400"
             case "Approved": return "bg-green-500/20 text-green-400"
             case "Rejected": return "bg-red-500/20 text-red-400"
@@ -66,7 +65,7 @@ export default function SuperAdminDetailAjuan() {
                             <div className="flex items-center gap-3">
                                 <Link href="/admin/approve" className="text-gray-400 hover:text-white transition-colors">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/>
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                                     </svg>
                                 </Link>
                                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Event Submission Details</h1>
@@ -76,11 +75,19 @@ export default function SuperAdminDetailAjuan() {
                         <div className="flex items-center gap-3">
                             {eventData.status === "Pending" && (
                                 <>
-                                    <button className="px-5 py-2.5 bg-green-500/20 text-green-400 rounded-xl text-sm font-semibold hover:bg-green-500/30 transition-colors">
-                                        ✅ Approve
+                                    <button className="px-5 py-2.5 bg-green-500/20 text-green-400 rounded-xl flex gap-2 font-semibold hover:bg-green-500/30 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            fill="currentColor" viewBox="0 0 24 24" >
+                                            <path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10m0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8"></path><path d="M10 16c-.26 0-.51-.1-.71-.29l-3-3L7.7 11.3l2.29 2.29 5.29-5.29 1.41 1.41-6 6c-.2.2-.45.29-.71.29Z"></path>
+                                        </svg>
+                                        <p className="text-sm">Approve</p>
                                     </button>
-                                    <button className="px-5 py-2.5 bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold hover:bg-red-500/30 transition-colors">
-                                        ❌ Reject
+                                    <button className="px-5 py-2.5 bg-red-500/20 text-red-400 rounded-xl flex gap-2 font-semibold hover:bg-red-500/30 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            fill="currentColor" viewBox="0 0 24 24" >
+                                            <path d="m7.76 14.83-2.83 2.83 1.41 1.41 2.83-2.83 2.12-2.12.71-.71.71.71 1.41 1.42 3.54 3.53 1.41-1.41-3.53-3.54-1.42-1.41-.71-.71 5.66-5.66-1.41-1.41L12 10.59 6.34 4.93 4.93 6.34 10.59 12l-.71.71z"></path>
+                                        </svg>
+                                        <p className="text-sm">Reject</p>
                                     </button>
                                 </>
                             )}
@@ -91,9 +98,7 @@ export default function SuperAdminDetailAjuan() {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Main Content */}
                         <div className="lg:col-span-2 space-y-6">
-                            {/* Event Info */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <div className="flex items-start gap-6">
                                     <img src={eventData.image} className="w-40 h-32 rounded-xl object-cover flex-shrink-0" />
@@ -131,21 +136,19 @@ export default function SuperAdminDetailAjuan() {
                                 </div>
                             </div>
 
-                            {/* Description */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <h2 className="text-lg font-semibold mb-3">Description</h2>
                                 <p className="text-gray-300">{eventData.description}</p>
                             </div>
 
-                            {/* Ticket Tiers */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <h2 className="text-lg font-semibold mb-3">Ticket Tiers</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     {eventData.ticketTiers.map((tier, index) => (
                                         <div key={index} className="bg-[#1a1a1a] rounded-xl p-4 border border-[#333]">
-                                            <h3 className="font-bold text-lg" style={{ 
-                                                color: tier.name === "VIP" ? "#9b59b6" : 
-                                                       tier.name === "Gold" ? "#f39c12" : "#bdc3c7" 
+                                            <h3 className="font-bold text-lg" style={{
+                                                color: tier.name === "VIP" ? "#9b59b6" :
+                                                    tier.name === "Gold" ? "#f39c12" : "#bdc3c7"
                                             }}>
                                                 {tier.name}
                                             </h3>
@@ -159,7 +162,6 @@ export default function SuperAdminDetailAjuan() {
                                 </div>
                             </div>
 
-                            {/* Documents */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <h2 className="text-lg font-semibold mb-3">Documents</h2>
                                 <div className="space-y-3">
@@ -167,7 +169,7 @@ export default function SuperAdminDetailAjuan() {
                                         <div key={index} className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors">
                                             <div className="flex items-center gap-3">
                                                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                 </svg>
                                                 <div>
                                                     <p className="text-sm font-medium">{doc.name}</p>
@@ -183,9 +185,7 @@ export default function SuperAdminDetailAjuan() {
                             </div>
                         </div>
 
-                        {/* Sidebar */}
                         <div className="space-y-6">
-                            {/* Stats */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <h2 className="text-lg font-semibold mb-4">Event Statistics</h2>
                                 <div className="space-y-3">
@@ -212,12 +212,11 @@ export default function SuperAdminDetailAjuan() {
                                 </div>
                             </div>
 
-                            {/* Organizer Info */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <h2 className="text-lg font-semibold mb-4">Organizer</h2>
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-3 p-3 bg-[#1a1a1a] rounded-xl">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] flex items-center justify-center text-black font-bold">
+                                        <div className="w-10 h-10 rounded-full bg-[#FBADCC] flex items-center justify-center text-black font-bold">
                                             {eventData.organizer.charAt(0)}
                                         </div>
                                         <div>
@@ -235,7 +234,7 @@ export default function SuperAdminDetailAjuan() {
                                 </div>
                             </div>
 
-                     
+
                         </div>
                     </div>
                 </div>

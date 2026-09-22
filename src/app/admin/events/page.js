@@ -53,15 +53,14 @@ export default function SuperAdminEvents() {
 
                     <div className="flex flex-wrap items-center gap-3 mb-6">
                         <div className="flex bg-[#272727] rounded-xl p-1 border border-[#333]">
-                            <button onClick={() => setActiveTab("all")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>All</button>
-                            <button onClick={() => setActiveTab("Active")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Active" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>Active</button>
-                            <button onClick={() => setActiveTab("Upcoming")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Upcoming" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>Upcoming</button>
-                            <button onClick={() => setActiveTab("Draft")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Draft" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>Draft</button>
+                            <button onClick={() => setActiveTab("all")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>All</button>
+                            <button onClick={() => setActiveTab("Active")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Active" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Active</button>
+                            <button onClick={() => setActiveTab("Upcoming")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Upcoming" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Upcoming</button>
+                            <button onClick={() => setActiveTab("Draft")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Draft" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Draft</button>
                         </div>
                         <input type="text" placeholder="Search events..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors text-sm flex-1 min-w-[200px]" />
                     </div>
 
-                    {/* List */}
                     <div className="divide-y divide-[#222] border-y border-[#222]">
                         {filteredEvents.map(event => {
                             const pct = Math.round((event.sold / event.tickets) * 100)
@@ -90,7 +89,6 @@ export default function SuperAdminEvents() {
                                                 {event.date} · {event.location}
                                             </p>
 
-                                            {/* Stats inline */}
                                             <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-3 text-xs text-neutral-400">
                                                 <span>
                                                     Tiket terjual{" "}
@@ -109,7 +107,6 @@ export default function SuperAdminEvents() {
                                                 </span>
                                             </div>
 
-                                            {/* Progress tipis */}
                                             <div className="w-full bg-[#222] rounded-full h-1 mt-3">
                                                 <div
                                                     className={`h-1 rounded-full ${pct > 50 ? "bg-emerald-500/60" : "bg-amber-500/60"}`}
@@ -132,7 +129,6 @@ export default function SuperAdminEvents() {
                         })}
                     </div>
 
-                    {/* Empty state — cukup satu */}
                     {filteredEvents.length === 0 && (
                         <div className="text-center py-20">
                             <p className="text-neutral-500 text-sm">Tidak ada event yang cocok dengan filter kamu.</p>
@@ -150,7 +146,7 @@ export default function SuperAdminEvents() {
                         <p className="text-sm text-gray-400">Showing {filteredEvents.length} of {events.length} events</p>
                         <div className="flex gap-2">
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">Previous</button>
-                            <button className="px-4 py-2 bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] rounded-xl text-sm font-semibold text-black">1</button>
+                            <button className="px-4 py-2 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black">1</button>
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">2</button>
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">Next</button>
                         </div>

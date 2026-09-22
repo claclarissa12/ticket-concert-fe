@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useState } from "react"
 
 export default function SuperAdminApproveEO() {
-    const [activeTab, setActiveTab] = useState("pending")
+    const [activeTab, setActiveTab] = useState("all")
     const [searchTerm, setSearchTerm] = useState("")
 
     const eoRegistrations = [
@@ -108,23 +108,27 @@ export default function SuperAdminApproveEO() {
 
                     <div className="flex flex-wrap items-center gap-3 mb-6">
                         <div className="flex bg-[#272727] rounded-xl p-1 border border-[#333]">
-                            <button onClick={() => setActiveTab("pending")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "pending" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>Pending</button>
-                            <button onClick={() => setActiveTab("approved")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "approved" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>Approved</button>
-                            <button onClick={() => setActiveTab("rejected")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "rejected" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>Rejected</button>
-                            <button onClick={() => setActiveTab("all")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>All</button>
+                            <button onClick={() => setActiveTab("all")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>All</button>
+                            <button onClick={() => setActiveTab("pending")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "pending" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Pending</button>
+                            <button onClick={() => setActiveTab("approved")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "approved" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Approved</button>
+                            <button onClick={() => setActiveTab("rejected")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "rejected" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Rejected</button>
                         </div>
                         <input type="text" placeholder="Search EO..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors text-sm flex-1 min-w-[200px]" />
                     </div>
 
                     <div className="space-y-4">
                         {filteredEO.map((eo) => (
-                            <div key={eo.id} className="bg-[#272727] rounded-2xl p-6 border border-[#333] hover:border-[#FBADCC]/30 transition-all hover:scale-[1.005]">
+                            <div
+                                key={eo.id}
+                                className="bg-[#272727] rounded-2xl p-6 border border-[#333] hover:border-[#FBADCC]/30 transition-all hover:scale-[1.005]"
+                            >
                                 <div className="flex flex-col md:flex-row gap-6">
                                     <div className="flex-shrink-0">
-                                        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] flex items-center justify-center text-2xl font-bold text-black">
+                                        <div className="w-20 h-20 rounded-full bg-[#FBADCC] flex items-center justify-center text-2xl font-bold text-black">
                                             {eo.name.charAt(0)}
                                         </div>
                                     </div>
+
                                     <div className="flex-1 min-w-0">
                                         <div className="flex flex-wrap items-start justify-between gap-2">
                                             <div>
@@ -160,36 +164,41 @@ export default function SuperAdminApproveEO() {
                                             <div className="sm:col-span-2">
                                                 <p className="text-xs text-gray-400">Documents</p>
                                                 <div className="flex flex-wrap gap-2 mt-1">
-                                                    {eo.documents.split(', ').map((doc, index) => (
-                                                        <span key={index} className="text-xs px-2 py-1 rounded-full bg-[#1a1a1a] border border-[#333]">
-                                                            📄 {doc}
+                                                    {eo.documents.split(", ").map((doc, index) => (
+                                                        <span
+                                                            key={index}
+                                                            className="text-xs flex px-2 py-1 gap-2 rounded-full bg-[#1a1a1a] border border-[#333]"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                                fill="currentColor" viewBox="0 0 24 24" >
+                                                                <path d="m19.94 7.68-.03-.09a.8.8 0 0 0-.2-.29l-5-5c-.09-.09-.19-.15-.29-.2l-.09-.03a.8.8 0 0 0-.26-.05c-.02 0-.04-.01-.06-.01H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-12s-.01-.04-.01-.06c0-.09-.02-.17-.05-.26ZM6 20V4h7v4c0 .55.45 1 1 1h4v11z"></path><path d="M8 11h8v2H8zm0 4h8v2H8zm0-8h3v2H8z"></path>
+                                                            </svg> {doc}
                                                         </span>
                                                     ))}
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {eo.status === "Pending" && (
-                                            <div className="flex gap-3 mt-5 pt-4 border-t border-[#333]">
+                                        <div className="flex gap-3 mt-5 pt-4 border-t border-[#333]">
+                                            {eo.status === "Pending" ? (
                                                 <a href="eoApprove/[id]">
                                                     <button className="px-6 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#333] transition-colors">
                                                         View Details
                                                     </button>
                                                 </a>
-                                            </div>
-                                        )}
-                                        {eo.status !== "Pending" && (
-                                            <div className="flex gap-3 mt-5 pt-4 border-t border-[#333]">
-                                                <button className="px-6 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#333] transition-colors">
-                                                    View Details
-                                                </button>
-                                                {eo.status === "Rejected" && (
+                                            ) : (
+                                                <>
                                                     <button className="px-6 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#333] transition-colors">
-                                                        Re-apply
+                                                        View Details
                                                     </button>
-                                                )}
-                                            </div>
-                                        )}
+                                                    {eo.status === "Rejected" && (
+                                                        <button className="px-6 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#333] transition-colors">
+                                                            Re-apply
+                                                        </button>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -208,7 +217,7 @@ export default function SuperAdminApproveEO() {
                         <p className="text-sm text-gray-400">Showing {filteredEO.length} of {eoRegistrations.length} registrations</p>
                         <div className="flex gap-2">
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">Previous</button>
-                            <button className="px-4 py-2 bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] rounded-xl text-sm font-semibold text-black">1</button>
+                            <button className="px-4 py-2 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black">1</button>
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">2</button>
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">Next</button>
                         </div>

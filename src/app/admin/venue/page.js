@@ -44,7 +44,7 @@ export default function Venue() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
                         {filteredDesigns.map((design) => (
-                            <div
+                              <div
                                 key={design.id}
                                 onClick={() => setSelectedDesign(design.id)}
                                 className={`bg-[#272727] rounded-xl p-4 border-2 transition-all cursor-pointer hover:scale-[1.02] ${
@@ -72,7 +72,7 @@ export default function Venue() {
                         <button className="px-6 py-3 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
                             Batal
                         </button>
-                        <button className="px-6 py-3 bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
+                        <button className="px-6 py-3 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
                             Tambah   Design
                         </button>
                     </div>

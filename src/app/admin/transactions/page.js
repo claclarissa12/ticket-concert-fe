@@ -84,11 +84,11 @@ export default function SuperAdminTransactions() {
 
                     <div className="flex flex-wrap items-center gap-3 mb-6">
                         <div className="flex bg-[#272727] rounded-xl p-1 border border-[#333]">
-                            <button onClick={() => setActiveTab("all")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>All</button>
-                            <button onClick={() => setActiveTab("Completed")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Completed" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>Completed</button>
-                            <button onClick={() => setActiveTab("Pending")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Pending" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>Pending</button>
-                            <button onClick={() => setActiveTab("Failed")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Failed" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>Failed</button>
-                            <button onClick={() => setActiveTab("Refunded")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Refunded" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}>Refunded</button>
+                            <button onClick={() => setActiveTab("all")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>All</button>
+                            <button onClick={() => setActiveTab("Completed")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Completed" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Completed</button>
+                            <button onClick={() => setActiveTab("Pending")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Pending" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Pending</button>
+                            <button onClick={() => setActiveTab("Failed")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Failed" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Failed</button>
+                            <button onClick={() => setActiveTab("Refunded")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Refunded" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Refunded</button>
                         </div>
                         <input type="text" placeholder="Search transactions..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors text-sm flex-1 min-w-[200px]" />
                     </div>
@@ -147,7 +147,7 @@ export default function SuperAdminTransactions() {
                         <p className="text-sm text-gray-400">Showing {filteredTransactions.length} of {transactions.length} transactions</p>
                         <div className="flex gap-2">
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">Previous</button>
-                            <button className="px-4 py-2 bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] rounded-xl text-sm font-semibold text-black">1</button>
+                            <button className="px-4 py-2 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black">1</button>
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">2</button>
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">Next</button>
                         </div>

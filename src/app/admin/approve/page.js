@@ -5,15 +5,14 @@ import Link from "next/link"
 import { useState } from "react"
 
 export default function SuperAdminApproveEvent() {
-    const [activeTab, setActiveTab] = useState("pending")
+    const [activeTab, setActiveTab] = useState("all")
     const [searchTerm, setSearchTerm] = useState("")
 
     const events = [
         { id: 1, name: "Nassar Tour 2026", organizer: "Event Organizer Corp", email: "info@eventorg.com", date: "20 Mei 2026", location: "Jakarta", category: "Concert", status: "Pending", submitted: "2 days ago", image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=200" },
         { id: 2, name: "Electronic Fest 2026", organizer: "Festival Pro", email: "hello@festivalpro.com", date: "25 Mei 2026", location: "Bandung", category: "Festival", status: "Pending", submitted: "5 days ago", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200" },
         { id: 3, name: "Jazz Night", organizer: "Music Lounge", email: "info@musiclounge.com", date: "30 Mei 2026", location: "Surabaya", category: "Concert", status: "Pending", submitted: "1 week ago", image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=200" },
-        { id: 4, name: "Rock Revolution", organizer: "Rock Empire", email: "contact@rockempire.com", date: "5 Juni 2026", location: "Yogyakarta", category: "Concert", status: "Approved", submitted: "2 weeks ago", image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=200" },
-        { id: 5, name: "Pop Music Festival", organizer: "Pop Culture", email: "info@popculture.com", date: "10 Juni 2026", location: "Jakarta", category: "Festival", status: "Rejected", submitted: "3 weeks ago", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200" },
+       
     ]
 
     const getStatusColor = (status) => {
@@ -55,29 +54,30 @@ export default function SuperAdminApproveEvent() {
                     <div className="flex flex-wrap items-center gap-3 mb-6">
                         <div className="flex bg-[#272727] rounded-xl p-1 border border-[#333]">
                             <button
+                                onClick={() => setActiveTab("all")}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
+                            >
+                                All
+                            </button>
+                            <button
                                 onClick={() => setActiveTab("pending")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "pending" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "pending" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 Pending
                             </button>
                             <button
                                 onClick={() => setActiveTab("approved")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "approved" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "approved" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 Approved
                             </button>
                             <button
                                 onClick={() => setActiveTab("rejected")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "rejected" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "rejected" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 Rejected
                             </button>
-                            <button
-                                onClick={() => setActiveTab("all")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
-                            >
-                                All
-                            </button>
+
                         </div>
                         <input
                             type="text"
@@ -103,19 +103,28 @@ export default function SuperAdminApproveEvent() {
                                         <p className="text-sm text-gray-400">{event.organizer}</p>
                                         <p className="text-xs text-gray-500">{event.email}</p>
                                         <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-400">
-                                            <span className="flex items-center gap-1">📅 {event.date}</span>
-                                            <span className="flex items-center gap-1">📍 {event.location}</span>
-                                            <span className="flex items-center gap-1">🎵 {event.category}</span>
+                                            <span className="flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" viewBox="0 0 24 24" >
+                                                    <path d="M19 4h-2V2h-2v2H9V2H7v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2M5 20V8h14V6v14z"></path><path d="M7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"></path>
+                                                </svg>{event.date}
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" viewBox="0 0 24 24" >
+                                                    <path d="M16 10c0-2.21-1.79-4-4-4s-4 1.79-4 4 1.79 4 4 4 4-1.79 4-4m-6 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2"></path><path d="M11.42 21.81c.17.12.38.19.58.19s.41-.06.58-.19c.3-.22 7.45-5.37 7.42-11.82 0-4.41-3.59-8-8-8s-8 3.59-8 8c-.03 6.44 7.12 11.6 7.42 11.82M12 4c3.31 0 6 2.69 6 6 .02 4.44-4.39 8.43-6 9.74-1.61-1.31-6.02-5.29-6-9.74 0-3.31 2.69-6 6-6"></path>
+                                                </svg> {event.location}</span>
                                         </div>
-                                        <p className="text-xs text-gray-500 mt-1">Submitted {event.submitted}</p>
                                         {event.status === "Pending" && (
-                                            <div className="flex gap-2 mt-3">
+                                            <div className="flex justify-between gap-2 mt-3">
 
                                                 <a href="/admin/approve/[id]">
                                                     <button className="px-4 py-1.5 bg-[#1a1a1a] rounded-lg text-xs hover:bg-[#333] transition-colors">
                                                         Detail
                                                     </button>
                                                 </a>
+                                                <p className="text-xs text-gray-500 mt-1">Submitted {event.submitted}</p>
+
                                             </div>
                                         )}
                                         {event.status !== "Pending" && (
@@ -143,7 +152,7 @@ export default function SuperAdminApproveEvent() {
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
                                 Previous
                             </button>
-                            <button className="px-4 py-2 bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] rounded-xl text-sm font-semibold text-black">
+                            <button className="px-4 py-2 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black">
                                 1
                             </button>
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">

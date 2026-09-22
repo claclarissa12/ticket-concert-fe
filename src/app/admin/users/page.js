@@ -66,7 +66,7 @@ export default function SuperAdminUsers() {
                                 </svg>
                                 Export
                             </button>
-                            <button className="px-5 py-2.5 bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
+                            <button className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
                                 + Add User
                             </button>
                         </div>
@@ -76,37 +76,32 @@ export default function SuperAdminUsers() {
                         <div className="flex bg-[#272727] rounded-xl p-1 border border-[#333]">
                             <button
                                 onClick={() => setActiveTab("all")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 All
                             </button>
                             <button
                                 onClick={() => setActiveTab("active")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "active" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "active" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 Active
                             </button>
-                            <button
-                                onClick={() => setActiveTab("inactive")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "inactive" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
-                            >
-                                Inactive
-                            </button>
+                            
                             <button
                                 onClick={() => setActiveTab("suspended")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "suspended" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "suspended" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 Suspended
                             </button>
                             <button
                                 onClick={() => setActiveTab("organizer")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "organizer" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "organizer" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 Organizer
                             </button>
                             <button
                                 onClick={() => setActiveTab("user")}
-                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "user" ? "bg-[#E21D8F] text-black" : "text-gray-400 hover:text-white"}`}
+                                className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "user" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}
                             >
                                 User
                             </button>
@@ -135,7 +130,7 @@ export default function SuperAdminUsers() {
                             <div key={user.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-[#2f2f2f] transition-colors border-b border-[#333] last:border-0">
                                 <div className="col-span-3">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] flex items-center justify-center text-black font-bold text-xs">
+                                        <div className="w-8 h-8 rounded-full bg-[#FBADCC] flex items-center justify-center text-black font-bold text-xs">
                                             {user.name.charAt(0)}
                                         </div>
                                         <div>
@@ -177,7 +172,7 @@ export default function SuperAdminUsers() {
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
                                 Previous
                             </button>
-                            <button className="px-4 py-2 bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] rounded-xl text-sm font-semibold text-black">
+                            <button className="px-4 py-2 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black">
                                 1
                             </button>
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">

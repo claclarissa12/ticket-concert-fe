@@ -26,7 +26,7 @@ export default function OrganizerSidebar() {
             )
         },
         {
-            href: "/organizer/events/create",
+            href: "/organizer/create",
             label: "Create Event",
             icon: (
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -95,7 +95,7 @@ export default function OrganizerSidebar() {
         <div className="w-64 h-screen sticky top-0 bg-[#0d0d0d] border-r border-[#1a1a1a] flex flex-col">
             <div className="px-5 py-4 border-b border-[#1a1a1a]">
                 <div className="flex items-center gap-2.5">
-                  
+
                     <h1 className="text-xl font-semibold text-white">
                         Ticket<span className="text-[#FBADCC]">.COM</span>
                     </h1>
@@ -111,7 +111,7 @@ export default function OrganizerSidebar() {
                             key={item.href}
                             href={item.href}
                             className={`
-                                flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors
+                                flex items-center gap-3 px-3 py-3.5 rounded-md text-sm transition-colors
                                 ${isActive
                                     ? 'bg-[#FBADCC]/20 text-[#FBADCC]'
                                     : 'text-gray-500 hover:text-gray-300 hover:bg-[#1a1a1a]'
