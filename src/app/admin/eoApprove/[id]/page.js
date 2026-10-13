@@ -31,10 +31,10 @@ export default function SuperAdminDetailEO() {
         memberSince: "2024",
         verificationStatus: "Verified",
         documentsList: [
-            { name: "Business License", file: "business_license.pdf", size: "2.4 MB", status: "Verified" },
-            { name: "NPWP", file: "npwp.pdf", size: "1.8 MB", status: "Verified" },
-            { name: "SIUP", file: "siup.pdf", size: "3.2 MB", status: "Pending" },
-            { name: "Bank Statement", file: "bank_statement.pdf", size: "1.5 MB", status: "Pending" },
+            { name: "Business License", file: "business_license.pdf", size: "2.4 MB" },
+            { name: "NPWP", file: "npwp.pdf", size: "1.8 MB" },
+            { name: "SIUP", file: "siup.pdf", size: "3.2 MB" },
+            { name: "Bank Statement", file: "bank_statement.pdf", size: "1.5 MB" },
         ],
         activityLog: [
             { action: "Registered as EO", date: "15 Mar 2026, 14:30" },
@@ -74,11 +74,19 @@ export default function SuperAdminDetailEO() {
                         <div className="flex items-center gap-3">
                             {eoData.status === "Pending" && (
                                 <>
-                                    <button className="px-5 py-2.5 bg-green-500/20 text-green-400 rounded-xl text-sm font-semibold hover:bg-green-500/30 transition-colors">
-                                        ✅ Approve
+                                    <button className="px-5 py-2.5 flex gap-2 bg-green-500/20 text-green-400 rounded-xl font-semibold hover:bg-green-500/30 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="currentColor" viewBox="0 0 24 24" >
+                                            <path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10m0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8"></path><path d="M10 16c-.26 0-.51-.1-.71-.29l-3-3L7.7 11.3l2.29 2.29 5.29-5.29 1.41 1.41-6 6c-.2.2-.45.29-.71.29Z"></path>
+                                        </svg>
+                                        <p>Approve</p>
                                     </button>
-                                    <button className="px-5 py-2.5 bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold hover:bg-red-500/30 transition-colors">
-                                        ❌ Reject
+                                    <button className="px-5 py-2.5 bg-red-500/20 text-red-400 rounded-xl flex gap-2 font-semibold hover:bg-red-500/30 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="currentColor" viewBox="2 2 20 20" >
+                                            <path d="m7.76 14.83-2.83 2.83 1.41 1.41 2.83-2.83 2.12-2.12.71-.71.71.71 1.41 1.42 3.54 3.53 1.41-1.41-3.53-3.54-1.42-1.41-.71-.71 5.66-5.66-1.41-1.41L12 10.59 6.34 4.93 4.93 6.34 10.59 12l-.71.71z"></path>
+                                        </svg> 
+                                        <p> Reject</p>
                                     </button>
                                 </>
                             )}
@@ -89,12 +97,10 @@ export default function SuperAdminDetailEO() {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Main Content */}
                         <div className="lg:col-span-2 space-y-6">
-                            {/* Profile Info */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <div className="flex items-start gap-6">
-                                    <div className="w-24 h-24 rounded-full bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] flex items-center justify-center text-3xl font-bold text-black flex-shrink-0">
+                                    <div className="w-24 h-24 rounded-full bg-[#FBADCC] flex items-center justify-center text-3xl font-bold text-black flex-shrink-0">
                                         {eoData.name.charAt(0)}
                                     </div>
                                     <div className="flex-1">
@@ -172,9 +178,7 @@ export default function SuperAdminDetailEO() {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <span className={`text-xs px-2.5 py-1 rounded-full ${getStatusColor(doc.status)}`}>
-                                                    {doc.status}
-                                                </span>
+
                                                 <button className="px-3 py-1.5 bg-[#272727] rounded-lg text-xs hover:bg-[#333] transition-colors">
                                                     View
                                                 </button>
@@ -216,23 +220,7 @@ export default function SuperAdminDetailEO() {
                                 </div>
                             </div>
 
-                            {/* Activity Log */}
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <h2 className="text-lg font-semibold mb-4">Activity Log</h2>
-                                <div className="space-y-3">
-                                    {eoData.activityLog.map((log, index) => (
-                                        <div key={index} className="flex items-start gap-3 p-2">
-                                            <div className="w-2 h-2 rounded-full bg-[#FBADCC] mt-1.5"></div>
-                                            <div>
-                                                <p className="text-sm">{log.action}</p>
-                                                <p className="text-xs text-gray-400">{log.date}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
 
-                            {/* Quick Actions */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                                 <div className="space-y-3">

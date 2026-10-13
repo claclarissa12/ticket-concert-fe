@@ -30,7 +30,6 @@ export default function OrganizerEvents() {
             <OrganizerSidebar/>
             <div className="flex-1 overflow-x-hidden">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-                    {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                         <div>
                             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Events</h1>
@@ -66,7 +65,7 @@ export default function OrganizerEvents() {
                             type="text" 
                             placeholder="Search events..." 
                             className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors text-sm w-full sm:w-64"
-                        />
+                        /> 
                         <select className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] outline-none focus:border-[#FBADCC] transition-colors text-sm">
                             <option>All Status</option>
                             <option>Active</option>
