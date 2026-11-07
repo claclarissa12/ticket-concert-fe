@@ -40,18 +40,21 @@ export default function Venue() {
                                 className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors text-sm w-64"
                             />
                         </div>
+
+                        <button className="px-6 py-3 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
+                            Tambah   Design
+                        </button>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
                         {filteredDesigns.map((design) => (
-                              <div
+                            <div
                                 key={design.id}
                                 onClick={() => setSelectedDesign(design.id)}
-                                className={`bg-[#272727] rounded-xl p-4 border-2 transition-all cursor-pointer hover:scale-[1.02] ${
-                                    selectedDesign === design.id
-                                        ? 'border-[#FBADCC] shadow-lg shadow-[#FBADCC]/20'
-                                        : 'border-[#333] hover:border-[#FBADCC]/30'
-                                }`}
+                                className={`bg-[#272727] rounded-xl p-4 border-2 transition-all cursor-pointer hover:scale-[1.02] ${selectedDesign === design.id
+                                    ? 'border-[#FBADCC] shadow-lg shadow-[#FBADCC]/20'
+                                    : 'border-[#333] hover:border-[#FBADCC]/30'
+                                    }`}
                             >
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -68,14 +71,7 @@ export default function Venue() {
 
                     <StageLayoutPicker />
 
-                    <div className="mt-8 flex justify-end gap-3">
-                        <button className="px-6 py-3 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
-                            Batal
-                        </button>
-                        <button className="px-6 py-3 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
-                            Tambah   Design
-                        </button>
-                    </div>
+
                 </div>
             </div>
         </div>

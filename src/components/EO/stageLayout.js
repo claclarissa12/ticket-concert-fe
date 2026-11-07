@@ -165,23 +165,7 @@ export default function StageLayoutPicker() {
             ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 text-xs text-gray-400 bg-[#1a1a1a] rounded-xl p-3">
-            <div>
-              <span className="block font-medium text-white mb-1">Tips Memilih:</span>
-              <ul className="space-y-1 list-disc list-inside">
-                <li>Sesuaikan dengan genre acara</li>
-                <li>Pertimbangkan interaksi dengan penonton</li>
-                <li>Perhatikan kapasitas venue</li>
-              </ul>
-            </div>
-            <div>
-              <span className="block font-medium text-white mb-1">Rekomendasi:</span>
-              <ul className="space-y-1 list-disc list-inside">
-                <li>Konser: {stageLayouts.filter(l => l.bestFor.includes('Konser')).map(l => l.name).join(', ')}</li>
-                <li>Festival: {stageLayouts.filter(l => l.bestFor.includes('Festival')).map(l => l.name).join(', ')}</li>
-              </ul>
-            </div>
-          </div>
+        
         </div>
       )}
     </div>

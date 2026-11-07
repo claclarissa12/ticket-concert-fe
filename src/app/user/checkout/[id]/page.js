@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 export default function CheckoutPage() {
     const [paymentMethod, setPaymentMethod] = useState("credit-card");
     const [selectedBank, setSelectedBank] = useState("mandiri");
-    const [timeLeft, setTimeLeft] = useState(300);
+    const [timeLeft, setTimeLeft] = useState(900);
 
     useEffect(() => {
         if (timeLeft <= 0) return;

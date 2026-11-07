@@ -8,10 +8,9 @@ export default function ManageTickets() {
     const [activeTab, setActiveTab] = useState("all")
 
     const ticketTiers = [
-        { id: 1, name: "VIP", price: "Rp 1.500.000", quota: 100, sold: 78, status: "Active", color: "from-purple-500 to-pink-500" },
-        { id: 2, name: "Gold", price: "Rp 1.000.000", quota: 200, sold: 145, status: "Active", color: "from-yellow-500 to-orange-500" },
-        { id: 3, name: "Silver", price: "Rp 750.000", quota: 300, sold: 234, status: "Active", color: "from-gray-400 to-gray-500" },
-        
+        { id: 1, name: "VIP", price: "Rp 1.500.000", quota: 100, sold: 78, status: "Active" },
+        { id: 2, name: "Gold", price: "Rp 1.000.000", quota: 200, sold: 145, status: "Active" },
+        { id: 3, name: "Silver", price: "Rp 750.000", quota: 300, sold: 234, status: "Active" },
     ]
 
     return (
@@ -63,7 +62,7 @@ export default function ManageTickets() {
                                         <div key={ticket.id} className="bg-[#1a1a1a] rounded-xl p-5 hover:bg-[#222] transition-colors border border-transparent hover:border-[#333]">
                                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                                 <div className="flex items-center gap-4">
-                                                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${ticket.color} flex items-center justify-center text-black font-bold text-sm`}>
+                                                    <div className="w-12 h-12 rounded-xl bg-[#FBADCC]/20 flex items-center justify-center text-[#FBADCC] font-bold text-sm">
                                                         {ticket.name.charAt(0)}
                                                     </div>
                                                     <div>
@@ -85,7 +84,7 @@ export default function ManageTickets() {
                                                         </div>
                                                         <div className="w-full bg-[#272727] rounded-full h-2">
                                                             <div 
-                                                                className="bg-gradient-to-r from-[#E21D8F] to-[#FBADCC] rounded-full h-2 transition-all"
+                                                                className="bg-[#FBADCC] rounded-full h-2 transition-all"
                                                                 style={{ width: `${(ticket.sold / ticket.quota) * 100}%` }}
                                                             ></div>
                                                         </div>

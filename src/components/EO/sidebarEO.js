@@ -71,7 +71,7 @@ export default function OrganizerSidebar() {
             )
         },
         {
-            href: "/organizer/profile",
+            href: "/organizer/PROFILE",
             label: "Profile",
             icon: (
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">

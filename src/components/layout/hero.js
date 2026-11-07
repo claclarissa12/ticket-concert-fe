@@ -2,21 +2,21 @@
 
 export default function HeroSection() {
     return (
-        <section className="mx-auto w-[95%] sm:w-[90%] lg:w-[92%] overflow-hidden rounded-2xl shadow-lg shadow-pink-300/20 bg-black relative">
+        <section className="mx-auto w-[90%] md:w-[85%] lg:w-[80%] overflow-hidden rounded-3xl shadow-2xl shadow-pink-500/10 bg-black relative mb-16">
             <img
                 src="https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1600"
-                className="h-[260px] sm:h-[340px] md:h-[400px] lg:h-[460px] w-full object-cover brightness-[0.35]"
+                className="h-[300px] sm:h-[380px] md:h-[450px] lg:h-[500px] w-full object-cover brightness-[0.35]"
                 alt="Concert Hero"
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f11] via-black/40 to-transparent" />
 
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 sm:px-6">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4 sm:px-6 pb-12">
                 <span className="text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase text-[#FBADCC] mb-3 sm:mb-4">
                     Live Experience 2026
                 </span>
 
-                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight text-white">
                     Musik Terbaik Layak
                     <br className="hidden sm:block" />
                     <span className="text-[#FBADCC]"> Dinikmati Secara Langsung</span>
@@ -36,12 +36,6 @@ export default function HeroSection() {
                         Lihat Event
                     </button>
                 </div>
-            </div>
-
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 animate-bounce hidden md:block">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="white" viewBox="0 0 24 24" className="opacity-40">
-                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
-                </svg>
             </div>
         </section>
     )

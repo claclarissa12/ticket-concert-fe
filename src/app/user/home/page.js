@@ -1,579 +1,218 @@
-"use client"
+import Footer from "@/components/layout/footer";
+import HeroSection from "@/components/layout/hero";
+import SearchHome from "@/components/layout/Search";
+import UserNavbar from "@/components/layout/UserNavbar";
+import { MapPin, Calendar, Clock, Music, Guitar, Mic2, Disc3 } from "lucide-react";
+import Image from "next/image";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import HeroSection from "@/components/home/hero"
-import SearchHome from "@/components/home/Search"
-import Footer from "@/components/layout/footer"
-import UserNavbar from "@/components/layout/UserNavbar"
+export default function Home() {
+  return (
+    <main className="min-h-screen bg-[#0f0f11] text-white font-sans selection:bg-pink-500 selection:text-white">
+      <UserNavbar />
 
-const categories = [
-    { id: "all", label: "Semua" },
-    { id: "konser", label: "Konser" },
-    { id: "festival", label: "Festival" },
-    { id: "theater", label: "Theater" },
-    { id: "sports", label: "Sports" },
-    { id: "comedy", label: "Comedy" },
-]
+      <HeroSection />
 
-const cities = ["Semua kota", "Jakarta", "Bandung", "Surabaya", "Bali"]
+      <SearchHome />
 
-const IMG = [
-    "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800",
-    "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
-    "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800",
-]
+      <section className="max-w-7xl mx-auto px-4 mt-12 bg-[#0f0f11]">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-1.5 h-6 bg-pink-500 rounded-full"></div>
+          <h2 className="text-xl font-bold text-white tracking-wide">Kategori</h2>
+        </div>
 
-const popularEvents = [
-    {
-        id: 1,
-        date: "2026-11-14",
-        title: "Nassar Tour 2026",
-        image: IMG[0],
-        price: 500000,
-        venue: "Jakarta International Stadium",
-        city: "Jakarta",
-        rating: 4.8,
-        sold: 12500,
-        category: "konser",
-        badge: "trending",
-    },
-    {
-        id: 2,
-        date: "2026-11-22",
-        title: "Langit Senja Music Festival",
-        image: IMG[1],
-        price: 350000,
-        venue: "Lapangan Gasibu",
-        city: "Bandung",
-        rating: 4.6,
-        sold: 8900,
-        category: "festival",
-        badge: null,
-    },
-    {
-        id: 3,
-        date: "2026-12-05",
-        title: "Senandung Pantai Live",
-        image: IMG[2],
-        price: 450000,
-        venue: "GWK Cultural Park",
-        city: "Bali",
-        rating: 4.9,
-        sold: 15200,
-        category: "konser",
-        badge: "limited",
-    },
-    {
-        id: 4,
-        date: "2026-12-12",
-        title: "Lakon Bayangan: Malam Terakhir",
-        image: IMG[0],
-        price: 200000,
-        venue: "Gedung Kesenian Jakarta",
-        city: "Jakarta",
-        rating: 4.5,
-        sold: 6700,
-        category: "theater",
-        badge: null,
-    },
-    {
-        id: 5,
-        date: "2026-12-19",
-        title: "Final Nusantara Basketball Cup",
-        image: IMG[1],
-        price: 150000,
-        venue: "GOR Kertajaya",
-        city: "Surabaya",
-        rating: 4.7,
-        sold: 9800,
-        category: "sports",
-        badge: null,
-    },
-    {
-        id: 6,
-        date: "2027-01-09",
-        title: "Stand Up Malam Minggu",
-        image: IMG[2],
-        price: 175000,
-        venue: "Balai Sarbini",
-        city: "Jakarta",
-        rating: 4.4,
-        sold: 4300,
-        category: "comedy",
-        badge: null,
-    },
-]
-
-const upcomingEvents = [
-    {
-        id: 11,
-        date: "2027-07-22",
-        title: "Nassar Horizon World Tour 2027",
-        image: IMG[0],
-        venue: "Jakarta International Stadium",
-        price: 500000,
-        countdown: "2027-07-22T19:00:00",
-    },
-    {
-        id: 12,
-        date: "2027-05-08",
-        title: "Langit Senja Festival 2027",
-        image: IMG[1],
-        venue: "Lapangan Gasibu, Bandung",
-        price: 400000,
-        countdown: "2027-05-08T16:00:00",
-    },
-    {
-        id: 13,
-        date: "2027-03-27",
-        title: "Senandung Pantai Anniversary",
-        image: IMG[2],
-        venue: "GWK Cultural Park, Bali",
-        price: 475000,
-        countdown: "2027-03-27T18:30:00",
-    },
-]
-
-/* ------------------------------------------------------------------ */
-/* Helpers                                                             */
-/* ------------------------------------------------------------------ */
-
-const MONTHS = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-    "Juli", "Agustus", "September", "Oktober", "November", "Desember",
-]
-const MONTHS_SHORT = [
-    "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
-    "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
-]
-
-// "2026-11-14" -> { y: 2026, m: 11, d: 14 }  (manual parse avoids timezone/hydration drift)
-const parseDate = (iso) => {
-    const [y, m, d] = iso.split("-").map(Number)
-    return { y, m, d }
-}
-const formatDate = (iso) => {
-    const { y, m, d } = parseDate(iso)
-    return `${d} ${MONTHS[m - 1]} ${y}`
-}
-const formatIDR = (n) => `IDR ${n.toLocaleString("id-ID")}`
-
-const FOCUS =
-    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FBADCC]"
-
-const NO_SCROLLBAR = "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-
-/* ------------------------------------------------------------------ */
-/* Small pieces                                                        */
-/* ------------------------------------------------------------------ */
-
-function PinIcon({ className = "" }) {
-    return (
-        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className={`h-3.5 w-3.5 shrink-0 ${className}`}>
-            <path fillRule="evenodd" d="M10 18s6-5.2 6-10a6 6 0 10-12 0c0 4.8 6 10 6 10zm0-7.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" clipRule="evenodd" />
-        </svg>
-    )
-}
-
-function StarIcon({ className = "" }) {
-    return (
-        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className={`h-3.5 w-3.5 shrink-0 ${className}`}>
-            <path d="M10 1.8l2.4 5 5.4.7-4 3.8 1 5.4L10 14l-4.8 2.7 1-5.4-4-3.8 5.4-.7L10 1.8z" />
-        </svg>
-    )
-}
-
-function ChevronRight({ className = "" }) {
-    return (
-        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className={`h-4 w-4 ${className}`}>
-            <path fillRule="evenodd" d="M7.3 4.3a1 1 0 011.4 0l5 5a1 1 0 010 1.4l-5 5a1 1 0 01-1.4-1.4L11.6 10 7.3 5.7a1 1 0 010-1.4z" clipRule="evenodd" />
-        </svg>
-    )
-}
-
-function Chip({ active, onClick, children }) {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            aria-pressed={active}
-            className={`whitespace-nowrap rounded-full border px-4 py-2 text-xs font-medium transition-colors ${FOCUS} ${active
-                ? "border-white bg-white text-black"
-                : "border-[#272727] bg-transparent text-gray-400 hover:border-[#444] hover:text-white"
-                }`}
-        >
-            {children}
-        </button>
-    )
-}
-
-function Badge({ type }) {
-    if (!type) return null
-    const isTrending = type === "trending"
-    return (
-        <span
-            className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${isTrending ? "bg-white text-black" : "bg-[#FBADCC] text-black"
-                }`}
-        >
-            {isTrending ? "Trending" : "Hampir habis"}
-        </span>
-    )
-}
-
-function SectionHeader({ title, subtitle, href = "/events" }) {
-    return (
-        <div className="flex items-end justify-between gap-4">
-            <div className="flex items-center gap-3">
-                <div className="h-9 w-1 rounded-full bg-[#FBADCC]" />
-                <div>
-                    <h2 className="text-lg font-semibold sm:text-xl">{title}</h2>
-                    <p className="mt-0.5 text-xs text-gray-500">{subtitle}</p>
-                </div>
-            </div>
-            <Link
-                href={href}
-                className={`flex items-center gap-0.5 whitespace-nowrap rounded text-xs text-gray-400 transition-colors hover:text-white ${FOCUS}`}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { icon: <Music size={24} className="text-[#0f0f11]" />, label: "Pop & R&B" },
+            { icon: <Guitar size={24} className="text-[#0f0f11]" />, label: "Rock & Metal" },
+            { icon: <Disc3 size={24} className="text-[#0f0f11]" />, label: "Jazz & Soul" },
+            { icon: <Mic2 size={24} className="text-[#0f0f11]" />, label: "Indie & Acoustic" },
+          ].map((cat, idx) => (
+            <div
+              key={idx}
+              className="bg-[#1a1a1d] border border-white/5 rounded-xl p-4 flex items-center gap-4 hover:bg-[#222225] hover:border-white/10 cursor-pointer transition duration-300"
             >
-                Lihat semua
-                <ChevronRight />
-            </Link>
+              <div className="w-12 h-12 bg-[#888888] rounded-md flex items-center justify-center shrink-0">
+                {cat.icon}
+              </div>
+
+              <div className="flex flex-col">
+                <span className="font-bold text-sm text-white mb-0.5">{cat.label}</span>
+                <span className="text-xs text-gray-400">30 Events</span>
+              </div>
+            </div>
+          ))}
         </div>
-    )
-}
+      </section>
 
-function EmptyState({ message, actionLabel, onAction }) {
-    return (
-        <div className="rounded-2xl border border-dashed border-[#272727] px-6 py-16 text-center">
-            <p className="text-sm text-gray-400">{message}</p>
-            {onAction && (
-                <button
-                    type="button"
-                    onClick={onAction}
-                    className={`mt-4 rounded-lg border border-[#333] px-4 py-2 text-xs font-medium text-white transition-colors hover:border-[#FBADCC] hover:text-[#FBADCC] ${FOCUS}`}
-                >
-                    {actionLabel}
-                </button>
-            )}
+      <section className="max-w-7xl mx-auto px-4 mt-16 bg-[#0f0f11] pb-10">
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-white mb-2 tracking-wide">Spotlights</h2>
+          <div className="w-16 h-1.5 bg-pink-500 rounded-full"></div>
         </div>
-    )
-}
 
-/* ------------------------------------------------------------------ */
-/* Countdown                                                           */
-/* ------------------------------------------------------------------ */
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-7 relative h-[400px] rounded-2xl overflow-hidden group cursor-pointer">
+            <img
+              src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1200&auto=format&fit=crop"
+              alt="Nassar Tour Festival"
+              className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+            />
 
-function CountdownTimer({ targetDate }) {
-    // null until mounted -> server and client render the same markup first
-    const [t, setT] = useState(null)
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f11] via-[#0f0f11]/60 to-transparent"></div>
 
-    useEffect(() => {
-        const tick = () => {
-            const distance = new Date(targetDate).getTime() - Date.now()
-            if (distance <= 0) {
-                setT({ done: true })
-                return
-            }
-            setT({
-                days: Math.floor(distance / 86400000),
-                hours: Math.floor((distance % 86400000) / 3600000),
-                minutes: Math.floor((distance % 3600000) / 60000),
-                seconds: Math.floor((distance % 60000) / 1000),
-            })
-        }
-        tick()
-        const id = setInterval(tick, 1000)
-        return () => clearInterval(id)
-    }, [targetDate])
+            <div className="absolute bottom-0 left-0 p-6 w-full flex flex-col gap-3">
+              <span className="text-white text-sm font-medium">Rock & Metal</span>
+              <h3 className="text-3xl font-bold text-white mb-2">Nassar Tour Ferstival</h3>
 
-    if (t?.done) {
-        return <p className="text-xs font-medium text-[#FBADCC]">Acara sudah dimulai</p>
-    }
-
-    const cells = [
-        { label: "hari", value: t?.days },
-        { label: "jam", value: t?.hours },
-        { label: "menit", value: t?.minutes },
-        { label: "detik", value: t?.seconds },
-    ]
-
-    return (
-        <div className="grid grid-cols-4 gap-1.5" role="timer" aria-label="Hitung mundur acara">
-            {cells.map((c) => (
-                <div key={c.label} className="rounded-lg bg-[#131313] py-1.5 text-center">
-                    <div className="text-sm font-semibold tabular-nums text-[#FBADCC]">
-                        {c.value === undefined ? "--" : String(c.value).padStart(2, "0")}
-                    </div>
-                    <div className="text-[10px] text-gray-500">{c.label}</div>
+              <div className="bg-[#1a1a1d]/90 backdrop-blur-md border border-white/5 rounded-xl p-4 w-full">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-400 text-xs">Gelora Bung Karno, Jakarta</span>
+                  <span className="text-green-500 text-xs font-medium">93% Sold Out</span>
                 </div>
-            ))}
-        </div>
-    )
-}
 
-function TicketCard({ event }) {
-    return (
-        <article className="group flex flex-col overflow-hidden rounded-2xl border border-[#272727] bg-[#1a1a1a] transition-colors hover:border-[#3a3a3a]">
-            <div className="relative aspect-[16/10] overflow-hidden">
+                <div className="w-full h-1 bg-gray-700 rounded-full mb-4">
+                  <div className="h-full bg-pink-500 rounded-full" style={{ width: '93%' }}></div>
+                </div>
+
+                <div className="flex justify-between items-end">
+                  <div className="flex flex-col">
+                    <span className="text-gray-400 text-[10px] mb-0.5">Mulai</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-white font-bold text-lg">IDR 500.000</span>
+                      <span className="text-gray-400 text-[10px]">/Tiket</span>
+                    </div>
+                  </div>
+                  <a href="/user/ticket-selection" >
+
+                  <button className="bg-[#f9a8d4] hover:bg-[#f472b6] text-[#0f0f11] font-semibold text-sm px-6 py-2.5 rounded-full transition">
+                    Beli Tiket
+                  </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 flex flex-col gap-6">
+            {[1, 2].map((item) => (
+              <div key={item} className="relative h-[188px] rounded-2xl overflow-hidden group cursor-pointer">
                 <img
-                    src={event.image}
-                    alt={event.title}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  src="https://images.unsplash.com/photo-1493225457124-a1a2a5f5c5f7?q=80&w=800&auto=format&fit=crop"
+                  alt="Nassar Tour"
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-700 object-top"
                 />
-                <div className="absolute left-3 top-3">
-                    <Badge type={event.badge} />
-                </div>
-            </div>
 
-            <div className="flex flex-1 flex-col p-5">
-                <p className="text-xs font-medium text-[#FBADCC]">{formatDate(event.date)}</p>
-                <h3 className="mt-1.5 min-h-[2.75rem] text-base font-semibold leading-snug line-clamp-2">
-                    <Link href={`/events/${event.id}`} className={`rounded hover:underline ${FOCUS}`}>
-                        {event.title}
-                    </Link>
-                </h3>
-                <p className="mt-2 flex items-center gap-1.5 text-xs text-gray-400">
-                    <PinIcon />
-                    <span className="truncate">{event.venue}, {event.city}</span>
-                </p>
-                <p className="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
-                    <StarIcon className="text-[#FBADCC]" />
-                    <span className="text-gray-300">{event.rating}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>{event.sold.toLocaleString("id-ID")} terjual</span>
-                </p>
-            </div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a1d]/95 via-[#1a1a1d]/70 to-transparent"></div>
 
-            {/* perforation */}
-            <div className="relative h-0 border-t border-dashed border-[#333]" aria-hidden="true">
-                <span className="absolute -left-2.5 -top-2.5 h-5 w-5 rounded-full border border-[#272727] bg-[#131313]" />
-                <span className="absolute -right-2.5 -top-2.5 h-5 w-5 rounded-full border border-[#272727] bg-[#131313]" />
-            </div>
-
-            <div className="flex items-center justify-between gap-3 px-5 py-4">
-                <div>
-                    <p className="text-[11px] text-gray-500">Mulai dari</p>
-                    <p className="text-sm font-semibold">{formatIDR(event.price)}</p>
-                </div>
-                <Link
-                    href={`/events/${event.id}`}
-                    className={`rounded-lg bg-[#FBADCC] px-5 py-2 text-xs font-semibold text-black transition-colors hover:bg-[#f8a0c4] ${FOCUS}`}
-                >
-                    Beli tiket
-                </Link>
-            </div>
-        </article>
-    )
-}
-
-/* ------------------------------------------------------------------ */
-/* Page                                                                */
-/* ------------------------------------------------------------------ */
-
-export default function HomeUser() {
-    const [activeCategory, setActiveCategory] = useState("all")
-    const [activeCity, setActiveCity] = useState("Semua kota")
-
-    const filteredPopular =
-        activeCategory === "all"
-            ? popularEvents
-            : popularEvents.filter((e) => e.category === activeCategory)
-
-    const filteredList = (
-        activeCity === "Semua kota"
-            ? popularEvents
-            : popularEvents.filter((e) => e.city === activeCity)
-    ).slice(0, 4)
-
-    return (
-        <div className="min-h-screen bg-[#131313] text-white">
-            <UserNavbar />
-            <HeroSection />
-            <SearchHome />
-
-            <main className="space-y-14 px-4 py-8 sm:space-y-16 sm:px-6 sm:py-12 lg:px-12 xl:px-20">
-                {/* Category filter */}
-                <div
-                    className={`-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 ${NO_SCROLLBAR}`}
-                    role="group"
-                    aria-label="Filter kategori"
-                >
-                    {categories.map((cat) => (
-                        <Chip
-                            key={cat.id}
-                            active={activeCategory === cat.id}
-                            onClick={() => setActiveCategory(cat.id)}
-                        >
-                            {cat.label}
-                        </Chip>
-                    ))}
+                <div className="absolute top-4 left-4 bg-[#f9a8d4] text-[#0f0f11] text-xs font-bold px-4 py-1.5 rounded-full">
+                  85% Booked
                 </div>
 
-                {/* Terpopuler */}
-                <section className="space-y-6" aria-labelledby="populer">
-                    <div id="populer">
-                        <SectionHeader title="Terpopuler minggu ini" subtitle="Event paling banyak dicari" />
+                <div className="absolute bottom-0 left-0 p-5 w-full flex justify-between items-end">
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-2xl font-bold text-white">Nassar Tour</h3>
+                    <p className="text-gray-400 text-xs">Gelora Bung Karno, Jakarta</p>
+                    <div className="flex items-baseline gap-1 mt-1">
+                      <span className="text-gray-400 text-[10px]">Mulai</span>
+                      <span className="text-white font-bold text-sm">IDR 300.000</span>
                     </div>
+                  </div>
+                  <button className="bg-[#f9a8d4] hover:bg-[#f472b6] text-[#0f0f11] font-semibold text-xs px-5 py-2 rounded-full transition shrink-0 mb-1">
+                    Beli Tiket
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
 
-                    {filteredPopular.length === 0 ? (
-                        <EmptyState
-                            message="Belum ada event di kategori ini."
-                            actionLabel="Tampilkan semua kategori"
-                            onAction={() => setActiveCategory("all")}
-                        />
-                    ) : (
-                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                            {filteredPopular.map((event) => (
-                                <TicketCard key={event.id} event={event} />
-                            ))}
-                        </div>
-                    )}
-                </section>
-
-                {/* Konser mendatang */}
-                <section className="space-y-6" aria-labelledby="mendatang">
-                    <div id="mendatang">
-                        <SectionHeader title="Konser mendatang" subtitle="Amankan tiketmu sebelum kehabisan" />
-                    </div>
-
-                    <div
-                        className={`-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0 lg:grid lg:snap-none lg:grid-cols-3 lg:overflow-visible ${NO_SCROLLBAR}`}
-                    >
-                        {upcomingEvents.map((event) => (
-                            <article
-                                key={event.id}
-                                className="w-[85%] shrink-0 snap-start rounded-2xl border border-[#272727] bg-[#1a1a1a] p-5 transition-colors hover:border-[#3a3a3a] sm:w-[380px] lg:w-auto"
-                            >
-                                <div className="flex gap-4">
-                                    <img
-                                        src={event.image}
-                                        alt={event.title}
-                                        loading="lazy"
-                                        className="h-24 w-24 shrink-0 rounded-xl object-cover"
-                                    />
-                                    <div className="min-w-0 flex-1">
-                                        <p className="text-xs font-medium text-[#FBADCC]">{formatDate(event.date)}</p>
-                                        <h3 className="mt-1 text-sm font-semibold leading-snug line-clamp-2">
-                                            {event.title}
-                                        </h3>
-                                        <p className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-400">
-                                            <PinIcon />
-                                            <span className="truncate">{event.venue}</span>
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="mt-4">
-                                    <CountdownTimer targetDate={event.countdown} />
-                                </div>
-
-                                <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#272727] pt-4">
-                                    <div>
-                                        <p className="text-[11px] text-gray-500">Mulai dari</p>
-                                        <p className="text-sm font-semibold">{formatIDR(event.price)}</p>
-                                    </div>
-                                    <Link
-                                        href={`/events/${event.id}`}
-                                        className={`rounded-lg bg-[#FBADCC] px-5 py-2 text-xs font-semibold text-black transition-colors hover:bg-[#f8a0c4] ${FOCUS}`}
-                                    >
-                                        Pesan
-                                    </Link>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Daftar konser */}
-                <section className="space-y-6" aria-labelledby="daftar">
-                    <div id="daftar">
-                        <SectionHeader title="Daftar konser" subtitle="Pilih berdasarkan kota" />
-                    </div>
-
-                    <div
-                        className={`-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 ${NO_SCROLLBAR}`}
-                        role="group"
-                        aria-label="Filter kota"
-                    >
-                        {cities.map((city) => (
-                            <Chip key={city} active={activeCity === city} onClick={() => setActiveCity(city)}>
-                                {city}
-                            </Chip>
-                        ))}
-                    </div>
-
-                    {filteredList.length === 0 ? (
-                        <EmptyState
-                            message={`Belum ada event di ${activeCity}.`}
-                            actionLabel="Tampilkan semua kota"
-                            onAction={() => setActiveCity("Semua kota")}
-                        />
-                    ) : (
-                        <ul className="divide-y divide-[#272727] overflow-hidden rounded-2xl border border-[#272727]">
-                            {filteredList.map((event) => {
-                                const { d, m } = parseDate(event.date)
-                                return (
-                                    <li
-                                        key={event.id}
-                                        className="flex flex-col gap-4 p-4 transition-colors hover:bg-[#1a1a1a] sm:p-5 md:flex-row md:items-center md:gap-6"
-                                    >
-                                        <img
-                                            src={event.image}
-                                            alt={event.title}
-                                            loading="lazy"
-                                            className="h-44 w-full shrink-0 rounded-xl object-cover md:h-28 md:w-44"
-                                        />
-
-                                        <div className="flex min-w-0 flex-1 items-center gap-4">
-                                            <div className="flex w-14 shrink-0 flex-col items-center rounded-xl border border-[#272727] py-2">
-                                                <span className="text-lg font-semibold leading-none">{d}</span>
-                                                <span className="mt-1 text-[11px] text-[#FBADCC]">{MONTHS_SHORT[m - 1]}</span>
-                                            </div>
-                                            <div className="min-w-0">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <h3 className="text-base font-semibold">
-                                                        <Link
-                                                            href={`/events/${event.id}`}
-                                                            className={`rounded hover:underline ${FOCUS}`}
-                                                        >
-                                                            {event.title}
-                                                        </Link>
-                                                    </h3>
-                                                    <Badge type={event.badge} />
-                                                </div>
-                                                <p className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-400">
-                                                    <PinIcon />
-                                                    <span className="truncate">{event.venue}, {event.city}</span>
-                                                </p>
-                                                <p className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
-                                                    <StarIcon className="text-[#FBADCC]" />
-                                                    <span className="text-gray-300">{event.rating}</span>
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-between gap-4 md:flex-col md:items-end md:justify-center md:gap-2">
-                                            <div className="md:text-right">
-                                                <p className="text-[11px] text-gray-500">Mulai dari</p>
-                                                <p className="text-sm font-semibold">{formatIDR(event.price)}</p>
-                                            </div>
-                                            <Link
-                                                href={`/events/${event.id}`}
-                                                className={`rounded-lg bg-[#FBADCC] px-5 py-2 text-xs font-semibold text-black transition-colors hover:bg-[#f8a0c4] ${FOCUS}`}
-                                            >
-                                                Dapatkan tiket
-                                            </Link>
-                                        </div>
-                                    </li>
-                                )
-                            })}
-                        </ul>
-                    )}
-                </section>
-            </main>
-
-            <Footer />
         </div>
-    )
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 mt-16">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold uppercase tracking-wide text-white">Terpopuler Saat Ini</h2>
+          <div className="flex bg-[#1a1a1d] rounded-full p-1 border border-white/5">
+            {["Semua", "Minggu Ini", "VIP Tiket"].map((tab, idx) => (
+              <button key={idx} className={`px-6 py-2 text-sm font-semibold rounded-full transition ${idx === 0 ? "bg-gray-600 text-white" : "text-gray-400 hover:text-white"}`}>
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((item) => (
+            <div key={item} className="bg-[#1a1a1d] border border-white/5 rounded-[20px] overflow-hidden group cursor-pointer">
+              <div className="relative h-[280px] w-full">
+                <img
+                  src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=800&auto=format&fit=crop"
+                  alt="Nassar Tour"
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                />
+                <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-sm rounded-lg flex flex-col items-center justify-center w-12 h-12">
+                  <span className="text-white text-[10px] uppercase font-semibold leading-none mb-1">Oct</span>
+                  <span className="text-white text-lg font-bold leading-none">23</span>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-gray-400 text-sm">Rock & Metal</p>
+                  <p className="text-green-500 text-sm">Tersedia</p>
+                </div>
+                <h3 className="text-2xl font-bold mb-1 text-white">Nassar Tour 2026</h3>
+                <p className="text-gray-400 text-sm mb-6">Gelora Bung Karno, Jakarta</p>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-gray-400 text-xs mb-1">Mulai dari</span>
+                    <span className="font-bold text-white text-lg">IDR 500.000</span>
+                  </div>
+                  <button className="bg-[#f9a8d4] hover:bg-[#f472b6] text-[#0f0f11] text-sm font-semibold px-6 py-2.5 rounded-full transition">
+                    Beli Tiket
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 mt-16 mb-20">
+        <div className="flex items-center gap-4 mb-6">
+          <h2 className="text-xl font-bold uppercase tracking-wide">Konser Event</h2>
+          <span className="bg-[#1a1a1d] text-gray-400 text-xs px-3 py-1 rounded-full border border-white/5">200 Hasil</span>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          {[
+            "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg?auto=compress&cs=tinysrgb&w=800",
+            "https://images.pexels.com/photos/2078071/pexels-photo-2078071.jpeg?auto=compress&cs=tinysrgb&w=800",
+            "https://images.pexels.com/photos/167636/pexels-photo-167636.jpeg?auto=compress&cs=tinysrgb&w=800",
+            "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800",
+          ].map((src, item) => (
+            <div key={item} className="bg-[#1a1a1d] border border-white/5 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-6 hover:border-white/20 transition group">
+              <div className="relative w-full md:w-48 h-32 rounded-xl overflow-hidden shrink-0">
+                <img src={src} alt="Konser" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 w-full">
+                <h3 className="text-lg font-bold mb-1">King Nassar Anyelse</h3>
+                <div className="flex flex-col gap-1 text-xs text-gray-400 mb-2">
+                  <div className="flex items-center gap-2"><Calendar size={14} /> 13 April 2026</div>
+                  <div className="flex items-center gap-2"><Clock size={14} /> 10:00 WIB</div>
+                  <div className="flex items-center gap-2"><MapPin size={14} /> Aula Smandongi Lapang Ide</div>
+                </div>
+              </div>
+              <div className="flex flex-col items-end w-full md:w-auto gap-3">
+                <p className="font-bold text-[#FBADCC] text-lg">IDR 550.000</p>
+                <button className="bg-[#FBADCC] hover:bg-pink-300 text-black text-sm font-medium px-6 py-2 rounded-full transition w-full md:w-auto">
+                  Beli Tiket
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      <Footer/>
+    </main>
+  );
 }
