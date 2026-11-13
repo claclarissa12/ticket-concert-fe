@@ -15,9 +15,7 @@ export default function TicketsPage() {
                             <p className="text-gray-400 text-sm mt-1">Manage all tickets across events</p>
                         </div>
                         <button className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25 flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/>
-                            </svg>
+                          
                             Export Data
                         </button>
                     </div>

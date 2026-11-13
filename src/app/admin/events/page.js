@@ -115,12 +115,12 @@ export default function SuperAdminEvents() {
                                             </div>
 
                                             <div className="flex gap-2 mt-3">
-                                                <button className="text-xs px-3 py-1.5 rounded-md border border-[#2a2a2a] hover:border-[#444] hover:bg-[#1f1f1f] transition-colors">
+                                                <Link
+                                                    href={`/admin/events/${event.id}`}
+                                                    className="text-xs px-3 py-1.5 rounded-md border border-[#2a2a2a] hover:border-[#444] hover:bg-[#1f1f1f] transition-colors inline-block"
+                                                >
                                                     Detail
-                                                </button>
-                                                <button className="text-xs px-3 py-1.5 rounded-md border border-transparent text-neutral-500 hover:text-red-400 hover:border-red-400/30 transition-colors">
-                                                    Suspend
-                                                </button>
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>

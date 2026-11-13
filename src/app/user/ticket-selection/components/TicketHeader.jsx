@@ -16,7 +16,7 @@ export default function TicketHeader() {
 
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-lg font-bold">Tom Jones (21+)</h2>
+              <h2 className="text-lg font-bold">Nassar King</h2>
               <span className="text-xs px-3 py-1 rounded-full border border-[#333]">
                 ⓘ More Info
               </span>

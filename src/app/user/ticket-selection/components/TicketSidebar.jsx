@@ -22,41 +22,46 @@ export default function TicketSidebar({
 
   return (
     <aside className="w-full lg:w-[400px] bg-[#1a1a1a] border-t lg:border-t-0 lg:border-l border-[#333] p-5">
-      <label className="block text-xs text-gray-400 mb-1.5">
-        Jumlah tiket
-      </label>
+      <div className="flex w-full gap-4">
+        <div>
 
-      <select
-        value={maxSeats}
-        onChange={(e) => onCountChange(Number(e.target.value))}
-        className="w-full bg-[#272727] border border-[#333] rounded-lg px-4 py-2.5 text-sm mb-5"
-      >
-        {[1, 2, 3, 4, 5, 6].map((n) => (
-          <option key={n} value={n}>
-            {n} Tiket
-          </option>
-        ))}
-      </select>
+          <label className="block text-xs text-gray-400 mb-1.5">
+            Jumlah tiket
+          </label>
+
+          <select
+            value={maxSeats}
+            onChange={(e) => onCountChange(Number(e.target.value))}
+            className="w-full bg-[#272727] border border-[#333] rounded-lg px-4 py-2.5 text-sm mb-5"
+          >
+            {[1, 2, 3, 4].map((n) => (
+              <option key={n} value={n}>
+                {n} Tiket
+              </option>
+            ))}
+          </select>
+        </div>
+
+     
+      </div>
 
       <div className="flex border-b border-[#333] mb-4">
         <button
           onClick={() => onTabChange("seats")}
-          className={`flex-1 pb-3 text-xs font-semibold ${
-            tab === "seats"
-              ? "text-white border-b-2 border-[#FBADCC]"
-              : "text-gray-400"
-          }`}
+          className={`flex-1 pb-3 text-xs font-semibold ${tab === "seats"
+            ? "text-white border-b-2 border-[#FBADCC]"
+            : "text-gray-400"
+            }`}
         >
           Kursi dipilih ({selectedSeats.length}/{maxSeats})
         </button>
 
         <button
           onClick={() => onTabChange("sections")}
-          className={`flex-1 pb-3 text-xs font-semibold ${
-            tab === "sections"
-              ? "text-white border-b-2 border-[#FBADCC]"
-              : "text-gray-400"
-          }`}
+          className={`flex-1 pb-3 text-xs font-semibold ${tab === "sections"
+            ? "text-white border-b-2 border-[#FBADCC]"
+            : "text-gray-400"
+            }`}
         >
           Daftar section
         </button>

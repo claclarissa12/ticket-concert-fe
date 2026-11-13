@@ -94,7 +94,7 @@ export default function OrganizerDashboard() {
                         <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                             <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                             <div className="space-y-3">
-                                <Link href="/organizer/create-event" className="flex items-center gap-4 p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors border border-transparent hover:border-[#333]">
+                                <Link href="/organizer/create" className="flex items-center gap-4 p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors border border-transparent hover:border-[#333]">
                                     <div className="w-10 h-10 rounded-xl bg-[#FBADCC] flex items-center justify-center text-black font-bold text-lg">
                                         +
                                     </div>

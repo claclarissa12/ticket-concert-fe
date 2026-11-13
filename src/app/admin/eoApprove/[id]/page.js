@@ -85,7 +85,7 @@ export default function SuperAdminDetailEO() {
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             fill="currentColor" viewBox="2 2 20 20" >
                                             <path d="m7.76 14.83-2.83 2.83 1.41 1.41 2.83-2.83 2.12-2.12.71-.71.71.71 1.41 1.42 3.54 3.53 1.41-1.41-3.53-3.54-1.42-1.41-.71-.71 5.66-5.66-1.41-1.41L12 10.59 6.34 4.93 4.93 6.34 10.59 12l-.71.71z"></path>
-                                        </svg> 
+                                        </svg>
                                         <p> Reject</p>
                                     </button>
                                 </>
@@ -189,38 +189,7 @@ export default function SuperAdminDetailEO() {
                             </div>
                         </div>
 
-                        {/* Sidebar */}
                         <div className="space-y-6">
-                            {/* Stats */}
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <h2 className="text-lg font-semibold mb-4">Statistics</h2>
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
-                                        <span className="text-sm text-gray-400">Events Created</span>
-                                        <span className="font-bold">{eoData.eventsCreated}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
-                                        <span className="text-sm text-gray-400">Total Revenue</span>
-                                        <span className="font-bold text-[#FBADCC]">{eoData.totalRevenue}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
-                                        <span className="text-sm text-gray-400">Total Attendees</span>
-                                        <span className="font-bold">{eoData.totalAttendees}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
-                                        <span className="text-sm text-gray-400">Member Since</span>
-                                        <span className="font-bold">{eoData.memberSince}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
-                                        <span className="text-sm text-gray-400">Verification</span>
-                                        <span className={`text-xs px-2.5 py-1 rounded-full ${getStatusColor(eoData.verificationStatus)}`}>
-                                            {eoData.verificationStatus}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                                 <div className="space-y-3">
@@ -230,12 +199,7 @@ export default function SuperAdminDetailEO() {
                                         </svg>
                                         Send Email
                                     </button>
-                                    <button className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] transition-colors border border-[#333] flex items-center justify-center gap-2">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                        View Profile
-                                    </button>
+                                  
                                     <button className="w-full px-4 py-2.5 bg-red-500/10 rounded-xl text-sm text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20 flex items-center justify-center gap-2">
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
