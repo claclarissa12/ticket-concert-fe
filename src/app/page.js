@@ -82,10 +82,11 @@ export default function LandingPage() {
               </button>
             </a>
 
-            <button className="rounded-lg border border-white px-8 py-2 font-medium hover:bg-white hover:text-black duration-300">
+            <a href="/regis">
+            <button className="rounded-lg border border-white px-8 py-2 font-medium hover:bg-white hover:text-black duration-300 cursor-pointer">
               Daftar
             </button>
-
+            </a>
           </div>
 
         </div>
