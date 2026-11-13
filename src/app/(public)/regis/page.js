@@ -1,17 +1,37 @@
 'use client'
 
 import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { authApi } from "../../../../lib/api"
+import { useEffect, useState } from "react"
+import { authApi } from "../../../../lib/api.js"
+import { IconAlertCircle, IconArrowRight, IconCheck, IconEye, IconEyeOff, IconLoader2, IconUserPlus } from "@tabler/icons-react"
+
 
 
 export default function Regis() {
 
     const router = useRouter()
-    const [form, setForm] = useState({name: '', email: '', password:''})
+    const [form, setForm] = useState({name: '', email: '', phone: '', password:'', confirm: ''})
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
     const [showPass, setShowPass] = useState(false)
+    const [showSuccess, setShowSuccess] = useState(false)
+    const [countdown, setCountdown] = useState(3)
+
+    useEffect(() => {
+        if (!showSuccess) return
+
+        if (countdown === 0) {
+            router.push('/login?registered=1')
+            return
+        }
+
+        const timer = setTimeout(() => {
+            setCountdown(prev => prev - 1)
+        }, 1000)
+
+        return () => clearTimeout(timer)
+    }, [showSuccess, countdown, router])
+
 
     const handleChange = (e) => {
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -20,14 +40,20 @@ export default function Regis() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!form.name || !form.email || !form.password || !form.confirm) {
+        setError('Semua kolom wajib diisi.');
+        return;
+             }
+
         if (form.password !== form.confirm) {
             setError('Password dan konfirmasi password tidak cocok.');
             return;
         }
         setLoading(true);
         try {
-            await authApi.register({ name: form.name, email: form.email, password: form.password });
-            router.push('/login?registered=1');
+            await authApi.register({ name: form.name, email: form.email, phone: form.phone , password: form.password });
+            setShowSuccess(true)
         } catch (err) {
             setError(err.message);
         } finally {
@@ -36,7 +62,41 @@ export default function Regis() {
     };
 
     return (
+        
         <div className="flex items-center justify-center p-10">
+            {showSuccess && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fadeIn">
+                    <div className="w-full max-w-sm rounded-2xl border border-[#343434] bg-[#1E1E1E] p-7 text-center shadow-2xl shadow-pink-500/15">
+                        
+                      
+                        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-pink-500/30 bg-gradient-to-tr from-[#E21D8F]/20 to-[#F551B5]/20 shadow-lg shadow-pink-500/20">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-[#E21D8F] to-[#F551B5] text-white">
+                                <IconCheck size={24} stroke={2.5} />
+                            </div>
+                        </div>
+
+                        <h2 className="text-2xl font-bold text-white">
+                            Pendaftaran Berhasil!
+                        </h2>
+
+                        <p className="mt-2 text-sm leading-relaxed text-gray-400">
+                            Akun Anda telah berhasil dibuat. Anda akan dialihkan ke halaman login dalam{' '}
+                            <span className="font-semibold text-pink-400">{countdown} detik</span>...
+                        </p>
+
+
+                        <button
+                            type="button"
+                            onClick={() => router.push('/login?registered=1')}
+                            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#E21D8F] to-[#F551B5] py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-pink-500/30"
+                        >
+                            <span>Masuk Sekarang</span>
+                            <IconArrowRight size={18} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="w-full flex max-w-5xl rounded-2xl border border-[#2d2d2d] bg-[#1E1E1E] p-8 shadow shadow-pink-200">
               
                 <div>
@@ -59,71 +119,111 @@ export default function Regis() {
                         </a>
                     </p>
 
+                    
+                    {error && (
+                        <div className="flex items-center gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400 mt-4 mb-4">
+                            <IconAlertCircle size={18} className="shrink-0 text-red-400" />
+                            <span>{error}</span>
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="mt-8 space-y-4">
 
-
+                        <div>
+                            <label className="block text-sm font-semibold text-[#ffffff] mb-1.5">Nama Lengkap</label>
                         <input
-
                             type="text"
                             name="name"
                             value={form.name}
                             placeholder="Nama Lengkap"
-                            className="w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
-                        />
+                            onChange={handleChange}
+                            className=" w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
+                            required
+                            />
+                        </div>
 
-                        {/* <label className="block text-sm font-semibold text-[#2D2D2D] mb-1.5">
-                            Place holder label <span className="text-[#ABABAB] font-normal">(opsional)</span>
-                        </label> */}
-
+                        <div>
+                            <label className="block text-sm font-semibold text-[#ffffff] mb-1.5">Email</label>
                         <input
                             type="email"
                             name="email"
                             value={form.email}
                             placeholder="youremail@example.com"
+                            onChange={handleChange}
                             className="w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
-                        />
+                            required
+                            />
+                        </div>
 
-                        {/* <div> */}
-                        {/* 
-                        <button type="button" onClick={() => setShowPass(p => !p)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#ABABAB] hover:text-[#7A7A7A]">
-                            <i className={`ti ${showPass ? 'ti-eye-off' : 'ti-eye'} text-base`} />
-                        </button> */}
+                        <div>
+                            <label className="block text-sm font-semibold text-[#ffffff] mb-1.5">Nomor HP (Opsional)</label>
                         <input
-                            type="password"
-                            name="password"
-                            value={form.password}
-                            placeholder="Password"
+                            type="tel"
+                            name="phone"
+                            value={form.phone}
+                            placeholder="08xxxxxxx"
+                            onChange={handleChange}
                             className="w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
                             />
-                        {/* </div> */}
+                        </div>
 
-                        <input
-                            type={showPass ? 'text' : 'password'} 
-                            name="confirm" 
-                            value={form.confirm}
-                            placeholder="Ulangi password"
-                            className="w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
-                        />
+                        <div>
+                            <label className="block text-sm font-semibold text-[#ffffff] mb-1.5">Password</label>
+                            <div className="relative">
+                                <input
+                                    type={showPass ? "text" : "password"}
+                                    name="password"
+                                    value={form.password}
+                                    placeholder="Min 8 karakter"
+                                    onChange={handleChange}
+                                    className="w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 pr-12 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPass(p => !p)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#ABABAB] hover:text-white transition-colors"
+                                >
+                                    {showPass ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+                                </button>
+                            </div>
+                        </div>
 
-                    </form>
+                        <div>
+                            <label className="block text-sm font-semibold text-[#ffffff] mb-1.5">Ulangi Password</label>
+                            <div className="relative">
+                                <input
+                                    type={showPass ? "text" : "password"}
+                                    name="confirm"
+                                    value={form.confirm}
+                                    placeholder="Min 8 karakter"
+                                    onChange={handleChange}
+                                    className="w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 pr-12 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
+                                    required
+                               />
+                            </div>
+                        </div>
+
 
                     <label className="mt-5 flex items-start gap-2">
-                        <input type="checkbox" className="mt-1 accent-pink-500" />
+                        <input type="checkbox" className="mt-1 accent-pink-500 cursor-pointer" required />
                         <p className="text-xs leading-5 text-gray-400">
                             Saya telah membaca dan menyetujui
-                            <span className="text-pink-400"> Syarat & Ketentuan </span>
+                            <a className="text-pink-400 cursor-pointer"> Syarat & Ketentuan </a>
                             serta
-                            <span className="text-pink-400"> Kebijakan Privasi</span>.
+                            <a className="text-pink-400 cursor-pointer"> Kebijakan Privasi</a>.
                         </p>
                     </label>
-
-                    <button type="submit" disabled={loading}
-                        className="mt-6 w-full rounded-xl bg-gradient-to-r from-[#E21D8F] to-[#F551B5] py-3 font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-pink-500/30">
-                        {loading
-                            ? <><i className="ti ti-loader-2 animate-spin text-base" /> Memproses...</>
-                            : <><i className="ti ti-user-plus text-base" /> Daftar Sekarang</>}
-                    </button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#E21D8F] to-[#F551B5] py-3 font-semibold text-white transition duration-300 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg hover:shadow-pink-500/30 disabled:opacity-50"
+                        >
+                            {loading
+                                ? <><IconLoader2 size={18} className="animate-spin" /> Memproses...</>
+                                : <><IconUserPlus size={18} /> Daftar Sekarang</>}
+                        </button>
+                    </form>
 
                     <div className="my-5 flex items-center gap-3">
                         <div className="h-px flex-1 bg-[#3A3A3A]"></div>
