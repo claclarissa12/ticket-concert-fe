@@ -4,7 +4,7 @@ import { Search, MapPin, Calendar } from "lucide-react";
 export default function SearchHome() {
     return (
         <section className="relative z-30 max-w-[80%] md:max-w-[75%] lg:max-w-[82%] mx-auto w-full px-2 sm:px-0 mt-6">
-            <div className="bg-[#1a1a1d]/95 backdrop-blur-md border border-white/10 rounded-2xl p-4 md:p-5 flex flex-col lg:flex-row items-center gap-4 shadow-2xl shadow-black/50">
+            <div className=" rounded-2xl p-4 md:p-5 flex flex-col lg:flex-row items-center gap-4 shadow-2xl shadow-black/50">
                 
                 <div className="flex-1 w-full relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-pink-500" size={18} />
