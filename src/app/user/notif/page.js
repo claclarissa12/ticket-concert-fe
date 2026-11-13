@@ -5,10 +5,6 @@ import Link from "next/link"
 import Footer from "@/components/layout/footer"
 import UserNavbar from "@/components/layout/UserNavbar"
 
-/* ------------------------------------------------------------------ */
-/* Data (ganti dengan data dari API / database)                        */
-/* ------------------------------------------------------------------ */
-
 const categories = [
     { id: "all", label: "Semua", icon: "bell" },
     { id: "pesanan", label: "Pesanan", icon: "ticket" },
@@ -56,8 +52,6 @@ const initialNotifications = [
         message: ["Nikmati potongan ", { b: "20%" }, " untuk konser apa pun bulan ini."],
         actions: [{ label: "Klaim diskon", href: "/promo" }],
     },
-
-  
     {
         id: 6,
         category: "pesanan",
@@ -68,12 +62,7 @@ const initialNotifications = [
         message: ["Pembayaran untuk 2 tiket ", { b: "Langit Senja Festival" }, " sudah kami terima."],
         actions: [{ label: "Lihat e-tiket", href: "/tickets/6" }],
     },
-   
 ]
-
-/* ------------------------------------------------------------------ */
-/* Helpers & small pieces                                              */
-/* ------------------------------------------------------------------ */
 
 const FOCUS =
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FBADCC]"
@@ -103,19 +92,11 @@ const ICONS = {
             <circle cx="7" cy="7" r="1" />
         </>
     ),
-   
 }
 
 function Icon({ name, className = "h-4 w-4" }) {
     return (
-        <svg
-            viewBox="0 0 20 20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            aria-hidden="true"
-            className={`shrink-0 ${className}`}
-        >
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true" className={`shrink-0 ${className}`}>
             {ICONS[name]}
         </svg>
     )
@@ -125,11 +106,7 @@ function Message({ parts }) {
     return (
         <p className="mt-1 text-sm leading-relaxed text-gray-400">
             {parts.map((p, i) =>
-                typeof p === "string" ? (
-                    <span key={i}>{p}</span>
-                ) : (
-                    <strong key={i} className="font-medium text-white">{p.b}</strong>
-                )
+                typeof p === "string" ? <span key={i}>{p}</span> : <strong key={i} className="font-medium text-white">{p.b}</strong>
             )}
         </p>
     )
@@ -137,14 +114,9 @@ function Message({ parts }) {
 
 const BTN_TEXT = `rounded text-xs font-medium transition-colors ${FOCUS}`
 
-/* ------------------------------------------------------------------ */
-/* Page                                                                */
-/* ------------------------------------------------------------------ */
-
 export default function Notif() {
     const [items, setItems] = useState(initialNotifications)
     const [category, setCategory] = useState("all")
-    const [unreadOnly, setUnreadOnly] = useState(false)
 
     const unreadCounts = useMemo(() => {
         const counts = { all: 0 }
@@ -158,11 +130,8 @@ export default function Notif() {
     }, [items])
 
     const visible = useMemo(
-        () =>
-            items.filter(
-                (n) => (category === "all" || n.category === category) && (!unreadOnly || !n.read)
-            ),
-        [items, category, unreadOnly]
+        () => items.filter((n) => category === "all" || n.category === category),
+        [items, category]
     )
 
     const activeCategory = categories.find((c) => c.id === category)
@@ -170,10 +139,6 @@ export default function Notif() {
 
     const markRead = (id) => setItems((list) => list.map((n) => (n.id === id ? { ...n, read: true } : n)))
     const remove = (id) => setItems((list) => list.filter((n) => n.id !== id))
-    const markAllRead = () => {
-        const ids = new Set(visible.map((n) => n.id))
-        setItems((list) => list.map((n) => (ids.has(n.id) ? { ...n, read: true } : n)))
-    }
 
     const catLabel = (id) => categories.find((c) => c.id === id)?.label
 
@@ -183,7 +148,6 @@ export default function Notif() {
 
             <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-                    {/* Kategori */}
                     <aside className="w-full shrink-0 lg:sticky lg:top-24 lg:w-72 lg:rounded-2xl lg:border lg:border-[#272727] lg:bg-[#1a1a1a] lg:p-3 xl:w-80">
                         <p className="hidden px-3 pb-2 pt-2 text-xs font-medium text-gray-500 lg:block">Kategori</p>
                         <nav
@@ -199,10 +163,11 @@ export default function Notif() {
                                         type="button"
                                         onClick={() => setCategory(c.id)}
                                         aria-current={active ? "true" : undefined}
-                                        className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-medium transition-colors lg:w-full lg:rounded-xl lg:px-3 lg:py-2.5 lg:text-sm ${FOCUS} ${active
-                                            ? "border-[#FBADCC]/40 bg-[#FBADCC]/10 text-white"
-                                            : "border-[#272727] text-gray-400 hover:text-white lg:border-transparent lg:hover:bg-[#272727]/60"
-                                            }`}
+                                        className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-3.5 py-2 text-xs font-medium transition-colors lg:w-full lg:rounded-xl lg:px-3 lg:py-2.5 lg:text-sm ${FOCUS} ${
+                                            active
+                                                ? "border-[#FBADCC]/40 bg-[#FBADCC]/10 text-white"
+                                                : "border-[#272727] text-gray-400 hover:text-white lg:border-transparent lg:hover:bg-[#272727]/60"
+                                        }`}
                                     >
                                         <Icon name={c.icon} className={`h-4 w-4 ${active ? "text-[#FBADCC]" : ""}`} />
                                         <span>{c.label}</span>
@@ -221,16 +186,12 @@ export default function Notif() {
 
                         <div className="mt-3 hidden border-t border-[#272727] px-3 pb-2 pt-4 lg:block">
                             <p className="text-xs text-gray-500">Ingin mengubah jenis notifikasi yang kamu terima?</p>
-                            <Link
-                                href="/profile"
-                                className={`mt-2 inline-block text-xs font-medium text-[#FBADCC] hover:underline ${FOCUS}`}
-                            >
+                            <Link href="/profile" className={`mt-2 inline-block text-xs font-medium text-[#FBADCC] hover:underline ${FOCUS}`}>
                                 Buka pengaturan notifikasi
                             </Link>
                         </div>
                     </aside>
 
-                    {/* Daftar notifikasi */}
                     <section className="min-w-0 flex-1 rounded-2xl border border-[#272727] bg-[#1a1a1a]">
                         <div className="flex flex-col gap-4 border-b border-[#272727] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
                             <div>
@@ -241,31 +202,6 @@ export default function Notif() {
                                     {unreadInView > 0 ? `${unreadInView} belum dibaca` : "Semua sudah dibaca"}
                                 </p>
                             </div>
-
-                            <div className="flex flex-wrap items-center gap-3">
-                                <button
-                                    type="button"
-                                    role="switch"
-                                    aria-checked={unreadOnly}
-                                    onClick={() => setUnreadOnly((v) => !v)}
-                                    className={`flex items-center gap-2 rounded-full border border-[#272727] py-1.5 pl-3 pr-2 text-xs text-gray-300 transition-colors hover:border-[#444] ${FOCUS}`}
-                                >
-                                    Belum dibaca saja
-                                    <span className={`relative h-5 w-9 rounded-full transition-colors ${unreadOnly ? "bg-[#FBADCC]" : "bg-[#333]"}`}>
-                                        <span
-                                            className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full transition-transform motion-reduce:transition-none ${unreadOnly ? "translate-x-4 bg-black" : "translate-x-0 bg-white"}`}
-                                        />
-                                    </span>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={markAllRead}
-                                    disabled={unreadInView === 0}
-                                    className={`rounded-lg border border-[#333] px-3.5 py-2 text-xs font-medium text-white transition-colors hover:border-[#555] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[#333] ${FOCUS}`}
-                                >
-                                    Tandai semua dibaca
-                                </button>
-                            </div>
                         </div>
 
                         {visible.length === 0 ? (
@@ -273,23 +209,10 @@ export default function Notif() {
                                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#272727] text-gray-400">
                                     <Icon name="bell" className="h-5 w-5" />
                                 </div>
-                                <p className="mt-4 text-sm font-medium">
-                                    {unreadOnly ? "Tidak ada notifikasi yang belum dibaca" : "Belum ada notifikasi"}
-                                </p>
+                                <p className="mt-4 text-sm font-medium">Belum ada notifikasi</p>
                                 <p className="mx-auto mt-1 max-w-sm text-xs text-gray-500">
-                                    {unreadOnly
-                                        ? "Semua notifikasi di kategori ini sudah kamu baca."
-                                        : "Kabar tentang pesanan, pengingat, dan promo akan muncul di sini."}
+                                    Kabar tentang pesanan, pengingat, dan promo akan muncul di sini.
                                 </p>
-                                {unreadOnly && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setUnreadOnly(false)}
-                                        className={`mt-5 rounded-lg border border-[#333] px-4 py-2 text-xs font-medium transition-colors hover:border-[#FBADCC] hover:text-[#FBADCC] ${FOCUS}`}
-                                    >
-                                        Tampilkan semua
-                                    </button>
-                                )}
                             </div>
                         ) : (
                             <div>
@@ -305,21 +228,17 @@ export default function Notif() {
                                                 {rows.map((n) => (
                                                     <li
                                                         key={n.id}
-                                                        className={`relative flex gap-4 px-5 py-5 transition-colors sm:px-6 ${n.read ? "hover:bg-[#1e1e1e]" : "bg-[#FBADCC]/[0.04] hover:bg-[#FBADCC]/[0.07]"}`}
+                                                        className={`relative flex gap-4 px-5 py-5 transition-colors sm:px-6 ${
+                                                            n.read ? "hover:bg-[#1e1e1e]" : "bg-[#FBADCC]/[0.04] hover:bg-[#FBADCC]/[0.07]"
+                                                        }`}
                                                     >
-                                                        {!n.read && (
-                                                            <span
-                                                                className="absolute inset-y-0 left-0 w-0.5 bg-[#FBADCC]"
-                                                                aria-hidden="true"
-                                                            />
-                                                        )}
+                                                        {!n.read && <span className="absolute inset-y-0 left-0 w-0.5 bg-[#FBADCC]" aria-hidden="true" />}
                                                         <div
-                                                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${n.read ? "bg-[#272727] text-gray-400" : "bg-[#FBADCC]/15 text-[#FBADCC]"}`}
+                                                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                                                                n.read ? "bg-[#272727] text-gray-400" : "bg-[#FBADCC]/15 text-[#FBADCC]"
+                                                            }`}
                                                         >
-                                                            <Icon
-                                                                name={categories.find((c) => c.id === n.category).icon}
-                                                                className="h-[18px] w-[18px]"
-                                                            />
+                                                            <Icon name={categories.find((c) => c.id === n.category).icon} className="h-[18px] w-[18px]" />
                                                         </div>
 
                                                         <div className="min-w-0 flex-1">

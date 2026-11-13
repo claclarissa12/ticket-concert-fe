@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import HeroSection from "@/components/layout/hero";
 import SearchHome from "@/components/layout/Search";
+=======
+
+>>>>>>> 97a29784798eec032a45e1219cb82057c10864ee
 import Footer from "@/components/layout/footer";
+import HeroSection from "@/components/layout/hero";
+import SearchHome from "@/components/layout/Search";
 import UserNavbar from "@/components/layout/UserNavbar";
 import { Search, MapPin, Calendar, Clock, Music, Guitar, Mic2, Disc3, Apple, Play } from "lucide-react";
 import Image from "next/image";
@@ -12,11 +18,18 @@ export default function landing() {
         <h1 className="text-xl font-bold">
           Ticket<span className="text-[#E21D8F]">.COM</span>
         </h1>
+        <a href="/auth">
+          <button className="rounded-full bg-[#E21D8F] px-6 py-2 text-sm font-medium hover:bg-pink-600 duration-300">
+            Mulai Sekarang
+          </button>
 
+<<<<<<< HEAD
         <a href="/public/regist" className="cursor-pointer">
         <button  className="rounded-full bg-[#E21D8F] px-6 py-2 text-sm font-medium hover:bg-pink-600 duration-300 cursor-pointer">
           Mulai Sekarang
         </button>
+=======
+>>>>>>> 97a29784798eec032a45e1219cb82057c10864ee
         </a>
       </nav>
 
