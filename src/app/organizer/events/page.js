@@ -1,5 +1,6 @@
 "use client"
 
+import EoGuard from "@/components/EO/guardEO"
 import OrganizerSidebar from "@/components/EO/sidebarEO"
 import Link from "next/link"
 
@@ -44,7 +45,8 @@ export default function OrganizerEvents() {
     }
 
     return (
-        <div className="bg-[#131313] min-h-screen flex text-white">
+        <EoGuard>
+<div className="bg-[#131313] min-h-screen flex text-white">
             <OrganizerSidebar/>
             <div className="flex-1 overflow-x-hidden">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
@@ -132,5 +134,7 @@ export default function OrganizerEvents() {
                 </div>
             </div>
         </div>
+        </EoGuard>
+        
     )
 }

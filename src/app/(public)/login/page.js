@@ -19,8 +19,8 @@ export default function Login() {
     };
 
     const redirectByRole = (role) => {
-        if (role === 'superadmin') router.push('/admin');
-        else if (role === 'event_organizer') router.push('/organizer');
+        if (role === 'superadmin') router.push('/admin/dashboard');
+        else if (role === 'event_organizer') router.push('/organizer/dashboard');
         else router.push('/user/home');
     };
 

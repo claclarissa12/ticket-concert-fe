@@ -1,5 +1,6 @@
 "use client"
 
+import AdminGuard from "@/components/admin/guardAdmin"
 import SidebarAdmin from "@/components/admin/sidebarADM"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -55,163 +56,166 @@ export default function SuperAdminDetailEO() {
     }
 
     return (
-        <div className="bg-[#131313] min-h-screen flex text-white">
-            <SidebarAdmin />
-            <div className="flex-1 overflow-x-hidden">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                        <div>
+        <AdminGuard>
+
+            <div className="bg-[#131313] min-h-screen flex text-white">
+                <SidebarAdmin />
+                <div className="flex-1 overflow-x-hidden">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                            <div>
+                                <div className="flex items-center gap-3">
+                                    <Link href="/admin/eoApprove" className="text-gray-400 hover:text-white transition-colors">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                    </Link>
+                                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">EO Registration Details</h1>
+                                </div>
+                                <p className="text-gray-400 text-sm mt-1">{eoData.company}</p>
+                            </div>
                             <div className="flex items-center gap-3">
-                                <Link href="/admin/eoApprove" className="text-gray-400 hover:text-white transition-colors">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </Link>
-                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">EO Registration Details</h1>
+                                {eoData.status === "Pending" && (
+                                    <>
+                                        <button className="px-5 py-2.5 flex gap-2 bg-green-500/20 text-green-400 rounded-xl font-semibold hover:bg-green-500/30 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                fill="currentColor" viewBox="0 0 24 24" >
+                                                <path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10m0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8"></path><path d="M10 16c-.26 0-.51-.1-.71-.29l-3-3L7.7 11.3l2.29 2.29 5.29-5.29 1.41 1.41-6 6c-.2.2-.45.29-.71.29Z"></path>
+                                            </svg>
+                                            <p>Approve</p>
+                                        </button>
+                                        <button className="px-5 py-2.5 bg-red-500/20 text-red-400 rounded-xl flex gap-2 font-semibold hover:bg-red-500/30 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                fill="currentColor" viewBox="2 2 20 20" >
+                                                <path d="m7.76 14.83-2.83 2.83 1.41 1.41 2.83-2.83 2.12-2.12.71-.71.71.71 1.41 1.42 3.54 3.53 1.41-1.41-3.53-3.54-1.42-1.41-.71-.71 5.66-5.66-1.41-1.41L12 10.59 6.34 4.93 4.93 6.34 10.59 12l-.71.71z"></path>
+                                            </svg>
+                                            <p> Reject</p>
+                                        </button>
+                                    </>
+                                )}
+                                <button className="px-5 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
+                                    Export Data
+                                </button>
                             </div>
-                            <p className="text-gray-400 text-sm mt-1">{eoData.company}</p>
                         </div>
-                        <div className="flex items-center gap-3">
-                            {eoData.status === "Pending" && (
-                                <>
-                                    <button className="px-5 py-2.5 flex gap-2 bg-green-500/20 text-green-400 rounded-xl font-semibold hover:bg-green-500/30 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            fill="currentColor" viewBox="0 0 24 24" >
-                                            <path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10m0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8"></path><path d="M10 16c-.26 0-.51-.1-.71-.29l-3-3L7.7 11.3l2.29 2.29 5.29-5.29 1.41 1.41-6 6c-.2.2-.45.29-.71.29Z"></path>
-                                        </svg>
-                                        <p>Approve</p>
-                                    </button>
-                                    <button className="px-5 py-2.5 bg-red-500/20 text-red-400 rounded-xl flex gap-2 font-semibold hover:bg-red-500/30 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            fill="currentColor" viewBox="2 2 20 20" >
-                                            <path d="m7.76 14.83-2.83 2.83 1.41 1.41 2.83-2.83 2.12-2.12.71-.71.71.71 1.41 1.42 3.54 3.53 1.41-1.41-3.53-3.54-1.42-1.41-.71-.71 5.66-5.66-1.41-1.41L12 10.59 6.34 4.93 4.93 6.34 10.59 12l-.71.71z"></path>
-                                        </svg>
-                                        <p> Reject</p>
-                                    </button>
-                                </>
-                            )}
-                            <button className="px-5 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
-                                Export Data
-                            </button>
-                        </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="lg:col-span-2 space-y-6">
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <div className="flex items-start gap-6">
-                                    <div className="w-24 h-24 rounded-full bg-[#FBADCC] flex items-center justify-center text-3xl font-bold text-black flex-shrink-0">
-                                        {eoData.name.charAt(0)}
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="flex flex-wrap items-center gap-3">
-                                            <h2 className="text-2xl font-bold">{eoData.name}</h2>
-                                            <span className={`text-xs px-3 py-1 rounded-full ${getStatusColor(eoData.status)}`}>
-                                                {eoData.status}
-                                            </span>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
+                                    <div className="flex items-start gap-6">
+                                        <div className="w-24 h-24 rounded-full bg-[#FBADCC] flex items-center justify-center text-3xl font-bold text-black flex-shrink-0">
+                                            {eoData.name.charAt(0)}
                                         </div>
-                                        <p className="text-gray-400">{eoData.company}</p>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                                            <div>
-                                                <p className="text-xs text-gray-400">Email</p>
-                                                <p className="text-sm">{eoData.email}</p>
+                                        <div className="flex-1">
+                                            <div className="flex flex-wrap items-center gap-3">
+                                                <h2 className="text-2xl font-bold">{eoData.name}</h2>
+                                                <span className={`text-xs px-3 py-1 rounded-full ${getStatusColor(eoData.status)}`}>
+                                                    {eoData.status}
+                                                </span>
                                             </div>
-                                            <div>
-                                                <p className="text-xs text-gray-400">Phone</p>
-                                                <p className="text-sm">{eoData.phone}</p>
-                                            </div>
-                                            <div className="sm:col-span-2">
-                                                <p className="text-xs text-gray-400">Address</p>
-                                                <p className="text-sm">{eoData.address}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-gray-400">Website</p>
-                                                <p className="text-sm text-[#FBADCC]">{eoData.website}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-gray-400">Instagram</p>
-                                                <p className="text-sm text-[#FBADCC]">{eoData.instagram}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Description */}
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <h2 className="text-lg font-semibold mb-3">Description</h2>
-                                <p className="text-gray-300">{eoData.description}</p>
-                            </div>
-
-                            {/* Bank Information */}
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <h2 className="text-lg font-semibold mb-3">Bank Information</h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div>
-                                        <p className="text-xs text-gray-400">Bank Name</p>
-                                        <p className="text-sm font-medium">{eoData.bankName}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-400">Account Number</p>
-                                        <p className="text-sm font-medium">{eoData.bankAccount}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-400">Account Holder</p>
-                                        <p className="text-sm font-medium">{eoData.bankHolder}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Documents */}
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <h2 className="text-lg font-semibold mb-3">Documents</h2>
-                                <div className="space-y-3">
-                                    {eoData.documentsList.map((doc, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors">
-                                            <div className="flex items-center gap-3">
-                                                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
+                                            <p className="text-gray-400">{eoData.company}</p>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                                                 <div>
-                                                    <p className="text-sm font-medium">{doc.name}</p>
-                                                    <p className="text-xs text-gray-400">{doc.file} • {doc.size}</p>
+                                                    <p className="text-xs text-gray-400">Email</p>
+                                                    <p className="text-sm">{eoData.email}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-gray-400">Phone</p>
+                                                    <p className="text-sm">{eoData.phone}</p>
+                                                </div>
+                                                <div className="sm:col-span-2">
+                                                    <p className="text-xs text-gray-400">Address</p>
+                                                    <p className="text-sm">{eoData.address}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-gray-400">Website</p>
+                                                    <p className="text-sm text-[#FBADCC]">{eoData.website}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-gray-400">Instagram</p>
+                                                    <p className="text-sm text-[#FBADCC]">{eoData.instagram}</p>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-3">
-
-                                                <button className="px-3 py-1.5 bg-[#272727] rounded-lg text-xs hover:bg-[#333] transition-colors">
-                                                    View
-                                                </button>
-                                            </div>
                                         </div>
-                                    ))}
+                                    </div>
+                                </div>
+
+                                {/* Description */}
+                                <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
+                                    <h2 className="text-lg font-semibold mb-3">Description</h2>
+                                    <p className="text-gray-300">{eoData.description}</p>
+                                </div>
+
+                                {/* Bank Information */}
+                                <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
+                                    <h2 className="text-lg font-semibold mb-3">Bank Information</h2>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div>
+                                            <p className="text-xs text-gray-400">Bank Name</p>
+                                            <p className="text-sm font-medium">{eoData.bankName}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-400">Account Number</p>
+                                            <p className="text-sm font-medium">{eoData.bankAccount}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-400">Account Holder</p>
+                                            <p className="text-sm font-medium">{eoData.bankHolder}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Documents */}
+                                <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
+                                    <h2 className="text-lg font-semibold mb-3">Documents</h2>
+                                    <div className="space-y-3">
+                                        {eoData.documentsList.map((doc, index) => (
+                                            <div key={index} className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors">
+                                                <div className="flex items-center gap-3">
+                                                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                    </svg>
+                                                    <div>
+                                                        <p className="text-sm font-medium">{doc.name}</p>
+                                                        <p className="text-xs text-gray-400">{doc.file} • {doc.size}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+
+                                                    <button className="px-3 py-1.5 bg-[#272727] rounded-lg text-xs hover:bg-[#333] transition-colors">
+                                                        View
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="space-y-6">
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-                                <div className="space-y-3">
-                                    <button className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] transition-colors border border-[#333] flex items-center justify-center gap-2">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                        Send Email
-                                    </button>
-                                  
-                                    <button className="w-full px-4 py-2.5 bg-red-500/10 rounded-xl text-sm text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20 flex items-center justify-center gap-2">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        Suspend Account
-                                    </button>
+                            <div className="space-y-6">
+                                <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
+                                    <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+                                    <div className="space-y-3">
+                                        <button className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] transition-colors border border-[#333] flex items-center justify-center gap-2">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                            Send Email
+                                        </button>
+
+                                        <button className="w-full px-4 py-2.5 bg-red-500/10 rounded-xl text-sm text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20 flex items-center justify-center gap-2">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            Suspend Account
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </AdminGuard>
     )
 }
