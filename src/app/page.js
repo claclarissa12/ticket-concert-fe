@@ -1,4 +1,3 @@
-
 import Footer from "@/components/layout/footer";
 import HeroSection from "@/components/layout/hero";
 import SearchHome from "@/components/layout/Search";
@@ -13,7 +12,8 @@ export default function landing() {
         <h1 className="text-xl font-bold">
           Ticket<span className="text-[#E21D8F]">.COM</span>
         </h1>
-        <a href="/public/regist" className="cursor-pointer">
+
+        <a href="/regis" className="cursor-pointer">
         <button  className="rounded-full bg-[#E21D8F] px-6 py-2 text-sm font-medium hover:bg-pink-600 duration-300 cursor-pointer">
           Mulai Sekarang
         </button>
