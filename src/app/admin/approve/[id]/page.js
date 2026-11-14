@@ -10,48 +10,46 @@ export default function SuperAdminDetailAjuan() {
 
     const eventData = {
         id: 1,
-        name: "Nassar Tour 2026",
-        organizer: "Event Organizer Corp",
-        email: "info@eventorg.com",
+        title: "Konser Melodi Senja",
+        organizer: "Admin",
+        email: "admin@gmail.com",
         phone: "+62 812 3456 7890",
-        date: "20 Mei 2026",
-        time: "19:00 WIB",
-        location: "Jakarta International Stadium",
-        address: "Jl. Margonda Raya No. 45, Depok, Jawa Barat",
-        category: "Concert",
-        genre: "Pop",
-        status: "Pending",
-        submitted: "2 days ago",
-        description: "Nassar Tour 2026 is the biggest concert event of the year featuring top artists from around the world. Join us for an unforgettable night of music and entertainment.",
-        image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400",
-        capacity: 1000,
-        price: "Rp 500.000",
-        ticketsSold: 0,
-        totalRevenue: "Rp 0",
-        stageLayout: "Catwalk Design",
+        date: "01 Des 2026 • 19:00",
+        venue: "Hall A",
+        location: "Jakarta",
+        status: "draft",
+        submitted: "2026-01-01",
+        description: "Konser akustik intim membawakan lagu-lagu romantis.",
+        banner_url: "https://images.unsplash.com/photo-1540039155732-684736882273?w=400",
         ticketTiers: [
-            { name: "VIP", price: "Rp 1.500.000", quota: 100, sold: 0 },
-            { name: "Gold", price: "Rp 1.000.000", quota: 200, sold: 0 },
-            { name: "Silver", price: "Rp 750.000", quota: 300, sold: 0 },
+            { name: "VIP", price: 1500000, quota: 100, sold: 0 },
+            { name: "Regular", price: 750000, quota: 500, sold: 0 },
+            { name: "Festival", price: 500000, quota: 1000, sold: 0 },
         ],
-        documents: [
-            { name: "Event Poster", file: "poster.jpg", size: "2.4 MB" },
-            { name: "Stage Layout", file: "stage_layout.pdf", size: "1.8 MB" },
-            { name: "Event Proposal", file: "proposal.pdf", size: "3.2 MB" },
-        ],
-        activityLog: [
-            { action: "Event submitted for approval", date: "2 days ago" },
-            { action: "Documents uploaded", date: "3 days ago" },
-            { action: "Event created", date: "5 days ago" },
-        ]
+        totalTickets: 1600,
+        ticketsSold: 0,
+        totalRevenue: 0
+    }
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)
     }
 
     const getStatusColor = (status) => {
         switch (status) {
-            case "Pending": return "bg-yellow-500/20 text-yellow-400"
-            case "Approved": return "bg-green-500/20 text-green-400"
-            case "Rejected": return "bg-red-500/20 text-red-400"
+            case "draft": return "bg-yellow-500/20 text-yellow-400"
+            case "published": return "bg-green-500/20 text-green-400"
+            case "cancelled": return "bg-red-500/20 text-red-400"
             default: return "bg-gray-500/20 text-gray-400"
+        }
+    }
+
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case "draft": return "Draft"
+            case "published": return "Published"
+            case "cancelled": return "Cancelled"
+            default: return status
         }
     }
 
@@ -68,26 +66,24 @@ export default function SuperAdminDetailAjuan() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                                     </svg>
                                 </Link>
-                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Event Submission Details</h1>
+                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Event Details</h1>
                             </div>
-                            <p className="text-gray-400 text-sm mt-1">{eventData.name}</p>
+                            <p className="text-gray-400 text-sm mt-1">{eventData.title}</p>
                         </div>
                         <div className="flex items-center gap-3">
-                            {eventData.status === "Pending" && (
+                            {eventData.status === "draft" && (
                                 <>
                                     <button className="px-5 py-2.5 bg-green-500/20 text-green-400 rounded-xl flex gap-2 font-semibold hover:bg-green-500/30 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                            fill="currentColor" viewBox="0 0 24 24" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24" >
                                             <path d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10m0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8"></path><path d="M10 16c-.26 0-.51-.1-.71-.29l-3-3L7.7 11.3l2.29 2.29 5.29-5.29 1.41 1.41-6 6c-.2.2-.45.29-.71.29Z"></path>
                                         </svg>
-                                        <p className="text-sm">Approve</p>
+                                        <p className="text-sm">Publish</p>
                                     </button>
                                     <button className="px-5 py-2.5 bg-red-500/20 text-red-400 rounded-xl flex gap-2 font-semibold hover:bg-red-500/30 transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                            fill="currentColor" viewBox="0 0 24 24" >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24" >
                                             <path d="m7.76 14.83-2.83 2.83 1.41 1.41 2.83-2.83 2.12-2.12.71-.71.71.71 1.41 1.42 3.54 3.53 1.41-1.41-3.53-3.54-1.42-1.41-.71-.71 5.66-5.66-1.41-1.41L12 10.59 6.34 4.93 4.93 6.34 10.59 12l-.71.71z"></path>
                                         </svg>
-                                        <p className="text-sm">Reject</p>
+                                        <p className="text-sm">Cancel</p>
                                     </button>
                                 </>
                             )}
@@ -101,35 +97,23 @@ export default function SuperAdminDetailAjuan() {
                         <div className="lg:col-span-2 space-y-6">
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <div className="flex items-start gap-6">
-                                    <img src={eventData.image} className="w-40 h-32 rounded-xl object-cover flex-shrink-0" />
+                                    <img src={eventData.banner_url} className="w-40 h-32 rounded-xl object-cover flex-shrink-0" />
                                     <div className="flex-1">
                                         <div className="flex flex-wrap items-center gap-3">
-                                            <h2 className="text-2xl font-bold">{eventData.name}</h2>
+                                            <h2 className="text-2xl font-bold">{eventData.title}</h2>
                                             <span className={`text-xs px-3 py-1 rounded-full ${getStatusColor(eventData.status)}`}>
-                                                {eventData.status}
+                                                {getStatusLabel(eventData.status)}
                                             </span>
                                         </div>
                                         <p className="text-sm text-gray-400">{eventData.organizer}</p>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                                             <div>
                                                 <p className="text-xs text-gray-400">Date & Time</p>
-                                                <p className="text-sm">{eventData.date} • {eventData.time}</p>
+                                                <p className="text-sm">{eventData.date}</p>
                                             </div>
                                             <div>
                                                 <p className="text-xs text-gray-400">Location</p>
-                                                <p className="text-sm">{eventData.location}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-gray-400">Category</p>
-                                                <p className="text-sm">{eventData.category} • {eventData.genre}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-xs text-gray-400">Stage Layout</p>
-                                                <p className="text-sm">{eventData.stageLayout}</p>
-                                            </div>
-                                            <div className="sm:col-span-2">
-                                                <p className="text-xs text-gray-400">Address</p>
-                                                <p className="text-sm">{eventData.address}</p>
+                                                <p className="text-sm">{eventData.venue}, {eventData.location}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -148,37 +132,15 @@ export default function SuperAdminDetailAjuan() {
                                         <div key={index} className="bg-[#1a1a1a] rounded-xl p-4 border border-[#333]">
                                             <h3 className="font-bold text-lg" style={{
                                                 color: tier.name === "VIP" ? "#9b59b6" :
-                                                    tier.name === "Gold" ? "#f39c12" : "#bdc3c7"
+                                                    tier.name === "Regular" ? "#f39c12" : "#bdc3c7"
                                             }}>
                                                 {tier.name}
                                             </h3>
-                                            <p className="text-2xl font-bold text-[#FBADCC]">{tier.price}</p>
+                                            <p className="text-2xl font-bold text-[#FBADCC]">{formatPrice(tier.price)}</p>
                                             <div className="flex justify-between text-sm text-gray-400 mt-2">
                                                 <span>Quota: {tier.quota}</span>
                                                 <span>Sold: {tier.sold}</span>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <h2 className="text-lg font-semibold mb-3">Documents</h2>
-                                <div className="space-y-3">
-                                    {eventData.documents.map((doc, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors">
-                                            <div className="flex items-center gap-3">
-                                                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                <div>
-                                                    <p className="text-sm font-medium">{doc.name}</p>
-                                                    <p className="text-xs text-gray-400">{doc.file} • {doc.size}</p>
-                                                </div>
-                                            </div>
-                                            <button className="px-3 py-1.5 bg-[#272727] rounded-lg text-xs hover:bg-[#333] transition-colors">
-                                                View
-                                            </button>
                                         </div>
                                     ))}
                                 </div>
@@ -190,12 +152,8 @@ export default function SuperAdminDetailAjuan() {
                                 <h2 className="text-lg font-semibold mb-4">Event Statistics</h2>
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
-                                        <span className="text-sm text-gray-400">Capacity</span>
-                                        <span className="font-bold">{eventData.capacity}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
-                                        <span className="text-sm text-gray-400">Ticket Price</span>
-                                        <span className="font-bold text-[#FBADCC]">{eventData.price}</span>
+                                        <span className="text-sm text-gray-400">Total Tickets</span>
+                                        <span className="font-bold">{eventData.totalTickets}</span>
                                     </div>
                                     <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
                                         <span className="text-sm text-gray-400">Tickets Sold</span>
@@ -203,7 +161,7 @@ export default function SuperAdminDetailAjuan() {
                                     </div>
                                     <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
                                         <span className="text-sm text-gray-400">Total Revenue</span>
-                                        <span className="font-bold text-[#FBADCC]">{eventData.totalRevenue}</span>
+                                        <span className="font-bold text-[#FBADCC]">{formatPrice(eventData.totalRevenue)}</span>
                                     </div>
                                     <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
                                         <span className="text-sm text-gray-400">Submitted</span>
@@ -233,8 +191,6 @@ export default function SuperAdminDetailAjuan() {
                                     </Link>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
                 </div>

@@ -4,12 +4,11 @@ import SidebarAdmin from "@/components/admin/sidebarADM"
 import { useParams, useRouter } from "next/navigation"
 
 const eventsData = [
-    { id: 1, name: "Nassar Tour 2026", organizer: "Event Organizer Corp", date: "20 Mei 2026", location: "Jakarta", category: "Concert", status: "Active", tickets: 600, sold: 457, revenue: "Rp 456.500.000", image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800", description: "Konser tunggal Nassar dalam rangka tur nasional 2026. Menampilkan lagu-lagu terbaik dan spesial performance." },
-    { id: 2, name: "Electronic Fest 2026", organizer: "Festival Pro", date: "25 Mei 2026", location: "Bandung", category: "Festival", status: "Active", tickets: 400, sold: 289, revenue: "Rp 289.000.000", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800", description: "Festival musik elektronik terbesar di Bandung tahun ini. Menghadirkan DJ lokal dan internasional." },
-    { id: 3, name: "Jazz Night", organizer: "Music Lounge", date: "30 Mei 2026", location: "Surabaya", category: "Concert", status: "Upcoming", tickets: 150, sold: 78, revenue: "Rp 78.000.000", image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800", description: "Malam yang tenang dengan alunan musik jazz. Cocok untuk bersantai bersama teman dan keluarga." },
-    { id: 4, name: "Rock Revolution", organizer: "Rock Empire", date: "5 Juni 2026", location: "Yogyakarta", category: "Concert", status: "Upcoming", tickets: 300, sold: 120, revenue: "Rp 120.000.000", image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800", description: "Revolusi musik rock kembali hadir! Persembahan dari band-band rock legendaris Indonesia." },
-    { id: 5, name: "Pop Music Festival", organizer: "Pop Culture", date: "10 Juni 2026", location: "Jakarta", category: "Festival", status: "Draft", tickets: 250, sold: 0, revenue: "Rp 0", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800", description: "Festival musik pop yang sedang dalam tahap persiapan. Tunggu tanggal mainnya!" },
-    { id: 6, name: "EDM Night", organizer: "Electronic Dreams", date: "15 Juni 2026", location: "Bali", category: "Festival", status: "Active", tickets: 500, sold: 312, revenue: "Rp 312.000.000", image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=800", description: "Nikmati malam penuh energi dengan musik EDM di Bali. Lineup spesial menanti!" },
+    { id: 1, title: "Konser Melodi Senja", description: "Konser akustik intim membawakan lagu-lagu romantis.", venue: "Hall A", location: "Jakarta", date: "01 Des 2026", status: "published", banner_url: "https://images.unsplash.com/photo-1540039155732-684736882273?w=800", total_tickets: 1600, sold: 0, revenue: 0 },
+    { id: 2, title: "Neon Party 2026", description: "Pesta musik EDM dengan laser dan DJ ternama.", venue: "Main Stadium", location: "Bandung", date: "25 Nov 2026", status: "published", banner_url: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800", total_tickets: 50, sold: 0, revenue: 0 },
+    { id: 3, title: "Rock In Solo", description: "Konser musik rock legendaris dari band lokal.", venue: "Lapangan Kota", location: "Solo", date: "15 Okt 2026", status: "published", banner_url: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=800", total_tickets: 200, sold: 0, revenue: 0 },
+    { id: 4, title: "Jazz Under The Stars", description: "Nikmati alunan musik jazz di bawah langit malam.", venue: "Rooftop Hotel Bintang", location: "Surabaya", date: "10 Jan 2027", status: "draft", banner_url: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=800", total_tickets: 0, sold: 0, revenue: 0 },
+    { id: 5, title: "K-Pop Festival Indonesia", description: "Konser besar yang menghadirkan berbagai grup K-Pop.", venue: "Gelora Bung Karno", location: "Jakarta", date: "20 Sep 2026", status: "cancelled", banner_url: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800", total_tickets: 0, sold: 0, revenue: 0 },
 ]
 
 export default function EventDetail() {
@@ -34,7 +33,20 @@ export default function EventDetail() {
         )
     }
 
-    const pct = Math.round((event.sold / event.tickets) * 100)
+    const pct = event.total_tickets > 0 ? Math.round((event.sold / event.total_tickets) * 100) : 0
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)
+    }
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "published": return "bg-green-500/20 text-green-400"
+            case "draft": return "bg-yellow-500/20 text-yellow-400"
+            case "cancelled": return "bg-red-500/20 text-red-400"
+            default: return "bg-gray-500/20 text-gray-400"
+        }
+    }
 
     return (
         <div className="bg-[#131313] min-h-screen flex text-white">
@@ -52,14 +64,14 @@ export default function EventDetail() {
                     </button>
 
                     <div className="w-full h-64 sm:h-80 rounded-2xl overflow-hidden mb-8 relative">
-                        <img src={event.image} alt={event.name} className="w-full h-full object-cover" />
+                        <img src={event.banner_url} alt={event.title} className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#131313] to-transparent opacity-80" />
                         <div className="absolute bottom-6 left-6 right-6">
-                            <span className="bg-[#FBADCC] text-black text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                {event.category}
+                            <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${getStatusColor(event.status)}`}>
+                                {event.status}
                             </span>
-                            <h1 className="text-3xl sm:text-4xl font-bold mt-3">{event.name}</h1>
-                            <p className="text-gray-300 mt-1">{event.organizer}</p>
+                            <h1 className="text-3xl sm:text-4xl font-bold mt-3">{event.title}</h1>
+                            <p className="text-gray-300 mt-1">{event.venue}, {event.location}</p>
                         </div>
                     </div>
 
@@ -82,11 +94,11 @@ export default function EventDetail() {
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 mb-1">Status</p>
-                                        <p className="font-medium text-sm">{event.status}</p>
+                                        <p className="font-medium text-sm capitalize">{event.status}</p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-500 mb-1">Organizer</p>
-                                        <p className="font-medium text-sm">{event.organizer}</p>
+                                        <p className="text-xs text-gray-500 mb-1">Venue</p>
+                                        <p className="font-medium text-sm">{event.venue}</p>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +106,7 @@ export default function EventDetail() {
                         <div className="space-y-4">
                             <div className="bg-[#1a1a1a] border border-[#333] rounded-2xl p-6">
                                 <h3 className="text-sm text-gray-400 mb-1">Total Revenue</h3>
-                                <p className="text-2xl font-bold text-[#FBADCC]">{event.revenue}</p>
+                                <p className="text-2xl font-bold text-[#FBADCC]">{formatPrice(event.revenue)}</p>
                             </div>
 
                             <div className="bg-[#1a1a1a] border border-[#333] rounded-2xl p-6">
@@ -106,7 +118,7 @@ export default function EventDetail() {
                                         <p className="text-xs text-gray-500">terjual</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-lg font-medium text-gray-400">{event.tickets}</p>
+                                        <p className="text-lg font-medium text-gray-400">{event.total_tickets}</p>
                                         <p className="text-xs text-gray-500">total tiket</p>
                                     </div>
                                 </div>
@@ -120,9 +132,7 @@ export default function EventDetail() {
                                 <p className="text-xs text-right mt-2 text-gray-400">{pct}% terjual</p>
                             </div>
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>

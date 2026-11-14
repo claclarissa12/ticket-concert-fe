@@ -62,11 +62,12 @@ export default function OrganizerSidebar() {
             )
         },
         {
-            href: "/organizer/notifications",
-            label: "Notifications",
+            href: "/organizer/reports",
+            label: "Reports",
             icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    fill="currentColor" viewBox="0 0 24 24" >
+                    <path d="m19.94 7.68-.03-.09a.8.8 0 0 0-.2-.29l-5-5a1 1 0 0 0-.3-.2l-.09-.03a.9.9 0 0 0-.27-.05c-.02 0-.04-.01-.05-.01H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-12s-.01-.04-.01-.06c0-.09-.02-.17-.05-.26ZM6 20V4h7v4c0 .55.45 1 1 1h4v11z"></path><path d="M8 12h2v6H8zm3-2h2v8h-2zm3 4h2v4h-2z"></path>
                 </svg>
             )
         },

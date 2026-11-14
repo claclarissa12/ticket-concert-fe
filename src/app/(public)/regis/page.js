@@ -10,7 +10,7 @@ import { IconAlertCircle, IconArrowRight, IconCheck, IconEye, IconEyeOff, IconLo
 export default function Regis() {
 
     const router = useRouter()
-    const [form, setForm] = useState({name: '', email: '', phone: '', password:'', confirm: ''})
+    const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirm: '' })
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
     const [showPass, setShowPass] = useState(false)
@@ -42,9 +42,9 @@ export default function Regis() {
         e.preventDefault();
 
         if (!form.name || !form.email || !form.password || !form.confirm) {
-        setError('Semua kolom wajib diisi.');
-        return;
-             }
+            setError('Semua kolom wajib diisi.');
+            return;
+        }
 
         if (form.password !== form.confirm) {
             setError('Password dan konfirmasi password tidak cocok.');
@@ -52,7 +52,7 @@ export default function Regis() {
         }
         setLoading(true);
         try {
-            await authApi.register({ name: form.name, email: form.email, phone: form.phone , password: form.password });
+            await authApi.register({ name: form.name, email: form.email, phone: form.phone, password: form.password });
             setShowSuccess(true)
         } catch (err) {
             setError(err.message);
@@ -62,13 +62,10 @@ export default function Regis() {
     };
 
     return (
-        
-        <div className="flex items-center justify-center p-10">
+        <div className="min-h-screen bg-[#0f0f11] flex items-center justify-center px-4 py-10 overflow-y-auto">
             {showSuccess && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fadeIn">
                     <div className="w-full max-w-sm rounded-2xl border border-[#343434] bg-[#1E1E1E] p-7 text-center shadow-2xl shadow-pink-500/15">
-                        
-                      
                         <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-pink-500/30 bg-gradient-to-tr from-[#E21D8F]/20 to-[#F551B5]/20 shadow-lg shadow-pink-500/20">
                             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-[#E21D8F] to-[#F551B5] text-white">
                                 <IconCheck size={24} stroke={2.5} />
@@ -84,7 +81,6 @@ export default function Regis() {
                             <span className="font-semibold text-pink-400">{countdown} detik</span>...
                         </p>
 
-
                         <button
                             type="button"
                             onClick={() => router.push('/login?registered=1')}
@@ -97,29 +93,20 @@ export default function Regis() {
                 </div>
             )}
 
-            <div className="w-full flex max-w-5xl rounded-2xl border border-[#2d2d2d] bg-[#1E1E1E] p-8 shadow shadow-pink-200">
-              
-                <div>
-                    <img
-                        src="/image 9.png"
-                        alt="Concert"
-                        className="h-full w-full px-8 py-8"
-                    />
-                </div>
-                <div className="max-w-md my-auto mx-0">
+            <div className="w-full max-w-md rounded-2xl border border-[#2d2d2d] bg-[#1E1E1E] p-6 sm:p-8 shadow-lg shadow-pink-500/5">
 
-                    <h1 className="text-4xl font-bold tracking-tight text-white">
+                <div className="w-full mx-auto">
+                    <h1 className="text-3xl font-bold tracking-tight text-white">
                         Buat Akun Baru
                     </h1>
 
                     <p className="mt-2 text-sm text-gray-400">
                         Sudah punya akun?
-                        <a href="/login" className="ml-1 font-medium text-pink-400 hover:text-pink-300">
+                        <a href="/login" className="ml-1 font-medium text-pink-400 hover:text-pink-300 transition-colors">
                             Masuk
                         </a>
                     </p>
 
-                    
                     {error && (
                         <div className="flex items-center gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400 mt-4 mb-4">
                             <IconAlertCircle size={18} className="shrink-0 text-red-400" />
@@ -127,43 +114,42 @@ export default function Regis() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-
+                    <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                         <div>
-                            <label className="block text-sm font-semibold text-[#ffffff] mb-1.5">Nama Lengkap</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={form.name}
-                            placeholder="Nama Lengkap"
-                            onChange={handleChange}
-                            className=" w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
-                            required
+                            <label className="block text-gray-300 text-sm font-medium mb-1.5">Nama Lengkap</label>
+                            <input
+                                type="text"
+                                name="name"
+                                value={form.name}
+                                placeholder="Nama Lengkap"
+                                onChange={handleChange}
+                                className="w-full bg-[#252529] border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#E21D8F] transition"
+                                required
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-semibold text-[#ffffff] mb-1.5">Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={form.email}
-                            placeholder="youremail@example.com"
-                            onChange={handleChange}
-                            className="w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
-                            required
+                            <input
+                                type="email"
+                                name="email"
+                                value={form.email}
+                                placeholder="youremail@example.com"
+                                onChange={handleChange}
+                                className="w-full bg-[#252529] border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#E21D8F] transition"
+                                required
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-semibold text-[#ffffff] mb-1.5">Nomor HP (Opsional)</label>
-                        <input
-                            type="tel"
-                            name="phone"
-                            value={form.phone}
-                            placeholder="08xxxxxxx"
-                            onChange={handleChange}
-                            className="w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
+                            <input
+                                type="tel"
+                                name="phone"
+                                value={form.phone}
+                                placeholder="08xxxxxxx"
+                                onChange={handleChange}
+                                className="w-full bg-[#252529] border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#E21D8F] transition"
                             />
                         </div>
 
@@ -176,7 +162,7 @@ export default function Regis() {
                                     value={form.password}
                                     placeholder="Min 8 karakter"
                                     onChange={handleChange}
-                                    className="w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 pr-12 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
+                                    className="w-full bg-[#252529] border border-white/10 rounded-xl px-4 py-3 pr-12 text-white text-sm outline-none focus:border-[#E21D8F] transition"
                                     required
                                 />
                                 <button
@@ -198,26 +184,26 @@ export default function Regis() {
                                     value={form.confirm}
                                     placeholder="Min 8 karakter"
                                     onChange={handleChange}
-                                    className="w-full rounded-xl border border-[#343434] bg-[#2B2B2B] px-4 py-3 pr-12 text-white placeholder:text-gray-500 outline-none transition-all duration-300 focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
+                                    className="w-full bg-[#252529] border border-white/10 rounded-xl px-4 py-3 pr-12 text-white text-sm outline-none focus:border-[#E21D8F] transition"
                                     required
-                               />
+                                />
                             </div>
                         </div>
 
+                        <label className="mt-5 flex items-start gap-2 cursor-pointer">
+                            <input type="checkbox" className="mt-1 accent-pink-500 cursor-pointer" required />
+                            <p className="text-xs leading-5 text-gray-400">
+                                Saya telah membaca dan menyetujui
+                                <a className="text-pink-400 cursor-pointer hover:underline"> Syarat & Ketentuan </a>
+                                serta
+                                <a className="text-pink-400 cursor-pointer hover:underline"> Kebijakan Privasi</a>.
+                            </p>
+                        </label>
 
-                    <label className="mt-5 flex items-start gap-2">
-                        <input type="checkbox" className="mt-1 accent-pink-500 cursor-pointer" required />
-                        <p className="text-xs leading-5 text-gray-400">
-                            Saya telah membaca dan menyetujui
-                            <a className="text-pink-400 cursor-pointer"> Syarat & Ketentuan </a>
-                            serta
-                            <a className="text-pink-400 cursor-pointer"> Kebijakan Privasi</a>.
-                        </p>
-                    </label>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#E21D8F] to-[#F551B5] py-3 font-semibold text-white transition duration-300 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg hover:shadow-pink-500/30 disabled:opacity-50"
+                            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#E21D8F] to-[#F551B5] py-3 font-semibold text-white transition duration-300 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg hover:shadow-pink-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading
                                 ? <><IconLoader2 size={18} className="animate-spin" /> Memproses...</>
@@ -232,20 +218,17 @@ export default function Regis() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-
-                        <button className="flex items-center justify-center gap-2 rounded-xl border border-[#3A3A3A] bg-[#252525] py-3 text-white transition-all duration-300 hover:border-pink-500 hover:bg-[#2F2F2F]">
-                            <img src="/goggle.png" alt="Google" className="h-5 " />
+                        <button className="flex items-center justify-center gap-2 rounded-xl border border-[#3A3A3A] bg-[#252525] py-2.5 text-white text-sm transition-all duration-300 hover:border-pink-500 hover:bg-[#2F2F2F]">
+                            <img src="/goggle.png" alt="Google" className="h-4 sm:h-5" />
                             <span>Google</span>
                         </button>
 
-                        <button className="flex items-center justify-center gap-2 rounded-xl border border-[#3A3A3A] bg-[#252525] py-3 text-white transition-all duration-300 hover:border-pink-500 hover:bg-[#2F2F2F]">
-                            <img src="/apple.png" alt="Apple" className="h-5 " />
+                        <button className="flex items-center justify-center gap-2 rounded-xl border border-[#3A3A3A] bg-[#252525] py-2.5 text-white text-sm transition-all duration-300 hover:border-pink-500 hover:bg-[#2F2F2F]">
+                            <img src="/apple.png" alt="Apple" className="h-4 sm:h-5" />
                             <span>Apple</span>
                         </button>
-
                     </div>
                 </div>
-
             </div>
         </div>
     )

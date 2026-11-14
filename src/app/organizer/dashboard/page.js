@@ -2,6 +2,16 @@
 
 import OrganizerSidebar from "@/components/EO/sidebarEO"
 import Link from "next/link"
+import { Bar, BarChart, CartesianGrid, Legend, Line, Tooltip, XAxis, YAxis } from 'recharts';
+
+const data = [
+    { month: 'Jan', revenue: 4200, profit: 1100 },
+    { month: 'Feb', revenue: 5800, profit: 1500 },
+    { month: 'Mar', revenue: 7200, profit: 2400 },
+    { month: 'Apr', revenue: 6100, profit: 1800 },
+    { month: 'May', revenue: 8900, profit: 3100 },
+    { month: 'Jun', revenue: 7400, profit: 2600 },
+];
 
 export default function OrganizerDashboard() {
     return (
@@ -79,15 +89,23 @@ export default function OrganizerDashboard() {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                        <div className="lg:col-span-2 bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-semibold">Ticket Sales</h2>
-                                <select className="bg-[#1a1a1a] text-sm px-4 py-2 rounded-lg border border-[#333] outline-none focus:border-[#FBADCC] transition-colors">
-                                    <option>Last 7 Days</option>
-                                    <option>Last 30 Days</option>
-                                    <option>Last 3 Months</option>
-                                </select>
-                            </div>
+                        <div className="bg-[#FBADCC]/20 lg:col-span-2 rounded-xl p-4">
+                            <h3 className="text-lg font-semibold mb-4">Grafik Pendapatan</h3>
+
+                            <BarChart
+                                style={{ width: '100%', maxWidth: 600, maxHeight: '70vh', aspectRatio: 1.618 }}
+                                responsive
+                                data={data}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            >
+                                <CartesianGrid strokeDasharray="5 5" />
+                                <XAxis dataKey="month" />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Bar dataKey="revenue" barSize={20} fill="#E21D8F" name="Pendapatan" />
+                                <Bar dataKey="profit" barSize={20} fill="#FBADCC" name="Keuntungan" />
+                            </BarChart>
 
                         </div>
 

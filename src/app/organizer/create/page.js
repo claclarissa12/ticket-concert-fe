@@ -3,8 +3,40 @@
 import OrganizerSidebar from "@/components/EO/sidebarEO"
 import StageLayoutPicker from "@/components/EO/stageLayout"
 import Link from "next/link"
+import { useState } from "react"
 
 export default function CreateEvent() {
+    const [form, setForm] = useState({
+        title: "",
+        description: "",
+        venue: "",
+        location: "",
+        date: "",
+        time: "",
+        banner_url: "",
+        status: "draft"
+    })
+
+    const handleChange = (e) => {
+        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        const payload = {
+            title: form.title,
+            description: form.description,
+            venue: form.venue,
+            location: form.location,
+            date: `${form.date} ${form.time}:00`,
+            banner_url: form.banner_url,
+            status: form.status,
+            created_by: 1,
+            created_at: new Date().toISOString()
+        }
+        console.log("Data siap dikirim ke API:", payload)
+    }
+
     return (
         <div className="bg-[#131313] min-h-screen flex text-white">
             <OrganizerSidebar />
@@ -19,7 +51,7 @@ export default function CreateEvent() {
                             <Link href="/organizer/events" className="px-5 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
                                 Cancel
                             </Link>
-                            <button className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
+                            <button onClick={handleSubmit} className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
                                 Save Event
                             </button>
                         </div>
@@ -34,32 +66,35 @@ export default function CreateEvent() {
                                         <label className="text-sm text-gray-400 block mb-1.5">Event Name</label>
                                         <input
                                             type="text"
+                                            name="title"
+                                            value={form.title}
+                                            onChange={handleChange}
                                             placeholder="Enter event name"
                                             className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
                                         />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="text-sm text-gray-400 block mb-1.5">Category</label>
-                                            <select className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors">
-                                                <option value="">Select Category</option>
-                                                <option value="Concert">Concert</option>
-                                                <option value="Festival">Festival</option>
-                                                <option value="Conference">Conference</option>
-                                                <option value="Exhibition">Exhibition</option>
-                                                <option value="Sports">Sports</option>
-                                            </select>
+                                            <label className="text-sm text-gray-400 block mb-1.5">Venue</label>
+                                            <input
+                                                type="text"
+                                                name="venue"
+                                                value={form.venue}
+                                                onChange={handleChange}
+                                                placeholder="e.g. Hall A"
+                                                className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
+                                            />
                                         </div>
                                         <div>
-                                            <label className="text-sm text-gray-400 block mb-1.5">Genre</label>
-                                            <select className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors">
-                                                <option value="">Select Genre</option>
-                                                <option value="Pop">Pop</option>
-                                                <option value="Rock">Rock</option>
-                                                <option value="Electronic">Electronic</option>
-                                                <option value="Jazz">Jazz</option>
-                                                <option value="Hip Hop">Hip Hop</option>
-                                            </select>
+                                            <label className="text-sm text-gray-400 block mb-1.5">Location</label>
+                                            <input
+                                                type="text"
+                                                name="location"
+                                                value={form.location}
+                                                onChange={handleChange}
+                                                placeholder="e.g. Jakarta"
+                                                className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
+                                            />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
@@ -67,6 +102,9 @@ export default function CreateEvent() {
                                             <label className="text-sm text-gray-400 block mb-1.5">Date</label>
                                             <input
                                                 type="date"
+                                                name="date"
+                                                value={form.date}
+                                                onChange={handleChange}
                                                 className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
                                             />
                                         </div>
@@ -74,33 +112,24 @@ export default function CreateEvent() {
                                             <label className="text-sm text-gray-400 block mb-1.5">Time</label>
                                             <input
                                                 type="time"
+                                                name="time"
+                                                value={form.time}
+                                                onChange={handleChange}
                                                 className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
                                             />
                                         </div>
                                     </div>
-                                    <div>
-                                        <label className="text-sm text-gray-400 block mb-1.5">Location</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Venue name"
-                                            className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-sm text-gray-400 block mb-1.5">Address</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Complete address"
-                                            className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
-                                        />
-                                    </div>
                                 </div>
                             </div>
+                            
                             <StageLayoutPicker />
 
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <h2 className="text-lg font-semibold mb-4">Description</h2>
                                 <textarea
+                                    name="description"
+                                    value={form.description}
+                                    onChange={handleChange}
                                     rows={5}
                                     placeholder="Describe your event..."
                                     className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors resize-none"
@@ -108,14 +137,16 @@ export default function CreateEvent() {
                             </div>
 
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <h2 className="text-lg font-semibold mb-4">Event Poster</h2>
-                                <div className="border-2 border-dashed border-[#333] rounded-xl p-8 text-center hover:border-[#FBADCC] transition-colors cursor-pointer">
-                                    <svg className="w-12 h-12 mx-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <p className="text-gray-400 text-sm mt-2">Click or drag to upload poster</p>
-                                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, WebP (Max 5MB)</p>
-                                </div>
+                                <h2 className="text-lg font-semibold mb-4">Event Banner URL</h2>
+                                <input
+                                    type="url"
+                                    name="banner_url"
+                                    value={form.banner_url}
+                                    onChange={handleChange}
+                                    placeholder="https://example.com/image.jpg"
+                                    className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
+                                />
+                                <p className="text-xs text-gray-500 mt-2">Masukkan link gambar poster dari internet (maks 500 karakter)</p>
                             </div>
                         </div>
 
@@ -123,52 +154,32 @@ export default function CreateEvent() {
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <h2 className="text-lg font-semibold mb-4">Event Status</h2>
                                 <div className="space-y-3">
-                                    <div className="w-full px-4 py-3 bg-[#FBADCC]/10 rounded-xl border border-[#FBADCC]">
+                                    <div 
+                                        onClick={() => setForm(prev => ({ ...prev, status: 'draft' }))}
+                                        className={`w-full px-4 py-3 rounded-xl border cursor-pointer transition-all ${form.status === 'draft' ? 'bg-[#FBADCC]/10 border-[#FBADCC]' : 'bg-[#1a1a1a] border-[#333]'}`}
+                                    >
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <p className="font-medium text-[#FBADCC]">Draft</p>
+                                                <p className={`font-medium ${form.status === 'draft' ? 'text-[#FBADCC]' : 'text-white'}`}>Draft</p>
                                                 <p className="text-xs text-gray-400">Save as draft</p>
                                             </div>
-                                            <div className="w-3 h-3 rounded-full bg-[#FBADCC]"></div>
+                                            {form.status === 'draft' && <div className="w-3 h-3 rounded-full bg-[#FBADCC]"></div>}
                                         </div>
                                     </div>
-                                    <div className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333]">
+                                    <div 
+                                        onClick={() => setForm(prev => ({ ...prev, status: 'published' }))}
+                                        className={`w-full px-4 py-3 rounded-xl border cursor-pointer transition-all ${form.status === 'published' ? 'bg-[#FBADCC]/10 border-[#FBADCC]' : 'bg-[#1a1a1a] border-[#333]'}`}
+                                    >
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <p className="font-medium text-white">Published</p>
+                                                <p className={`font-medium ${form.status === 'published' ? 'text-[#FBADCC]' : 'text-white'}`}>Published</p>
                                                 <p className="text-xs text-gray-400">Live and visible</p>
                                             </div>
+                                            {form.status === 'published' && <div className="w-3 h-3 rounded-full bg-[#FBADCC]"></div>}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <h2 className="text-lg font-semibold mb-4">Pricing & Capacity</h2>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="text-sm text-gray-400 block mb-1.5">Capacity</label>
-                                        <input
-                                            type="number"
-                                            placeholder="Total capacity"
-                                            className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-sm text-gray-400 block mb-1.5">Ticket Price</label>
-                                        <input
-                                            type="number"
-                                            placeholder="Price per ticket"
-                                            className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
-                                        />
-                                    </div>
-                                    <button className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm text-[#FBADCC] hover:bg-[#222] transition-colors border border-[#333]">
-                                        + Add Ticket Tier
-                                    </button>
-                                </div>
-                            </div>
-
-                          
                         </div>
                     </div>
                 </div>

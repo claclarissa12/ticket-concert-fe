@@ -9,26 +9,36 @@ export default function SuperAdminEvents() {
     const [searchTerm, setSearchTerm] = useState("")
 
     const events = [
-        { id: 1, name: "Nassar Tour 2026", organizer: "Event Organizer Corp", date: "20 Mei 2026", location: "Jakarta", category: "Concert", status: "Active", tickets: 600, sold: 457, revenue: "Rp 456.500.000", image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400" },
-        { id: 2, name: "Electronic Fest 2026", organizer: "Festival Pro", date: "25 Mei 2026", location: "Bandung", category: "Festival", status: "Active", tickets: 400, sold: 289, revenue: "Rp 289.000.000", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400" },
-        { id: 3, name: "Jazz Night", organizer: "Music Lounge", date: "30 Mei 2026", location: "Surabaya", category: "Concert", status: "Upcoming", tickets: 150, sold: 78, revenue: "Rp 78.000.000", image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400" },
-        { id: 4, name: "Rock Revolution", organizer: "Rock Empire", date: "5 Juni 2026", location: "Yogyakarta", category: "Concert", status: "Upcoming", tickets: 300, sold: 120, revenue: "Rp 120.000.000", image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400" },
-        { id: 5, name: "Pop Music Festival", organizer: "Pop Culture", date: "10 Juni 2026", location: "Jakarta", category: "Festival", status: "Draft", tickets: 250, sold: 0, revenue: "Rp 0", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400" },
-        { id: 6, name: "EDM Night", organizer: "Electronic Dreams", date: "15 Juni 2026", location: "Bali", category: "Festival", status: "Active", tickets: 500, sold: 312, revenue: "Rp 312.000.000", image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400" },
+        { id: 2, title: "Neon Party 2026", date: "25 Nov 2026", location: "Bandung", status: "published", tickets: 50, sold: 0, revenue: 0, banner_url: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400" },
+        { id: 3, title: "Rock In Solo", date: "15 Okt 2026", location: "Solo", status: "published", tickets: 200, sold: 0, revenue: 0, banner_url: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400" },
+        { id: 4, title: "Jazz Under The Stars", date: "10 Jan 2027", location: "Surabaya", status: "draft", tickets: 0, sold: 0, revenue: 0, banner_url: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400" },
+        { id: 5, title: "K-Pop Festival Indonesia", date: "20 Sep 2026", location: "Jakarta", status: "cancelled", tickets: 0, sold: 0, revenue: 0, banner_url: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400" },
     ]
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)
+    }
 
     const getStatusColor = (status) => {
         switch (status) {
-            case "Active": return "bg-green-500/20 text-green-400"
-            case "Upcoming": return "bg-blue-500/20 text-blue-400"
-            case "Draft": return "bg-yellow-500/20 text-yellow-400"
+            case "published": return "bg-green-500/20 text-green-400"
+            case "draft": return "bg-yellow-500/20 text-yellow-400"
+            case "cancelled": return "bg-red-500/20 text-red-400"
             default: return "bg-gray-500/20 text-gray-400"
         }
     }
 
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case "published": return "Published"
+            case "draft": return "Draft"
+            case "cancelled": return "Cancelled"
+            default: return status
+        }
+    }
+
     const filteredEvents = events.filter(event => {
-        const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            event.organizer.toLowerCase().includes(searchTerm.toLowerCase())
+        const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase())
         if (activeTab === "all") return matchesSearch
         return matchesSearch && event.status === activeTab
     })
@@ -54,34 +64,31 @@ export default function SuperAdminEvents() {
                     <div className="flex flex-wrap items-center gap-3 mb-6">
                         <div className="flex bg-[#272727] rounded-xl p-1 border border-[#333]">
                             <button onClick={() => setActiveTab("all")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "all" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>All</button>
-                            <button onClick={() => setActiveTab("Active")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Active" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Active</button>
-                            <button onClick={() => setActiveTab("Upcoming")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Upcoming" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Upcoming</button>
-                            <button onClick={() => setActiveTab("Draft")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "Draft" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Draft</button>
+                            <button onClick={() => setActiveTab("published")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "published" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Published</button>
+                            <button onClick={() => setActiveTab("draft")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "draft" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Draft</button>
+                            <button onClick={() => setActiveTab("cancelled")} className={`px-4 py-1.5 rounded-lg text-sm transition-colors ${activeTab === "cancelled" ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>Cancelled</button>
                         </div>
                         <input type="text" placeholder="Search events..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors text-sm flex-1 min-w-[200px]" />
                     </div>
 
                     <div className="divide-y divide-[#222] border-y border-[#222]">
                         {filteredEvents.map(event => {
-                            const pct = Math.round((event.sold / event.tickets) * 100)
+                            const pct = event.tickets > 0 ? Math.round((event.sold / event.tickets) * 100) : 0
                             return (
                                 <div key={event.id} className="py-5 hover:bg-[#181818] transition-colors -mx-3 px-3 rounded-lg">
                                     <div className="flex flex-col sm:flex-row gap-4">
                                         <img
-                                            src={event.image}
-                                            alt={event.name}
+                                            src={event.banner_url}
+                                            alt={event.title}
                                             className="w-full sm:w-32 h-32 rounded-lg object-cover flex-shrink-0 grayscale-[30%]"
                                         />
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-3">
                                                 <div className="min-w-0">
-                                                    <h3 className="font-medium truncate">{event.name}</h3>
-                                                    <p className="text-xs text-neutral-500 mt-0.5">
-                                                        {event.organizer} · {event.category}
-                                                    </p>
+                                                    <h3 className="font-medium truncate">{event.title}</h3>
                                                 </div>
                                                 <span className={`text-[11px] px-2 py-0.5 rounded font-medium ${getStatusColor(event.status)}`}>
-                                                    {event.status}
+                                                    {getStatusLabel(event.status)}
                                                 </span>
                                             </div>
 
@@ -97,7 +104,7 @@ export default function SuperAdminEvents() {
                                                 </span>
                                                 <span>
                                                     Revenue{" "}
-                                                    <span className="text-white font-medium">{event.revenue}</span>
+                                                    <span className="text-white font-medium">{formatPrice(event.revenue)}</span>
                                                 </span>
                                                 <span>
                                                     Kehadiran{" "}
@@ -130,11 +137,6 @@ export default function SuperAdminEvents() {
                     </div>
 
                     {filteredEvents.length === 0 && (
-                        <div className="text-center py-20">
-                            <p className="text-neutral-500 text-sm">Tidak ada event yang cocok dengan filter kamu.</p>
-                        </div>
-                    )}
-                    {filteredEvents.length === 0 && (
                         <div className="text-center py-16">
                             <div className="text-6xl mb-4">📅</div>
                             <h3 className="text-xl font-semibold mb-2">No events found</h3>
@@ -147,7 +149,6 @@ export default function SuperAdminEvents() {
                         <div className="flex gap-2">
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">Previous</button>
                             <button className="px-4 py-2 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black">1</button>
-                            <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">2</button>
                             <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">Next</button>
                         </div>
                     </div>
