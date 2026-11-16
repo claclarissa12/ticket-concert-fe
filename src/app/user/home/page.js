@@ -30,7 +30,7 @@ export default async function Home() {
   // ---------- Ambil data dari BE ----------
   let data = [];
   try {
-    data = await apiFetch("/api/konser");
+    data = await apiFetch("/api/concert");
   } catch (err) {
     console.error("Gagal ambil data konser:", err.message);
   }
