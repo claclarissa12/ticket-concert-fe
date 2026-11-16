@@ -38,7 +38,6 @@ export default function SuperAdminUsers() {
         try {
             const res = await adminApi.getAllUser()
 
-
             const listData = res.data?.items || [];
             setUsers(listData);
 
@@ -49,10 +48,6 @@ export default function SuperAdminUsers() {
             setLoading(false)
         }
     }, [])
-
-    useEffect(() => {
-        fetchUsers()
-    }, [fetchUsers])
 
     const filteredUsers = users.filter((user) => {
         const matchesSearch =
