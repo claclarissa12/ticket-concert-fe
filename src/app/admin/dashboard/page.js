@@ -1,19 +1,18 @@
 "use client"
 
-import AdminGuard from "@/components/admin/guardAdmin";
+import AdminGuard from "@/components/admin/guardAdmin"
 import SidebarAdmin from "@/components/admin/sidebarADM"
-import { LineChart } from "lucide-react";
 import Link from "next/link"
-import { Bar, BarChart, CartesianGrid, Legend, Line, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from "recharts"
 
 const data = [
-    { month: 'Jan', revenue: 4200, profit: 1100 },
-    { month: 'Feb', revenue: 5800, profit: 1500 },
-    { month: 'Mar', revenue: 7200, profit: 2400 },
-    { month: 'Apr', revenue: 6100, profit: 1800 },
-    { month: 'May', revenue: 8900, profit: 3100 },
-    { month: 'Jun', revenue: 7400, profit: 2600 },
-];
+    { month: "Jan", revenue: 4200, profit: 1100 },
+    { month: "Feb", revenue: 5800, profit: 1500 },
+    { month: "Mar", revenue: 7200, profit: 2400 },
+    { month: "Apr", revenue: 6100, profit: 1800 },
+    { month: "May", revenue: 8900, profit: 3100 },
+    { month: "Jun", revenue: 7400, profit: 2600 },
+]
 
 export default function SuperAdminDashboard() {
     const pendingEvents = [
@@ -48,7 +47,8 @@ export default function SuperAdminDashboard() {
 
                 <div className="flex-1 overflow-x-hidden">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                        {/* Header */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                             <div>
                                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
                                 <p className="text-gray-400 text-sm mt-1">Super Admin - Overview</p>
@@ -65,72 +65,64 @@ export default function SuperAdminDashboard() {
                             </div>
                         </div>
 
-
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-8">
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <p className="text-3xl font-bold">12,847</p>
-                                <p className="text-sm text-gray-400 mt-1">Total Users</p>
+                        {/* Stat Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                            <div className="bg-[#272727] rounded-2xl p-5 border border-[#333]">
+                                <p className="text-sm text-gray-400">Total Users</p>
+                                <p className="text-2xl font-bold mt-1">12,847</p>
                             </div>
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <p className="text-3xl font-bold">156</p>
-                                <p className="text-sm text-gray-400 mt-1">Total Events</p>
+                            <div className="bg-[#272727] rounded-2xl p-5 border border-[#333]">
+                                <p className="text-sm text-gray-400">Total Events</p>
+                                <p className="text-2xl font-bold mt-1">156</p>
                             </div>
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <p className="text-3xl font-bold">Rp 8.7B</p>
-                                <p className="text-sm text-gray-400 mt-1">Total Revenue</p>
+                            <div className="bg-[#272727] rounded-2xl p-5 border border-[#333]">
+                                <p className="text-sm text-gray-400">Total Revenue</p>
+                                <p className="text-2xl font-bold mt-1 text-[#FBADCC]">Rp 8.7B</p>
                             </div>
-                            <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                <p className="text-3xl font-bold">23</p>
-                                <p className="text-sm text-gray-400 mt-1">Pending Approvals</p>
+                            <div className="bg-[#272727] rounded-2xl p-5 border border-[#333]">
+                                <p className="text-sm text-gray-400">Pending Approvals</p>
+                                <p className="text-2xl font-bold mt-1 text-yellow-400">23</p>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-
-
-                            <div className="bg-[#FBADCC]/20 rounded-xl p-4 ">
-                                <h3 className="text-lg font-semibold mb-4">Grafik Pendapatan</h3>
-
-                                <BarChart
-                                    style={{ width: '100%', maxWidth: 600, maxHeight: '70vh', aspectRatio: 1.618 }}
-                                    responsive
-                                    data={data}
-                                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                                >
-                                    <CartesianGrid strokeDasharray="5 5" />
-                                    <XAxis dataKey="month" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Bar dataKey="revenue" barSize={20} fill="#E21D8F" name="Pendapatan" />
-                                    <Bar dataKey="profit" barSize={20} fill="#FBADCC" name="Keuntungan" />
-                                </BarChart>
+                        {/* Chart */}
+                        <div className="bg-[#272727] rounded-2xl p-6 border border-[#333] mb-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-semibold">Grafik Pendapatan</h2>
+                                <span className="text-xs text-gray-400">6 bulan terakhir</span>
                             </div>
-                            <div className="bg-[#FBADCC]/20 rounded-xl p-4">
-                                <h3 className="text-lg font-semibold mb-4">Grafik Pendapatan</h3>
-
+                            <div className="w-full">
                                 <BarChart
-                                    style={{ width: '100%', maxWidth: 600, maxHeight: '70vh', aspectRatio: 1.618 }}
+                                    style={{ width: "100%", maxWidth: "100%", height: 320 }}
                                     responsive
                                     data={data}
-                                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                                 >
-                                    <CartesianGrid strokeDasharray="5 5" />
-                                    <XAxis dataKey="month" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Bar dataKey="revenue" barSize={20} fill="#E21D8F" name="Pendapatan" />
-                                    <Bar dataKey="profit" barSize={20} fill="#FBADCC" name="Keuntungan" />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                                    <XAxis dataKey="month" stroke="#888" tick={{ fontSize: 12 }} />
+                                    <YAxis stroke="#888" tick={{ fontSize: 12 }} />
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: "#1a1a1a",
+                                            border: "1px solid #333",
+                                            borderRadius: "8px",
+                                        }}
+                                        labelStyle={{ color: "#fff" }}
+                                    />
+                                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                                    <Bar dataKey="revenue" barSize={24} fill="#E21D8F" name="Pendapatan" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="profit" barSize={24} fill="#FBADCC" name="Keuntungan" radius={[4, 4, 0, 0]} />
                                 </BarChart>
                             </div>
                         </div>
 
+                        {/* Grid Panels */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Ajuan Event */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <div className="flex items-center justify-between mb-4">
                                     <h2 className="text-lg font-semibold">Ajuan Event</h2>
-                                    <Link href="/superadmin/approve-event" className="text-sm text-[#FBADCC] hover:underline">
+                                    <Link href="/admin/concert" className="text-sm text-[#FBADCC] hover:underline">
                                         View All
                                     </Link>
                                 </div>
@@ -141,7 +133,7 @@ export default function SuperAdminDashboard() {
                                                 <p className="text-sm font-medium truncate">{event.name}</p>
                                                 <p className="text-xs text-gray-400">{event.organizer} • {event.submitted}</p>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-2 shrink-0">
                                                 <button className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-xs hover:bg-green-500/30 transition-colors">
                                                     Approve
                                                 </button>
@@ -154,10 +146,11 @@ export default function SuperAdminDashboard() {
                                 </div>
                             </div>
 
+                            {/* Register EO */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <div className="flex items-center justify-between mb-4">
                                     <h2 className="text-lg font-semibold">Register EO</h2>
-                                    <Link href="/superadmin/approve-eo" className="text-sm text-[#FBADCC] hover:underline">
+                                    <Link href="/admin/eo" className="text-sm text-[#FBADCC] hover:underline">
                                         View All
                                     </Link>
                                 </div>
@@ -168,7 +161,7 @@ export default function SuperAdminDashboard() {
                                                 <p className="text-sm font-medium truncate">{eo.name}</p>
                                                 <p className="text-xs text-gray-400">{eo.email} • {eo.submitted}</p>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-2 shrink-0">
                                                 <button className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-xs hover:bg-green-500/30 transition-colors">
                                                     Approve
                                                 </button>
@@ -181,10 +174,11 @@ export default function SuperAdminDashboard() {
                                 </div>
                             </div>
 
+                            {/* Transaksi Terbaru */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <div className="flex items-center justify-between mb-4">
                                     <h2 className="text-lg font-semibold">Transaksi Terbaru</h2>
-                                    <Link href="/superadmin/transactions" className="text-sm text-[#FBADCC] hover:underline">
+                                    <Link href="/admin/orders" className="text-sm text-[#FBADCC] hover:underline">
                                         View All
                                     </Link>
                                 </div>
@@ -193,13 +187,13 @@ export default function SuperAdminDashboard() {
                                         <div key={transaction.id} className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors">
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium truncate">{transaction.event}</p>
-                                                <p className="text-xs text-gray-400">{transaction.organizer}</p>
+                                                <p className="text-xs text-gray-400">{transaction.organizer} • {transaction.date}</p>
                                             </div>
-                                            <div className="text-right">
+                                            <div className="text-right shrink-0 ml-3">
                                                 <p className="text-sm font-bold text-[#FBADCC]">{transaction.amount}</p>
-                                                <span className={`text-xs px-2.5 py-0.5 rounded-full ${transaction.status === 'Completed'
-                                                    ? 'bg-green-500/20 text-green-400'
-                                                    : 'bg-yellow-500/20 text-yellow-400'
+                                                <span className={`text-xs px-2.5 py-0.5 rounded-full ${transaction.status === "Completed"
+                                                    ? "bg-green-500/20 text-green-400"
+                                                    : "bg-yellow-500/20 text-yellow-400"
                                                     }`}>
                                                     {transaction.status}
                                                 </span>
@@ -209,32 +203,33 @@ export default function SuperAdminDashboard() {
                                 </div>
                             </div>
 
+                            {/* Semua User */}
                             <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                 <div className="flex items-center justify-between mb-4">
                                     <h2 className="text-lg font-semibold">Semua User</h2>
-                                    <Link href="/superadmin/users" className="text-sm text-[#FBADCC] hover:underline">
+                                    <Link href="/admin/users" className="text-sm text-[#FBADCC] hover:underline">
                                         View All
                                     </Link>
                                 </div>
                                 <div className="space-y-3">
                                     {users.map((user) => (
                                         <div key={user.id} className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-[#FBADCC] flex items-center justify-center text-black font-bold text-xs">
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="w-8 h-8 rounded-full bg-[#FBADCC] flex items-center justify-center text-black font-bold text-xs shrink-0">
                                                     {user.name.charAt(0)}
                                                 </div>
-                                                <div className="flex-1 min-w-0">
+                                                <div className="min-w-0">
                                                     <p className="text-sm font-medium truncate">{user.name}</p>
-                                                    <p className="text-xs text-gray-400">{user.email}</p>
+                                                    <p className="text-xs text-gray-400 truncate">{user.email}</p>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
+                                            <div className="flex items-center gap-2 shrink-0 ml-3">
                                                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400">
                                                     {user.role}
                                                 </span>
-                                                <span className={`text-xs ml-2 px-2.5 py-0.5 rounded-full ${user.status === 'Active'
-                                                    ? 'bg-green-500/20 text-green-400'
-                                                    : 'bg-red-500/20 text-red-400'
+                                                <span className={`text-xs px-2.5 py-0.5 rounded-full ${user.status === "Active"
+                                                    ? "bg-green-500/20 text-green-400"
+                                                    : "bg-red-500/20 text-red-400"
                                                     }`}>
                                                     {user.status}
                                                 </span>
@@ -248,6 +243,5 @@ export default function SuperAdminDashboard() {
                 </div>
             </div>
         </AdminGuard>
-
     )
 }

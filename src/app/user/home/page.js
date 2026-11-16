@@ -194,9 +194,8 @@ export default async function Home() {
             {["Semua", "Minggu Ini", "VIP Tiket"].map((tab, idx) => (
               <button
                 key={idx}
-                className={`px-6 py-2 text-sm font-semibold rounded-full transition ${
-                  idx === 0 ? "bg-gray-600 text-white" : "text-gray-400 hover:text-white"
-                }`}
+                className={`px-6 py-2 text-sm font-semibold rounded-full transition ${idx === 0 ? "bg-gray-600 text-white" : "text-gray-400 hover:text-white"
+                  }`}
               >
                 {tab}
               </button>
@@ -236,7 +235,7 @@ export default async function Home() {
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="text-gray-400 text-xs mb-1">Mulai dari</span>
-                     
+
                     </div>
                     <a href={`/user/ticket-selection/${konser.id}`}>            {/* ⬅️ KEY id */}
                       <button className="bg-[#f9a8d4] hover:bg-[#f472b6] text-[#0f0f11] text-sm font-semibold px-6 py-2.5 rounded-full transition">

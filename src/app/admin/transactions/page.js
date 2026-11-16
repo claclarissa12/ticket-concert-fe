@@ -9,11 +9,9 @@ export default function SuperAdminTransactions() {
     const [searchTerm, setSearchTerm] = useState("")
 
     const transactions = [
-        { id: 1, event: "Konser Melodi Senja", buyer: "Admin", tickets: 1, amount: 1500000, status: "paid", date: "15 Nov 2026", time: "12:00", method: "Bank Transfer", image: "https://images.unsplash.com/photo-1540039155732-684736882273?w=200" },
-        { id: 2, event: "Konser Melodi Senja", buyer: "Admin", tickets: 1, amount: 750000, status: "pending", date: "16 Nov 2026", time: "15:00", method: "QRIS", image: "https://images.unsplash.com/photo-1540039155732-684736882273?w=200" },
+      
         { id: 3, event: "Neon Party 2026", buyer: "Admin", tickets: 2, amount: 4000000, status: "paid", date: "18 Nov 2026", time: "10:00", method: "Credit Card", image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200" },
         { id: 4, event: "Rock In Solo", buyer: "Admin", tickets: 1, amount: 300000, status: "cancelled", date: "05 Okt 2026", time: "10:00", method: "OVO", image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=200" },
-        { id: 5, event: "Konser Melodi Senja", buyer: "Admin", tickets: 1, amount: 500000, status: "expired", date: "10 Nov 2026", time: "10:00", method: "GoPay", image: "https://images.unsplash.com/photo-1540039155732-684736882273?w=200" },
     ]
 
     const formatPrice = (price) => {

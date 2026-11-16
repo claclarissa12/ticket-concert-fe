@@ -10,7 +10,6 @@ export default function SuperAdminApproveEvent() {
     const [searchTerm, setSearchTerm] = useState("")
 
     const events = [
-        { id: 1, title: "Konser Melodi Senja", organizer: "Admin", email: "admin@gmail.com", date: "01 Des 2026", location: "Jakarta", status: "draft", banner_url: "https://images.unsplash.com/photo-1540039155732-684736882273?w=200", created_at: "2026-01-01" },
         { id: 2, title: "Neon Party 2026", organizer: "Admin", email: "admin@gmail.com", date: "25 Nov 2026", location: "Bandung", status: "published", banner_url: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=200", created_at: "2026-01-02" },
         { id: 3, title: "Rock In Solo", organizer: "Admin", email: "admin@gmail.com", date: "15 Okt 2026", location: "Solo", status: "published", banner_url: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=200", created_at: "2026-01-03" },
         { id: 4, title: "K-Pop Festival Indonesia", organizer: "Admin", email: "admin@gmail.com", date: "20 Sep 2026", location: "Jakarta", status: "cancelled", banner_url: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=200", created_at: "2026-01-04" },
