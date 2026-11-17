@@ -4,41 +4,50 @@ import AdminGuard from "@/components/admin/guardAdmin"
 import SidebarAdmin from "@/components/admin/sidebarADM"
 import Link from "next/link"
 import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from "recharts"
-
-const data = [
-    { month: "Jan", revenue: 4200, profit: 1100 },
-    { month: "Feb", revenue: 5800, profit: 1500 },
-    { month: "Mar", revenue: 7200, profit: 2400 },
-    { month: "Apr", revenue: 6100, profit: 1800 },
-    { month: "May", revenue: 8900, profit: 3100 },
-    { month: "Jun", revenue: 7400, profit: 2600 },
-]
+import { adminApi } from "../../../../lib/api"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 export default function SuperAdminDashboard() {
-    const pendingEvents = [
-        { id: 1, name: "Nassar Tour 2026", organizer: "Event Organizer Corp", date: "20 Mei 2026", status: "Pending", submitted: "2 hari lalu" },
-        { id: 2, name: "Electronic Fest 2026", organizer: "Festival Pro", date: "25 Mei 2026", status: "Pending", submitted: "5 hari lalu" },
-        { id: 3, name: "Jazz Night", organizer: "Music Lounge", date: "30 Mei 2026", status: "Pending", submitted: "1 minggu lalu" },
-    ]
+    const [stats, setStats] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
 
-    const pendingEO = [
-        { id: 1, name: "Creative Events", email: "creative@events.com", phone: "+62 812 3456 7890", status: "Pending", submitted: "3 hari lalu" },
-        { id: 2, name: "Concert Pro", email: "info@concertpro.com", phone: "+62 813 4567 8901", status: "Pending", submitted: "1 minggu lalu" },
-        { id: 3, name: "Festival Organizer", email: "hello@festival.com", phone: "+62 814 5678 9012", status: "Pending", submitted: "2 minggu lalu" },
-    ]
+    const fetchDashboard = useCallback(async () => {
+        setLoading(true)
+        setError("")
+        try {
+            const res = await adminApi.getDashboard()
+            const payload = res?.data?.data ?? res?.data ?? res
+            setStats(payload)
+        } catch (err) {
+            console.error("ERROR:", err)
+            setError(err.response?.data?.message || err.message || "Gagal memuat dashboard")
+        } finally {
+            setLoading(false)
+        }
+    }, [])
 
-    const transactions = [
-        { id: 1, event: "Nassar Tour 2026", organizer: "Event Organizer Corp", amount: "Rp 3.400.000", status: "Completed", date: "20 Mei 2026" },
-        { id: 2, event: "Electronic Fest 2026", organizer: "Festival Pro", amount: "Rp 1.200.000", status: "Pending", date: "21 Mei 2026" },
-        { id: 3, event: "Jazz Night", organizer: "Music Lounge", amount: "Rp 250.000", status: "Completed", date: "22 Mei 2026" },
-    ]
+    useEffect(() => { fetchDashboard() }, [fetchDashboard])
 
-    const users = [
-        { id: 1, name: "Ahmad Fauzi", email: "ahmad@email.com", role: "User", status: "Active", joined: "Jan 2026" },
-        { id: 2, name: "Siti Rahma", email: "siti@email.com", role: "User", status: "Active", joined: "Feb 2026" },
-        { id: 3, name: "Budi Santoso", email: "budi@email.com", role: "Organizer", status: "Active", joined: "Mar 2026" },
-        { id: 4, name: "Dewi Lestari", email: "dewi@email.com", role: "User", status: "Inactive", joined: "Apr 2026" },
-    ]
+    // Data chart: backend belum kirim timeseries, jadi kosongkan dulu
+    // Nanti kalau backend punya endpoint /dashboard/revenue-chart, isi dari situ
+    const chartData = useMemo(() => {
+        return stats?.revenue_chart ?? []
+    }, [stats])
+
+    // List yang belum ada di response getDashboard -> sementara kosong
+    const pendingEvents = stats?.pending_events ?? []
+    const pendingEO = stats?.pending_eo ?? []
+    const transactions = stats?.recent_transactions ?? []
+    const users = stats?.recent_users ?? []
+
+    const totalUsers = stats?.users ?? 0
+    const totalEvents = (stats?.concerts?.draft ?? 0) + (stats?.concerts?.published ?? 0) + (stats?.concerts?.cancelled ?? 0)
+    const totalRevenue = stats?.revenue ?? 0
+    const pendingApprovals = pendingEvents.length + pendingEO.length
+
+    const formatRupiah = (n) =>
+        new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n || 0)
 
     return (
         <AdminGuard>
@@ -54,8 +63,12 @@ export default function SuperAdminDashboard() {
                                 <p className="text-gray-400 text-sm mt-1">Super Admin - Overview</p>
                             </div>
                             <div className="flex items-center gap-3">
-                                <button className="px-4 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
-                                    Refresh
+                                <button
+                                    onClick={fetchDashboard}
+                                    disabled={loading}
+                                    className="px-4 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333] disabled:opacity-50"
+                                >
+                                    {loading ? "Loading..." : "Refresh"}
                                 </button>
                                 <select className="px-4 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333] outline-none">
                                     <option>Last 7 Days</option>
@@ -65,23 +78,29 @@ export default function SuperAdminDashboard() {
                             </div>
                         </div>
 
+                        {error && (
+                            <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/20 text-red-400 text-sm border border-red-500/30">
+                                {error}
+                            </div>
+                        )}
+
                         {/* Stat Cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                             <div className="bg-[#272727] rounded-2xl p-5 border border-[#333]">
                                 <p className="text-sm text-gray-400">Total Users</p>
-                                <p className="text-2xl font-bold mt-1">12,847</p>
+                                <p className="text-2xl font-bold mt-1">{totalUsers.toLocaleString("id-ID")}</p>
                             </div>
                             <div className="bg-[#272727] rounded-2xl p-5 border border-[#333]">
                                 <p className="text-sm text-gray-400">Total Events</p>
-                                <p className="text-2xl font-bold mt-1">156</p>
+                                <p className="text-2xl font-bold mt-1">{totalEvents.toLocaleString("id-ID")}</p>
                             </div>
                             <div className="bg-[#272727] rounded-2xl p-5 border border-[#333]">
                                 <p className="text-sm text-gray-400">Total Revenue</p>
-                                <p className="text-2xl font-bold mt-1 text-[#FBADCC]">Rp 8.7B</p>
+                                <p className="text-2xl font-bold mt-1 text-[#FBADCC]">{formatRupiah(totalRevenue)}</p>
                             </div>
                             <div className="bg-[#272727] rounded-2xl p-5 border border-[#333]">
                                 <p className="text-sm text-gray-400">Pending Approvals</p>
-                                <p className="text-2xl font-bold mt-1 text-yellow-400">23</p>
+                                <p className="text-2xl font-bold mt-1 text-yellow-400">{pendingApprovals}</p>
                             </div>
                         </div>
 
@@ -92,27 +111,32 @@ export default function SuperAdminDashboard() {
                                 <span className="text-xs text-gray-400">6 bulan terakhir</span>
                             </div>
                             <div className="w-full">
-                                <BarChart
-                                    style={{ width: "100%", maxWidth: "100%", height: 320 }}
-                                    responsive
-                                    data={data}
-                                    margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-                                >
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                                    <XAxis dataKey="month" stroke="#888" tick={{ fontSize: 12 }} />
-                                    <YAxis stroke="#888" tick={{ fontSize: 12 }} />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: "#1a1a1a",
-                                            border: "1px solid #333",
-                                            borderRadius: "8px",
-                                        }}
-                                        labelStyle={{ color: "#fff" }}
-                                    />
-                                    <Legend wrapperStyle={{ fontSize: 12 }} />
-                                    <Bar dataKey="revenue" barSize={24} fill="#E21D8F" name="Pendapatan" radius={[4, 4, 0, 0]} />
-                                    <Bar dataKey="profit" barSize={24} fill="#FBADCC" name="Keuntungan" radius={[4, 4, 0, 0]} />
-                                </BarChart>
+                                {chartData.length === 0 ? (
+                                    <p className="text-sm text-gray-400 py-10 text-center">
+                                        Data grafik belum tersedia.
+                                    </p>
+                                ) : (
+                                    <BarChart
+                                        style={{ width: "100%", maxWidth: "100%", height: 320 }}
+                                        data={chartData}
+                                        margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                                        <XAxis dataKey="month" stroke="#888" tick={{ fontSize: 12 }} />
+                                        <YAxis stroke="#888" tick={{ fontSize: 12 }} />
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: "#1a1a1a",
+                                                border: "1px solid #333",
+                                                borderRadius: "8px",
+                                            }}
+                                            labelStyle={{ color: "#fff" }}
+                                        />
+                                        <Legend wrapperStyle={{ fontSize: 12 }} />
+                                        <Bar dataKey="revenue" barSize={24} fill="#E21D8F" name="Pendapatan" radius={[4, 4, 0, 0]} />
+                                        <Bar dataKey="profit" barSize={24} fill="#FBADCC" name="Keuntungan" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                )}
                             </div>
                         </div>
 
@@ -127,7 +151,9 @@ export default function SuperAdminDashboard() {
                                     </Link>
                                 </div>
                                 <div className="space-y-3">
-                                    {pendingEvents.map((event) => (
+                                    {pendingEvents.length === 0 ? (
+                                        <p className="text-sm text-gray-400">Tidak ada ajuan event.</p>
+                                    ) : pendingEvents.map((event) => (
                                         <div key={event.id} className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors">
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium truncate">{event.name}</p>
@@ -155,7 +181,9 @@ export default function SuperAdminDashboard() {
                                     </Link>
                                 </div>
                                 <div className="space-y-3">
-                                    {pendingEO.map((eo) => (
+                                    {pendingEO.length === 0 ? (
+                                        <p className="text-sm text-gray-400">Tidak ada pendaftaran EO.</p>
+                                    ) : pendingEO.map((eo) => (
                                         <div key={eo.id} className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors">
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium truncate">{eo.name}</p>
@@ -183,7 +211,9 @@ export default function SuperAdminDashboard() {
                                     </Link>
                                 </div>
                                 <div className="space-y-3">
-                                    {transactions.map((transaction) => (
+                                    {transactions.length === 0 ? (
+                                        <p className="text-sm text-gray-400">Belum ada transaksi.</p>
+                                    ) : transactions.map((transaction) => (
                                         <div key={transaction.id} className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors">
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium truncate">{transaction.event}</p>
@@ -212,11 +242,13 @@ export default function SuperAdminDashboard() {
                                     </Link>
                                 </div>
                                 <div className="space-y-3">
-                                    {users.map((user) => (
+                                    {users.length === 0 ? (
+                                        <p className="text-sm text-gray-400">Belum ada data user.</p>
+                                    ) : users.map((user) => (
                                         <div key={user.id} className="flex items-center justify-between p-3 bg-[#1a1a1a] rounded-xl hover:bg-[#222] transition-colors">
                                             <div className="flex items-center gap-3 min-w-0">
                                                 <div className="w-8 h-8 rounded-full bg-[#FBADCC] flex items-center justify-center text-black font-bold text-xs shrink-0">
-                                                    {user.name.charAt(0)}
+                                                    {user.name?.charAt(0)?.toUpperCase() || "?"}
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className="text-sm font-medium truncate">{user.name}</p>

@@ -3,18 +3,39 @@
 import AdminGuard from "@/components/admin/guardAdmin"
 import SidebarAdmin from "@/components/admin/sidebarADM"
 import Link from "next/link"
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
+import { concertApi } from "../../../../lib/api"
 
 export default function SuperAdminEvents() {
     const [activeTab, setActiveTab] = useState("all")
     const [searchTerm, setSearchTerm] = useState("")
 
-    const events = [
-        { id: 2, title: "Neon Party 2026", date: "25 Nov 2026", location: "Bandung", status: "published", tickets: 50, sold: 0, revenue: 0, banner_url: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400" },
-        { id: 3, title: "Rock In Solo", date: "15 Okt 2026", location: "Solo", status: "published", tickets: 200, sold: 0, revenue: 0, banner_url: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400" },
-        { id: 4, title: "Jazz Under The Stars", date: "10 Jan 2027", location: "Surabaya", status: "draft", tickets: 0, sold: 0, revenue: 0, banner_url: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400" },
-        { id: 5, title: "K-Pop Festival Indonesia", date: "20 Sep 2026", location: "Jakarta", status: "cancelled", tickets: 0, sold: 0, revenue: 0, banner_url: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=400" },
-    ]
+    const [concert, setConcert] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState("")
+
+
+    const fetchConcert = useCallback(async () => {
+        setLoading(true)
+        setError("")
+        try {
+            const res = await concertApi.getConcert()
+
+            const listData = res.data?.items || [];
+            setConcert(listData);
+
+        } catch (err) {
+            console.error("ERROR:", err)
+            setError(err.message || "Gagal memuat data")
+        } finally {
+            setLoading(false)
+        }
+    }, [])
+    useEffect(() => {
+        fetchConcert()
+    }, [fetchConcert])
+
+
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)
@@ -38,10 +59,10 @@ export default function SuperAdminEvents() {
         }
     }
 
-    const filteredEvents = events.filter(event => {
-        const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredEvents = concert.filter(concert => {
+        const matchesSearch = concert.title.toLowerCase().includes(searchTerm.toLowerCase())
         if (activeTab === "all") return matchesSearch
-        return matchesSearch && event.status === activeTab
+        return matchesSearch && concert.status === activeTab
     })
 
     return (
@@ -75,39 +96,39 @@ export default function SuperAdminEvents() {
                         </div>
 
                         <div className="divide-y divide-[#222] border-y border-[#222]">
-                            {filteredEvents.map(event => {
-                                const pct = event.tickets > 0 ? Math.round((event.sold / event.tickets) * 100) : 0
+                            {filteredEvents.map(concert => {
+                                const pct = concert.tickets > 0 ? Math.round((concert.sold / concert.tickets) * 100) : 0
                                 return (
-                                    <div key={event.id} className="py-5 hover:bg-[#181818] transition-colors -mx-3 px-3 rounded-lg">
+                                    <div key={concert.id} className="py-5 hover:bg-[#181818] transition-colors -mx-3 px-3 rounded-lg">
                                         <div className="flex flex-col sm:flex-row gap-4">
                                             <img
-                                                src={event.banner_url}
-                                                alt={event.title}
+                                                src={concert.banner_url}
+                                                alt={concert.title}
                                                 className="w-full sm:w-32 h-32 rounded-lg object-cover flex-shrink-0 grayscale-[30%]"
                                             />
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div className="min-w-0">
-                                                        <h3 className="font-medium truncate">{event.title}</h3>
+                                                        <h3 className="font-medium truncate">{concert.title}</h3>
                                                     </div>
                                                     <span className={`text-[11px] px-2 py-0.5 rounded font-medium ${getStatusColor(event.status)}`}>
-                                                        {getStatusLabel(event.status)}
+                                                        {getStatusLabel(concert.status)}
                                                     </span>
                                                 </div>
 
                                                 <p className="text-xs text-neutral-500 mt-2">
-                                                    {event.date} · {event.location}
+                                                    {concert.date} · {concert.location}
                                                 </p>
 
                                                 <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-3 text-xs text-neutral-400">
                                                     <span>
                                                         Tiket terjual{" "}
-                                                        <span className="text-white font-medium">{event.sold}</span>
-                                                        <span className="text-neutral-600">/{event.tickets}</span>
+                                                        <span className="text-white font-medium">{concert.sold}</span>
+                                                        <span className="text-neutral-600">/{concert.tickets}</span>
                                                     </span>
                                                     <span>
                                                         Revenue{" "}
-                                                        <span className="text-white font-medium">{formatPrice(event.revenue)}</span>
+                                                        <span className="text-white font-medium">{formatPrice(concert.revenue)}</span>
                                                     </span>
                                                     <span>
                                                         Kehadiran{" "}
@@ -126,7 +147,7 @@ export default function SuperAdminEvents() {
 
                                                 <div className="flex gap-2 mt-3">
                                                     <Link
-                                                        href={`/admin/events/${event.id}`}
+                                                        href={`/admin/events/${concert.id}`}
                                                         className="text-xs px-3 py-1.5 rounded-md border border-[#2a2a2a] hover:border-[#444] hover:bg-[#1f1f1f] transition-colors inline-block"
                                                     >
                                                         Detail
@@ -148,7 +169,7 @@ export default function SuperAdminEvents() {
                         )}
 
                         <div className="flex items-center justify-between mt-6">
-                            <p className="text-sm text-gray-400">Showing {filteredEvents.length} of {events.length} events</p>
+                            <p className="text-sm text-gray-400">Showing {filteredEvents.length} of {concert.length} events</p>
                             <div className="flex gap-2">
                                 <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">Previous</button>
                                 <button className="px-4 py-2 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black">1</button>

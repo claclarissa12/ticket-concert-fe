@@ -48,6 +48,10 @@ export default function SuperAdminUsers() {
             setLoading(false)
         }
     }, [])
+    useEffect(() => {
+        setLoading(true)           // set loading di sini, bukan di dalam fetchUsers
+        fetchUsers()
+    }, [fetchUsers])
 
     const filteredUsers = users.filter((user) => {
         const matchesSearch =

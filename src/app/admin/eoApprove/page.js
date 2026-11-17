@@ -2,44 +2,59 @@
 
 import AdminGuard from "@/components/admin/guardAdmin"
 import SidebarAdmin from "@/components/admin/sidebarADM"
-import { useState } from "react"
-
-const INITIAL_EOS = [
-    { id: 1, name: "Budi Santoso", email: "budi@email.com", phone: "+62 814 5678 9012", role: "event_organizer", is_active: true, created_at: "2026-03-10T10:00:00" },
-    { id: 2, name: "Rina Andini", email: "rina@email.com", phone: "+62 816 7890 1234", role: "event_organizer", is_active: true, created_at: "2026-01-12T10:00:00" },
-    { id: 3, name: "Rizki Pratama", email: "rizki@email.com", phone: "+62 819 0123 4567", role: "event_organizer", is_active: true, created_at: "2026-02-18T10:00:00" },
-    { id: 4, name: "Dewi Lestari", email: "dewi@email.com", phone: "+62 815 6789 0123", role: "event_organizer", is_active: false, created_at: "2026-04-05T10:00:00" },
-    { id: 5, name: "Andi Wijaya", email: "andi@email.com", phone: "+62 817 8901 2345", role: "event_organizer", is_active: false, created_at: "2026-03-25T10:00:00" },
-    { id: 6, name: "Nina Sari", email: "nina@email.com", phone: "+62 818 9012 3456", role: "event_organizer", is_active: false, created_at: "2026-04-01T10:00:00" },
-]
+import { useCallback, useEffect, useState } from "react"
+import { adminApi } from "../../../../lib/api"
 
 export default function SuperAdminEO() {
-    const [eos, setEos] = useState(INITIAL_EOS)
-    const [actionLoading, setActionLoading] = useState(null)
+    const [eos, setEos] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
+    const [actionLoading, setActionLoading] = useState(null) // id EO yang sedang diproses
 
-    const handleApprove = (id, name) => {
-        if (!window.confirm(`Approve Event Organizer "${name}"?`)) return
+    const fetchEO = useCallback(async () => {
+        setLoading(true)
+        setError("")
+        try {
+            const res = await adminApi.getAllEO()
+            const payload = res?.data?.data ?? res?.data ?? res
+            const list = Array.isArray(payload) ? payload : (payload?.items ?? [])
+            setEos(list)
+        } catch (err) {
+            setError(err.message || "Gagal memuat data Event Organizer")
+        } finally {
+            setLoading(false)
+        }
+    }, [])
+
+    useEffect(() => { fetchEO() }, [fetchEO])
+
+    const handleApprove = async (id, name) => {
+        if (!confirm(`Approve Event Organizer "${name}"?`)) return
         setActionLoading(id)
-        setTimeout(() => {
-            setEos((prev) =>
-                prev.map((eo) => (eo.id === id ? { ...eo, is_active: true } : eo))
-            )
+        setError("")
+        try {
+            await adminApi.approveEO(id)
+            await fetchEO()
+        } catch (err) {
+            setError(err.message)
+        } finally {
             setActionLoading(null)
-        }, 300)
+        }
     }
 
-    const handleReject = (id, name) => {
-        if (!window.confirm(`Reject Event Organizer "${name}"?`)) return
+    const handleReject = async (id, name) => {
+        if (!confirm(`Reject Event Organizer "${name}"?`)) return
         setActionLoading(id)
-        setTimeout(() => {
-            setEos((prev) =>
-                prev.map((eo) => (eo.id === id ? { ...eo, is_active: false } : eo))
-            )
+        setError("")
+        try {
+            await adminApi.rejectEO(id)
+            await fetchEO()
+        } catch (err) {
+            setError(err.message)
+        } finally {
             setActionLoading(null)
-        }, 300)
+        }
     }
-
-    const pendingCount = eos.filter((eo) => !eo.is_active).length
 
     return (
         <AdminGuard>
@@ -53,15 +68,23 @@ export default function SuperAdminEO() {
                                     Event Organizer
                                 </h1>
                                 <p className="text-gray-400 text-sm mt-1">
-                                    Approve atau reject pendaftaran Event Organizer
-                                    {pendingCount > 0 && (
-                                        <span className="ml-2 text-yellow-400 font-semibold">
-                                            ({pendingCount} pending)
-                                        </span>
-                                    )}
+                                    Kelola pendaftaran dan status Event Organizer
                                 </p>
                             </div>
+                            <button
+                                onClick={fetchEO}
+                                disabled={loading}
+                                className="px-4 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333] disabled:opacity-50"
+                            >
+                                {loading ? "Loading..." : "Refresh"}
+                            </button>
                         </div>
+
+                        {error && (
+                            <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/20 text-red-400 text-sm border border-red-500/30">
+                                {error}
+                            </div>
+                        )}
 
                         <div className="bg-[#272727] rounded-2xl overflow-hidden border border-[#333]">
                             <div className="grid grid-cols-12 gap-4 p-4 bg-[#1a1a1a] text-sm font-semibold text-gray-400 border-b border-[#333]">
@@ -72,7 +95,13 @@ export default function SuperAdminEO() {
                                 <div className="col-span-2 text-right">Actions</div>
                             </div>
 
-                            {eos.length === 0 && (
+                            {loading && eos.length === 0 && (
+                                <div className="p-8 text-center text-sm text-gray-400">
+                                    Memuat data...
+                                </div>
+                            )}
+
+                            {!loading && eos.length === 0 && (
                                 <div className="p-8 text-center text-sm text-gray-400">
                                     Belum ada Event Organizer.
                                 </div>
@@ -106,11 +135,10 @@ export default function SuperAdminEO() {
                                     <div className="col-span-2 text-sm">{eo.phone || "-"}</div>
                                     <div className="col-span-2">
                                         <span
-                                            className={`text-xs px-2.5 py-1 rounded-full ${
-                                                eo.is_active
-                                                    ? "bg-green-500/20 text-green-400"
-                                                    : "bg-yellow-500/20 text-yellow-400"
-                                            }`}
+                                            className={`text-xs px-2.5 py-1 rounded-full ${eo.is_active
+                                                ? "bg-green-500/20 text-green-400"
+                                                : "bg-yellow-500/20 text-yellow-400"
+                                                }`}
                                         >
                                             {eo.is_active ? "Approved" : "Pending"}
                                         </span>
