@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import AdminGuard from "@/components/admin/guardAdmin"
-import { concertApi } from "../../../../../lib/api"
+import { adminApi, concertApi } from "../../../../../lib/api"
 import SidebarAdmin from "@/components/admin/sidebarADM"
 
 export default function DetailEvent() {
@@ -16,6 +16,8 @@ export default function DetailEvent() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
     const [activeTab, setActiveTab] = useState("all")
+    const [deletingId, setDeletingId] = useState(null)
+
 
     const fetchDetail = useCallback(async () => {
         if (!id) return
@@ -34,6 +36,30 @@ export default function DetailEvent() {
             setLoading(false)
         }
     }, [id])
+
+    const handleDelete = async (id) => {
+        const confirmed = window.confirm(
+            "Apakah kamu yakin ingin menghapus konser ini? Tindakan ini tidak dapat dibatalkan."
+        )
+
+        if (!confirmed) return
+
+        try {
+            setDeletingId(id)
+
+            const result = await adminApi.removeConcert(id)
+
+            alert(result.message || "Konser berhasil dihapus")
+
+            await fetchConcerts()
+
+        } catch (err) {
+            console.error("DELETE CONCERT ERROR:", err)
+            alert(err.message || "Gagal menghapus konser")
+        } finally {
+            setDeletingId(null)
+        }
+    }
 
     useEffect(() => {
         fetchDetail()
@@ -108,7 +134,7 @@ export default function DetailEvent() {
                                     {concert.title} - Complete event information & ticket tiers
                                 </p>
                             </div>
-                           
+
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -280,11 +306,12 @@ export default function DetailEvent() {
                                             Manage Tickets
                                         </Link>
 
-                                        <button className="w-full px-4 py-2.5 bg-red-500/10 rounded-xl text-sm text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20 flex items-center justify-center gap-2">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                            Delete Event
+                                        <button
+                                            onClick={() => handleDelete(concert.id)}
+                                            disabled={deletingId === concert.id}
+                                            className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 disabled:opacity-50"
+                                        >
+                                            {deletingId === concert.id ? "Deleting..." : "Delete"}
                                         </button>
                                     </div>
                                 </div>

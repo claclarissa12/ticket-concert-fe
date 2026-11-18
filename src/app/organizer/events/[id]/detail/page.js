@@ -1,14 +1,16 @@
+
 "use client"
 
+import { useCallback, useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
 import EoGuard from "@/components/EO/guardEO"
 import OrganizerSidebar from "@/components/EO/sidebarEO"
 import Link from "next/link"
-import { useParams } from "next/navigation"
-import { concertApi } from "../../../../../../lib/api"
-import { useCallback, useEffect, useState } from "react"
+import { organizerApi } from "../../../../../../lib/api"
 
 export default function DetailEvent() {
     const params = useParams()
+    const router = useRouter()
     const id = params.id
 
     const [concert, setConcert] = useState(null)
@@ -16,82 +18,109 @@ export default function DetailEvent() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
     const [activeTab, setActiveTab] = useState("all")
+    const [publishing, setPublishing] = useState(false)
+    const [publishMessage, setPublishMessage] = useState("")
+    const [publishError, setPublishError] = useState("")
+    const [deleting, setDeleting] = useState(false)
 
     const fetchDetail = useCallback(async () => {
         if (!id) return
+
         setLoading(true)
         setError("")
-        try {
-            const res = await concertApi.getDetailConcert(id)
-            const data = res.data || {}
 
-            setConcert(data)
-            setTicketTiers(data.TicketTiers || data.ticketTiers || data.tiers || [])   // 👈 ini
+        try {
+            const [concertRes, tierRes] = await Promise.all([
+                organizerApi.getMyConcertById(id),
+                organizerApi.getTiers(id)
+            ])
+
+            const concertData = concertRes.data?.concert || concertRes.data
+            const tierData = tierRes.data?.items || tierRes.data?.tiers || tierRes.data || []
+
+            setConcert(concertData)
+            setTicketTiers(Array.isArray(tierData) ? tierData : [])
         } catch (err) {
-            console.error("ERROR:", err)
-            setError(err.message || "Gagal memuat data")
+            console.error("GET DETAIL ERROR:", err)
+            setError(err.message || "Gagal memuat detail konser")
         } finally {
             setLoading(false)
         }
     }, [id])
 
+    const handlePublish = async () => {
+        if (!window.confirm("Apakah kamu yakin ingin mempublikasikan konser ini?")) return
+
+        setPublishing(true)
+        setPublishMessage("")
+        setPublishError("")
+
+        try {
+            await organizerApi.publishConcert(id)
+            setPublishMessage("Konser berhasil dipublikasikan!")
+            await fetchDetail()
+        } catch (err) {
+            console.error("PUBLISH CONCERT ERROR:", err)
+            setPublishError(err.message || "Gagal mempublikasikan konser")
+        } finally {
+            setPublishing(false)
+        }
+    }
+
+    const handleDelete = async () => {
+        if (!window.confirm("Apakah kamu yakin ingin menghapus konser ini? Tindakan ini tidak dapat dibatalkan.")) return
+
+        try {
+            setDeleting(true)
+            const result = await organizerApi.deleteConcert(id)
+            alert(result.message || "Konser berhasil dihapus")
+            router.push("/organizer/events")
+            router.refresh()
+        } catch (err) {
+            console.error("DELETE CONCERT ERROR:", err)
+            alert(err.message || "Gagal menghapus konser")
+        } finally {
+            setDeleting(false)
+        }
+    }
+
     useEffect(() => {
         fetchDetail()
     }, [fetchDetail])
 
-    if (loading) return (
-        <EoGuard>
-            <div className="bg-[#131313] min-h-screen flex text-white">
-                <OrganizerSidebar />
-                <div className="flex-1 flex items-center justify-center">
-                    <p className="text-gray-400">Loading...</p>
+    if (loading || error || !concert) {
+        return (
+            <EoGuard>
+                <div className="bg-[#131313] min-h-screen flex text-white">
+                    <OrganizerSidebar />
+                    <div className="flex-1 flex items-center justify-center">
+                        <p className={error ? "text-red-400" : "text-gray-400"}>
+                            {loading ? "Loading..." : error || "Concert not found"}
+                        </p>
+                    </div>
                 </div>
-            </div>
-        </EoGuard>
-    )
-
-    if (error) return (
-        <EoGuard>
-            <div className="bg-[#131313] min-h-screen flex text-white">
-                <OrganizerSidebar />
-                <div className="flex-1 flex items-center justify-center">
-                    <p className="text-red-400">{error}</p>
-                </div>
-            </div>
-        </EoGuard>
-    )
-
-    if (!concert) return (
-        <EoGuard>
-            <div className="bg-[#131313] min-h-screen flex text-white">
-                <OrganizerSidebar />
-                <div className="flex-1 flex items-center justify-center">
-                    <p className="text-gray-400">Concert not found</p>
-                </div>
-            </div>
-        </EoGuard>
-    )
+            </EoGuard>
+        )
+    }
 
     const filteredTiers = ticketTiers.filter((tier) => {
         if (activeTab === "all") return true
         if (activeTab === "active") return (tier.status || "").toLowerCase() === "active"
         if (activeTab === "sold out") return (tier.sold || 0) >= (tier.quota || 0)
-        if (activeTab === "upcoming")
-            return tier.sale_start && new Date(tier.sale_start) > new Date()
+        if (activeTab === "upcoming") return tier.sale_start && new Date(tier.sale_start) > new Date()
         return true
     })
 
-    const totalQuota = ticketTiers.reduce((s, t) => s + (Number(t.quota) || 0), 0)
-    const totalSold = ticketTiers.reduce((s, t) => s + (Number(t.sold) || 0), 0)
+    const totalQuota = ticketTiers.reduce((total, tier) => total + (Number(tier.quota) || 0), 0)
+    const totalSold = ticketTiers.reduce((total, tier) => total + (Number(tier.sold) || 0), 0)
     const totalAvailable = totalQuota - totalSold
 
     return (
         <EoGuard>
             <div className="bg-[#131313] min-h-screen flex text-white">
                 <OrganizerSidebar />
-                <div className="flex-1 overflow-x-hidden">
+                <div className="flex-1 min-w-0 overflow-x-hidden">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                             <div>
                                 <div className="flex items-center gap-3">
@@ -100,35 +129,54 @@ export default function DetailEvent() {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                                         </svg>
                                     </Link>
-                                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-                                        Event Details & Manage Tickets
-                                    </h1>
+                                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Event Details & Manage Tickets</h1>
                                 </div>
-                                <p className="text-gray-400 text-sm mt-1">
-                                    {concert.title} - Complete event information & ticket tiers
-                                </p>
+                                <p className="text-gray-400 text-sm mt-1">{concert.title} - Complete event information & ticket tiers</p>
                             </div>
+
                             <div className="flex items-center gap-3">
                                 <Link href={`/organizer/events/${concert.id}/edit`} className="px-5 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
                                     Edit Event
                                 </Link>
-                                <button className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
-                                    Publish Event
-                                </button>
+                                {concert.status === "published" ? (
+                                    <span className="px-5 py-2.5 bg-green-500/20 text-green-400 rounded-xl text-sm font-semibold">Published</span>
+                                ) : concert.status === "cancelled" ? (
+                                    <span className="px-5 py-2.5 bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold">Cancelled</span>
+                                ) : (
+                                    <button onClick={handlePublish} disabled={publishing} className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                        {publishing ? "Publishing..." : "Publish Event"}
+                                    </button>
+                                )}
                             </div>
                         </div>
 
+                        {publishMessage && (
+                            <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl mb-5 text-sm">
+                                {publishMessage}
+                            </div>
+                        )}
+                        {publishError && (
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl mb-5 text-sm">
+                                {publishError}
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
                             <div className="lg:col-span-2 space-y-6">
-
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                     <div className="flex items-start gap-6">
                                         <img src={concert.banner_url} alt={concert.title} className="w-48 h-32 rounded-xl object-cover" />
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-2">
                                                 <h2 className="text-2xl font-bold">{concert.title}</h2>
-                                                <span className="text-xs px-3 py-1 rounded-full bg-green-500/20 text-green-400">Active</span>
+                                                <span className={`text-xs px-3 py-1 rounded-full ${concert.status === "published"
+                                                    ? "bg-green-500/20 text-green-400"
+                                                    : concert.status === "cancelled"
+                                                        ? "bg-red-500/20 text-red-400"
+                                                        : "bg-yellow-500/20 text-yellow-400"
+                                                    }`}>
+                                                    {concert.status?.charAt(0).toUpperCase() + concert.status?.slice(1)}
+                                                </span>
                                             </div>
                                             <div className="space-y-1 text-sm text-gray-400">
                                                 <div className="flex items-center gap-2">
@@ -156,94 +204,72 @@ export default function DetailEvent() {
                                     </div>
                                 </div>
 
-                                <div className="bg-[#272727] rounded-2xl border border-[#333] overflow-hidden">
-                                    <div className="flex border-b border-[#333]">
-                                        {["All", "Active", "Sold Out", "Upcoming"].map((tab) => (
-                                            <button
-                                                key={tab}
-                                                onClick={() => setActiveTab(tab.toLowerCase())}
-                                                className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === tab.toLowerCase()
-                                                    ? "border-[#FBADCC] text-[#FBADCC]"
-                                                    : "border-transparent text-gray-400 hover:text-white"
-                                                    }`}
-                                            >
-                                                {tab}
-                                            </button>
-                                        ))}
+                                <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
+                                    <div className="mb-5">
+                                        <h2 className="text-lg font-semibold">Ticket Tiers</h2>
+                                        <p className="text-sm text-gray-400 mt-1">Manage ticket categories for this event</p>
                                     </div>
-                                    <div className="p-6 space-y-4">
-                                        {filteredTiers.length === 0 && (
+
+                                    <div className="space-y-3">
+                                        {filteredTiers.length === 0 ? (
                                             <p className="text-center text-gray-400 py-8">Belum ada ticket tier.</p>
-                                        )}
+                                        ) : (
+                                            filteredTiers.map((tier) => {
+                                                const quota = Number(tier.quota) || 0
+                                                const sold = Number(tier.sold) || 0
+                                                const available = Math.max(quota - sold, 0)
+                                                let status = "Active"
 
-                                        {filteredTiers.map((tier) => (
-                                            <div key={tier.id} className="bg-[#1a1a1a] rounded-xl p-5 hover:bg-[#222] transition-colors border border-transparent hover:border-[#333]">
-                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-xl bg-[#FBADCC]/20 flex items-center justify-center text-[#FBADCC] font-bold text-sm">
-                                                            {(tier.name || "?").charAt(0)}
-                                                        </div>
-                                                        <div>
-                                                            <h3 className="font-semibold text-lg">{tier.name}</h3>
-                                                            <div className="flex items-center gap-3 text-sm text-gray-400">
-                                                                <span>Quota: {tier.quota}</span>
-                                                                <span>•</span>
-                                                                <span>Sold: {tier.sold}</span>
-                                                                <span>•</span>
-                                                                <span className="text-[#FBADCC] font-medium">
-                                                                    {new Intl.NumberFormat("id-ID", {
-                                                                        style: "currency",
-                                                                        currency: "IDR",
-                                                                        minimumFractionDigits: 0
-                                                                    }).format(Number(tier.price) || 0)}
+                                                if (available === 0) status = "Sold Out"
+                                                else if (tier.sale_start && new Date(tier.sale_start) > new Date()) status = "Upcoming"
+                                                else if (tier.sale_end && new Date(tier.sale_end) < new Date()) status = "Ended"
+
+                                                return (
+                                                    <div key={tier.id} className="bg-[#1a1a1a] rounded-xl p-5 border border-[#333]">
+                                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-12 h-12 rounded-xl bg-[#FBADCC]/20 flex items-center justify-center text-[#FBADCC] font-bold">
+                                                                    {(tier.name || "?").charAt(0)}
+                                                                </div>
+                                                                <div>
+                                                                    <h3 className="font-semibold text-lg">{tier.name}</h3>
+                                                                    <p className="text-[#FBADCC] font-medium text-sm">
+                                                                        {new Intl.NumberFormat("id-ID", {
+                                                                            style: "currency",
+                                                                            currency: "IDR",
+                                                                            maximumFractionDigits: 0
+                                                                        }).format(Number(tier.price) || 0)}
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-400 mt-1">
+                                                                        Quota: {quota.toLocaleString("id-ID")} · Sold: {sold.toLocaleString("id-ID")} · Available: {available.toLocaleString("id-ID")}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex items-center gap-3">
+                                                                <span className={`text-xs px-3 py-1 rounded-full ${status === "Sold Out"
+                                                                    ? "bg-red-500/20 text-red-400" : status === "Upcoming"
+                                                                        ? "bg-yellow-500/20 text-yellow-400" : status === "Ended"
+                                                                            ? "bg-gray-500/20 text-gray-400" : "bg-green-500/20 text-green-400"
+                                                                    }`}>
+                                                                    {status}
                                                                 </span>
+                                                                <div className="w-24">
+                                                                    <div className="w-full bg-[#333] rounded-full h-2">
+                                                                        <div className="bg-[#FBADCC] rounded-full h-2" style={{ width: `${quota > 0 ? Math.min((sold / quota) * 100, 100) : 0}%` }} />
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-32">
-                                                            <div className="flex justify-between text-xs mb-1">
-                                                                <span className="text-gray-400">Available</span>
-                                                                <span className="text-white">{(tier.quota || 0) - (tier.sold || 0)}</span>
-                                                            </div>
-                                                            <div className="w-full bg-[#272727] rounded-full h-2">
-                                                                <div
-                                                                    className="bg-[#FBADCC] rounded-full h-2 transition-all"
-                                                                    style={{ width: `${tier.quota > 0 ? (tier.sold / tier.quota) * 100 : 0}%` }}
-                                                                ></div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="flex gap-2">
-                                                            <button className="p-2 bg-[#272727] rounded-lg hover:bg-[#333] transition-colors">
-                                                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                                </svg>
-                                                            </button>
-                                                            <button className="p-2 bg-[#272727] rounded-lg hover:bg-red-500/20 transition-colors">
-                                                                <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
+                                                )
+                                            })
+                                        )}
                                     </div>
                                 </div>
-
-                                <Link href={`/organizer/events/${concert.id}/tickets`} className="px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm text-[#FBADCC] hover:bg-[#222] transition-colors border border-[#333] flex items-center justify-center gap-2">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Manage All Tickets
-                                </Link>
                             </div>
 
                             <div className="space-y-6">
-
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                     <h2 className="text-lg font-semibold mb-4">Ticket Summary</h2>
                                     <div className="space-y-4">
@@ -304,11 +330,8 @@ export default function DetailEvent() {
                                             </svg>
                                             View Attendees
                                         </Link>
-                                        <button className="w-full px-4 py-2.5 bg-red-500/10 rounded-xl text-sm text-red-400 hover:bg-red-500/20 transition-colors border border-red-500/20 flex items-center justify-center gap-2">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                            Delete Event
+                                        <button type="button" onClick={handleDelete} disabled={deleting || publishing} className="w-full px-5 py-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-50">
+                                            {deleting ? "Deleting..." : "Delete Event"}
                                         </button>
                                     </div>
                                 </div>

@@ -1,12 +1,19 @@
+
 "use client"
 
+import Link from "next/link"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { organizerApi } from "../../../../lib/api"
 import EoGuard from "@/components/EO/guardEO"
 import OrganizerSidebar from "@/components/EO/sidebarEO"
 import StageLayoutPicker from "@/components/EO/stageLayout"
-import Link from "next/link"
-import { useState } from "react"
 
 export default function CreateEvent() {
+    const router = useRouter()
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
+
     const [form, setForm] = useState({
         title: "",
         description: "",
@@ -14,35 +21,145 @@ export default function CreateEvent() {
         location: "",
         date: "",
         time: "",
-        banner_url: "",
-        status: "draft"
+        banner_url: ""
     })
+
+    const [tiers, setTiers] = useState([
+        {
+            name: "",
+            price: "",
+            quota: "",
+            sale_start: "",
+            sale_end: ""
+        }
+    ])
 
     const handleChange = (e) => {
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
     }
 
-    const handleSubmit = (e) => {
+    const handleTierChange = (index, e) => {
+        const { name, value } = e.target
+
+        setTiers(prev => prev.map((tier, i) =>
+            i === index ? { ...tier, [name]: value } : tier
+        ))
+    }
+
+    const addTier = () => {
+        setTiers(prev => [
+            ...prev,
+            {
+                name: "",
+                price: "",
+                quota: "",
+                sale_start: "",
+                sale_end: ""
+            }
+        ])
+    }
+
+    const removeTier = (index) => {
+        setTiers(prev => prev.filter((_, i) => i !== index))
+    }
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        const payload = {
-            title: form.title,
-            description: form.description,
-            venue: form.venue,
-            location: form.location,
-            date: `${form.date} ${form.time}:00`,
-            banner_url: form.banner_url,
-            status: form.status,
-            created_by: 1,
-            created_at: new Date().toISOString()
+        setLoading(true)
+        setError("")
+
+        try {
+            if (!form.title.trim() || !form.venue.trim() || !form.location.trim() || !form.date || !form.time) {
+                throw new Error("Title, venue, location, date, dan time wajib diisi")
+            }
+
+            const dateTime = new Date(`${form.date}T${form.time}:00`)
+
+            if (isNaN(dateTime.getTime())) {
+                throw new Error("Format tanggal dan jam tidak valid")
+            }
+
+            if (dateTime <= new Date()) {
+                throw new Error("Tanggal konser harus di masa depan")
+            }
+
+            if (tiers.length === 0) {
+                throw new Error("Tambahkan minimal satu kategori tiket")
+            }
+
+            const tierPayloads = tiers.map((tier, index) => {
+                if (!tier.name.trim() || !tier.price || !tier.quota || !tier.sale_start || !tier.sale_end) {
+                    throw new Error(`Lengkapi semua data tiket nomor ${index + 1}`)
+                }
+
+                const start = new Date(tier.sale_start)
+                const end = new Date(tier.sale_end)
+
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+                    throw new Error(`Tanggal penjualan tiket nomor ${index + 1} tidak valid`)
+                }
+
+                if (end <= start) {
+                    throw new Error(`Tanggal akhir penjualan tiket nomor ${index + 1} harus setelah tanggal mulai`)
+                }
+
+                if (Number(tier.price) <= 0 || Number(tier.quota) <= 0) {
+                    throw new Error(`Harga dan kuota tiket nomor ${index + 1} harus lebih dari 0`)
+                }
+
+                return {
+                    name: tier.name.trim(),
+                    price: Number(tier.price),
+                    quota: Number(tier.quota),
+                    sold: 0,
+                    sale_start: start.toISOString(),
+                    sale_end: end.toISOString()
+                }
+            })
+
+            const concertPayload = {
+                title: form.title.trim(),
+                description: form.description || null,
+                venue: form.venue.trim(),
+                location: form.location.trim(),
+                date: dateTime.toISOString(),
+                banner_url: form.banner_url || null
+            }
+
+            const concertResponse = await organizerApi.createConcert(concertPayload)
+
+            const concertData =
+                concertResponse?.data?.concert ||
+                concertResponse?.data?.item ||
+                concertResponse?.data ||
+                concertResponse?.concert ||
+                concertResponse
+
+            const concertId = concertData?.id
+
+            if (!concertId) {
+                throw new Error("ID konser tidak ditemukan pada response backend")
+            }
+
+            for (const tier of tierPayloads) {
+                await organizerApi.createTier(concertId, tier)
+            }
+
+            router.push("/organizer/events")
+
+        } catch (err) {
+            console.error("CREATE EVENT ERROR:", err)
+            setError(err.message || "Gagal membuat konser")
+        } finally {
+            setLoading(false)
         }
-        console.log("Data siap dikirim ke API:", payload)
     }
 
     return (
         <EoGuard>
-
             <div className="bg-[#131313] min-h-screen flex text-white">
                 <OrganizerSidebar />
+
                 <div className="flex-1 overflow-x-hidden">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -50,20 +167,29 @@ export default function CreateEvent() {
                                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Create Event</h1>
                                 <p className="text-gray-400 text-sm mt-1">Create a new event for your audience</p>
                             </div>
+
                             <div className="flex items-center gap-3">
                                 <Link href="/organizer/events" className="px-5 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
                                     Cancel
                                 </Link>
-                                <button onClick={handleSubmit} className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25">
-                                    Save Event
+
+                                <button onClick={handleSubmit} disabled={loading} className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all disabled:opacity-50">
+                                    {loading ? "Saving..." : "Save Event"}
                                 </button>
                             </div>
                         </div>
+
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm">
+                                {error}
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <div className="lg:col-span-2 space-y-6">
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                     <h2 className="text-lg font-semibold mb-4">Basic Information</h2>
+
                                     <div className="space-y-4">
                                         <div>
                                             <label className="text-sm text-gray-400 block mb-1.5">Event Name</label>
@@ -73,9 +199,10 @@ export default function CreateEvent() {
                                                 value={form.title}
                                                 onChange={handleChange}
                                                 placeholder="Enter event name"
-                                                className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
+                                                className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none"
                                             />
                                         </div>
+
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <label className="text-sm text-gray-400 block mb-1.5">Venue</label>
@@ -85,9 +212,10 @@ export default function CreateEvent() {
                                                     value={form.venue}
                                                     onChange={handleChange}
                                                     placeholder="e.g. Hall A"
-                                                    className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
+                                                    className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none"
                                                 />
                                             </div>
+
                                             <div>
                                                 <label className="text-sm text-gray-400 block mb-1.5">Location</label>
                                                 <input
@@ -96,10 +224,11 @@ export default function CreateEvent() {
                                                     value={form.location}
                                                     onChange={handleChange}
                                                     placeholder="e.g. Jakarta"
-                                                    className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
+                                                    className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none"
                                                 />
                                             </div>
                                         </div>
+
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <label className="text-sm text-gray-400 block mb-1.5">Date</label>
@@ -108,9 +237,10 @@ export default function CreateEvent() {
                                                     name="date"
                                                     value={form.date}
                                                     onChange={handleChange}
-                                                    className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
+                                                    className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none"
                                                 />
                                             </div>
+
                                             <div>
                                                 <label className="text-sm text-gray-400 block mb-1.5">Time</label>
                                                 <input
@@ -118,7 +248,7 @@ export default function CreateEvent() {
                                                     name="time"
                                                     value={form.time}
                                                     onChange={handleChange}
-                                                    className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
+                                                    className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none"
                                                 />
                                             </div>
                                         </div>
@@ -135,7 +265,7 @@ export default function CreateEvent() {
                                         onChange={handleChange}
                                         rows={5}
                                         placeholder="Describe your event..."
-                                        className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors resize-none"
+                                        className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none resize-none"
                                     />
                                 </div>
 
@@ -147,40 +277,127 @@ export default function CreateEvent() {
                                         value={form.banner_url}
                                         onChange={handleChange}
                                         placeholder="https://example.com/image.jpg"
-                                        className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors"
+                                        className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none"
                                     />
                                     <p className="text-xs text-gray-500 mt-2">Masukkan link gambar poster dari internet (maks 500 karakter)</p>
+                                </div>
+
+                                <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
+                                    <div className="flex items-center justify-between mb-5">
+                                        <div>
+                                            <h2 className="text-lg font-semibold">Ticket Tiers</h2>
+                                            <p className="text-sm text-gray-400 mt-1">
+                                                Tambahkan kategori dan harga tiket konser
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={addTier}
+                                            className="px-4 py-2 bg-[#FBADCC] text-black rounded-xl text-sm font-semibold hover:opacity-90"
+                                        >
+                                            + Add Ticket
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-5">
+                                        {tiers.map((tier, index) => (
+                                            <div key={index} className="bg-[#1a1a1a] border border-[#383838] rounded-xl p-5">
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <h3 className="font-semibold text-[#FBADCC]">
+                                                        Ticket {index + 1}
+                                                    </h3>
+
+                                                    {tiers.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeTier(index)}
+                                                            className="text-red-400 text-sm hover:text-red-300"
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <label className="text-sm text-gray-400 block mb-1.5">Ticket Name</label>
+                                                        <input
+                                                            type="text"
+                                                            name="name"
+                                                            value={tier.name}
+                                                            onChange={(e) => handleTierChange(index, e)}
+                                                            placeholder="Contoh: VIP, Regular, Festival"
+                                                            className="w-full px-4 py-3 bg-[#272727] rounded-xl border border-[#383838] focus:border-[#FBADCC] outline-none"
+                                                        />
+                                                    </div>
+
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label className="text-sm text-gray-400 block mb-1.5">Ticket Price (Rp)</label>
+                                                            <input
+                                                                type="number"
+                                                                name="price"
+                                                                min="1"
+                                                                value={tier.price}
+                                                                onChange={(e) => handleTierChange(index, e)}
+                                                                placeholder="1500000"
+                                                                className="w-full px-4 py-3 bg-[#272727] rounded-xl border border-[#383838] focus:border-[#FBADCC] outline-none"
+                                                            />
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="text-sm text-gray-400 block mb-1.5">Quota</label>
+                                                            <input
+                                                                type="number"
+                                                                name="quota"
+                                                                min="1"
+                                                                value={tier.quota}
+                                                                onChange={(e) => handleTierChange(index, e)}
+                                                                placeholder="100"
+                                                                className="w-full px-4 py-3 bg-[#272727] rounded-xl border border-[#383838] focus:border-[#FBADCC] outline-none"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label className="text-sm text-gray-400 block mb-1.5">Sale Start</label>
+                                                            <input
+                                                                type="datetime-local"
+                                                                name="sale_start"
+                                                                value={tier.sale_start}
+                                                                onChange={(e) => handleTierChange(index, e)}
+                                                                className="w-full px-4 py-3 bg-[#272727] rounded-xl border border-[#383838] focus:border-[#FBADCC] outline-none text-white"
+                                                            />
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="text-sm text-gray-400 block mb-1.5">Sale End</label>
+                                                            <input
+                                                                type="datetime-local"
+                                                                name="sale_end"
+                                                                value={tier.sale_end}
+                                                                onChange={(e) => handleTierChange(index, e)}
+                                                                className="w-full px-4 py-3 bg-[#272727] rounded-xl border border-[#383838] focus:border-[#FBADCC] outline-none text-white"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="space-y-6">
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                    <h2 className="text-lg font-semibold mb-4">Event Status</h2>
-                                    <div className="space-y-3">
-                                        <div
-                                            onClick={() => setForm(prev => ({ ...prev, status: 'draft' }))}
-                                            className={`w-full px-4 py-3 rounded-xl border cursor-pointer transition-all ${form.status === 'draft' ? 'bg-[#FBADCC]/10 border-[#FBADCC]' : 'bg-[#1a1a1a] border-[#333]'}`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <p className={`font-medium ${form.status === 'draft' ? 'text-[#FBADCC]' : 'text-white'}`}>Draft</p>
-                                                    <p className="text-xs text-gray-400">Save as draft</p>
-                                                </div>
-                                                {form.status === 'draft' && <div className="w-3 h-3 rounded-full bg-[#FBADCC]"></div>}
-                                            </div>
-                                        </div>
-                                        <div
-                                            onClick={() => setForm(prev => ({ ...prev, status: 'published' }))}
-                                            className={`w-full px-4 py-3 rounded-xl border cursor-pointer transition-all ${form.status === 'published' ? 'bg-[#FBADCC]/10 border-[#FBADCC]' : 'bg-[#1a1a1a] border-[#333]'}`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <p className={`font-medium ${form.status === 'published' ? 'text-[#FBADCC]' : 'text-white'}`}>Published</p>
-                                                    <p className="text-xs text-gray-400">Live and visible</p>
-                                                </div>
-                                                {form.status === 'published' && <div className="w-3 h-3 rounded-full bg-[#FBADCC]"></div>}
-                                            </div>
-                                        </div>
+                                    <h2 className="text-lg font-semibold mb-2">Event Status</h2>
+                                    <div className="px-4 py-3 rounded-xl border border-[#FBADCC] bg-[#FBADCC]/10">
+                                        <p className="font-medium text-[#FBADCC]">Draft</p>
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            Event will be saved as draft
+                                        </p>
                                     </div>
                                 </div>
                             </div>
