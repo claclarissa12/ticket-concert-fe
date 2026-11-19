@@ -155,6 +155,13 @@ export default function OrganizerEvents() {
                                                 >
                                                     Edit
                                                 </Link>
+
+                                                <Link
+                                                    href={`/organizer/events/${item.id}/transactions`}
+                                                    className="flex-1 text-center px-4 py-2 bg-[#1a1a1a] border border-[#FBADCC] text-[#FBADCC] rounded-xl text-sm hover:bg-[#FBADCC]/10"
+                                                >
+                                                    Transactions
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
