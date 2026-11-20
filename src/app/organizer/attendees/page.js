@@ -1,139 +1,209 @@
+
 "use client"
 
+import { useEffect, useRef, useState } from "react"
 import EoGuard from "@/components/EO/guardEO"
 import OrganizerSidebar from "@/components/EO/sidebarEO"
-import Link from "next/link"
+import { apiFetch, organizerApi } from "../../../../lib/api"
 
 export default function AttendeesPage() {
+    const scannerRef = useRef(null)
+    const [scanning, setScanning] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [result, setResult] = useState(null)
+    const [error, setError] = useState("")
+
+
+    const startScanner = async () => {
+        try {
+            setError("")
+            setResult(null)
+
+            if (!navigator.mediaDevices?.getUserMedia) {
+                throw new Error("Browser tidak mendukung kamera atau website belum menggunakan HTTPS/localhost.")
+            }
+
+            const { Html5Qrcode } = await import("html5-qrcode")
+            const scanner = new Html5Qrcode("qr-reader")
+            scannerRef.current = scanner
+
+            await scanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                async (decodedText) => {
+                    if (loading) return
+
+                    setLoading(true)
+                    await stopScanner()
+
+                    try {
+
+                        const response = await organizerApi.scanTicket({
+                            qr_code: decodedText
+                        })
+
+                        const data = response?.data?.data ?? response?.data ?? response
+
+                        if (response?.error || response?.status >= 400 || data?.status === "error") {
+                            setResult({
+                                success: false,
+                                message: data?.message || response?.message || "Tiket tidak valid"
+                            })
+                        } else {
+                            setResult({
+                                success: true,
+                                message: response?.message || "Valid ticket: entry granted",
+                                ticket: data
+                            })
+                        }
+
+                    } catch (err) {
+                        setResult({ success: false, message: err.message || "Gagal memverifikasi tiket" })
+                    } finally {
+                        setLoading(false)
+                    }
+                },
+                () => { }
+            )
+
+            setScanning(true)
+        } catch (err) {
+            console.error("Scanner error:", err)
+            setError(err.message || "Kamera gagal diaktifkan.")
+            setScanning(false)
+            scannerRef.current = null
+        }
+    }
+
+    const stopScanner = async () => {
+        if (scannerRef.current) {
+            try {
+                await scannerRef.current.stop()
+                await scannerRef.current.clear()
+            } catch (err) {
+                console.log(err)
+            }
+            scannerRef.current = null
+        }
+        setScanning(false)
+    }
+
+    useEffect(() => {
+        return () => {
+            if (scannerRef.current) {
+                scannerRef.current.stop().catch(() => { })
+            }
+        }
+    }, [])
+
     return (
         <EoGuard>
-
             <div className="bg-[#131313] min-h-screen flex text-white">
                 <OrganizerSidebar />
                 <div className="flex-1 overflow-x-hidden">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                             <div>
-                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Attendees</h1>
-                                <p className="text-gray-400 text-sm mt-1">Manage all event attendees and check-in</p>
-                            </div>
-                            <div className="flex gap-3">
-                                <button className="px-5 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333] flex items-center gap-2">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                    </svg>
-                                    Export
-                                </button>
-                                <button className="px-5 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25 flex items-center gap-2">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    Check-in
-                                </button>
+                                <h1 className="text-2xl sm:text-3xl font-bold">Attendees</h1>
+                                <p className="text-gray-400 text-sm mt-1">Scan QR ticket untuk memverifikasi kehadiran pengunjung</p>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                            <div className="bg-[#272727] rounded-xl p-4 border border-[#333]">
-                                <p className="text-sm text-gray-400">Total Attendees</p>
-                                <p className="text-2xl font-bold">7,891</p>
-                            </div>
-                            <div className="bg-[#272727] rounded-xl p-4 border border-[#333]">
-                                <p className="text-sm text-gray-400">Checked In</p>
-                                <p className="text-2xl font-bold text-green-400">5,234</p>
-                            </div>
-                            <div className="bg-[#272727] rounded-xl p-4 border border-[#333]">
-                                <p className="text-sm text-gray-400">Not Checked In</p>
-                                <p className="text-2xl font-bold text-yellow-400">2,657</p>
-                            </div>
-                            <div className="bg-[#272727] rounded-xl p-4 border border-[#333]">
-                                <p className="text-sm text-gray-400">Events</p>
-                                <p className="text-2xl font-bold text-[#FBADCC]">12</p>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-3 mb-6">
-                            <select className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] outline-none focus:border-[#FBADCC] transition-colors text-sm">
-                                <option>All Events</option>
-                                <option>Nassar Tour 2026</option>
-                                <option>Electronic Fest 2026</option>
-                                <option>Jazz Night</option>
-                            </select>
-                            <select className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] outline-none focus:border-[#FBADCC] transition-colors text-sm">
-                                <option>All Status</option>
-                                <option>Checked In</option>
-                                <option>Not Checked In</option>
-                            </select>
-                            <select className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] outline-none focus:border-[#FBADCC] transition-colors text-sm">
-                                <option>All Ticket Types</option>
-                                <option>VIP</option>
-                                <option>Gold</option>
-                                <option>Silver</option>
-                                <option>Regular</option>
-                            </select>
-                            <input
-                                type="text"
-                                placeholder="Search attendees..."
-                                className="px-4 py-2.5 bg-[#272727] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none transition-colors text-sm flex-1 min-w-[200px]"
-                            />
-                        </div>
-
-                        <div className="bg-[#272727] rounded-2xl overflow-hidden border border-[#333]">
-                            <div className="grid grid-cols-12 gap-4 p-4 bg-[#1a1a1a] text-sm font-semibold text-gray-400 border-b border-[#333]">
-                                <div className="col-span-1">No.</div>
-                                <div className="col-span-2">Name</div>
-                                <div className="col-span-2">Email</div>
-                                <div className="col-span-2">Event</div>
-                                <div className="col-span-1">Ticket</div>
-                                <div className="col-span-1 text-center">Status</div>
-                                <div className="col-span-2 text-right">Action</div>
-                            </div>
-
-                            <div className="grid grid-cols-13 gap-4 p-4 items-center hover:bg-[#2f2f2f] transition-colors border-b border-[#333]">
-                                <div className="col-span-1 text-sm text-gray-400">1</div>
-                                <div className="col-span-2">
-                                    <div className="flex items-center gap-3">
-                                        <div>
-                                            <p className="text-sm font-medium">Ahmad Fauzi</p>
-                                            <p className="text-xs text-gray-400">VIP Ticket</p>
-                                        </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="bg-[#272727] border border-[#333] rounded-2xl p-5">
+                                <div className="flex items-center justify-between mb-5">
+                                    <div>
+                                        <h2 className="text-lg font-semibold">QR Code Scanner</h2>
+                                        <p className="text-sm text-gray-400 mt-1">Arahkan kamera ke QR Code tiket</p>
                                     </div>
+                                    <span className={`text-xs px-3 py-1 rounded-full ${scanning ? "bg-green-500/20 text-green-400" : "bg-gray-500/20 text-gray-400"}`}>
+                                        {scanning ? "Camera Active" : "Camera Off"}
+                                    </span>
                                 </div>
-                                <div className="col-span-2 text-sm">ahmad@email.com</div>
-                                <div className="col-span-3 text-sm">Nassar Tour 2026</div>
-                                <div className="col-span-1 text-sm text-[#FBADCC]">VIP</div>
-                                <div className="col-span-2 text-center">
-                                    <span className="text-xs font-medium px-3 py-1 rounded-full bg-green-500/20 text-green-400">Checked In</span>
+
+                                <div className="bg-black rounded-xl overflow-hidden min-h-[300px] flex items-center justify-center">
+                                    <div id="qr-reader" className="w-full"></div>
+                                    {!scanning && (
+                                        <div className="text-center text-gray-500 py-16">
+                                            <p className="text-5xl mb-3">▦</p>
+                                            <p className="text-sm">Kamera belum diaktifkan</p>
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="col-span-2 flex justify-end gap-2">
-                                    <button className="px-3 py-1.5 bg-[#1a1a1a] rounded-lg text-xs hover:bg-[#333] transition-colors">
-                                        Detail
-                                    </button>
-                                    <button className="px-3 py-1.5 bg-[#1a1a1a] rounded-lg text-xs hover:bg-[#333] transition-colors">
-                                        Check-in
-                                    </button>
+
+                                {error && (
+                                    <p className="text-sm text-red-400 mt-4">{error}</p>
+                                )}
+
+                                <div className="flex gap-3 mt-5">
+                                    {!scanning ? (
+                                        <button onClick={startScanner} disabled={loading} className="flex-1 bg-[#FBADCC] text-black font-semibold py-3 rounded-xl hover:opacity-90 disabled:opacity-50">
+                                            Mulai Scan
+                                        </button>
+                                    ) : (
+                                        <button onClick={stopScanner} className="flex-1 bg-red-500/20 text-red-400 font-semibold py-3 rounded-xl hover:bg-red-500/30">
+                                            Hentikan Kamera
+                                        </button>
+                                    )}
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="flex items-center justify-between mt-6">
-                            <p className="text-sm text-gray-400">Showing 5 of 7,891 attendees</p>
-                            <div className="flex gap-2">
-                                <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
-                                    Previous
-                                </button>
-                                <button className="px-4 py-2 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black">
-                                    1
-                                </button>
-                                <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
-                                    2
-                                </button>
-                                <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
-                                    3
-                                </button>
-                                <button className="px-4 py-2 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333]">
-                                    Next
-                                </button>
+                            <div className="bg-[#272727] border border-[#333] rounded-2xl p-5">
+                                <h2 className="text-lg font-semibold mb-2">Hasil Verifikasi</h2>
+                                <p className="text-sm text-gray-400 mb-5">Informasi tiket yang berhasil dipindai akan muncul di sini.</p>
+
+                                {loading ? (
+                                    <div className="text-center py-16">
+                                        <p className="text-gray-300">Memverifikasi tiket...</p>
+                                    </div>
+                                ) : result ? (
+                                    <div className={`rounded-xl p-5 border ${result.success ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"}`}>
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <span className="text-3xl">{result.success ? "✓" : "✕"}</span>
+                                            <div>
+                                                <h3 className={`font-semibold ${result.success ? "text-green-400" : "text-red-400"}`}>
+                                                    {result.success ? "Tiket Valid" : "Tiket Tidak Valid"}
+                                                </h3>
+                                                <p className="text-sm text-gray-300">{result.message}</p>
+                                            </div>
+                                        </div>
+
+
+                                        {result.ticket && (
+                                            <div className="border-t border-white/10 pt-4 mt-4 space-y-3 text-sm">
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-gray-400">Ticket ID</span>
+                                                    <span>{result.ticket.ticket_id}</span>
+                                                </div>
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-gray-400">Holder</span>
+                                                    <span>{result.ticket.holder}</span>
+                                                </div>
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-gray-400">Ticket Tier</span>
+                                                    <span>{result.ticket.tier}</span>
+                                                </div>
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-gray-400">Concert</span>
+                                                    <span>{result.ticket.concert}</span>
+                                                </div>
+                                                <div className="flex justify-between gap-4">
+                                                    <span className="text-gray-400">Check-in Time</span>
+                                                    <span>{new Date(result.ticket.check_in_at).toLocaleString("id-ID")}</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <button onClick={() => setResult(null)} className="w-full mt-5 py-2.5 rounded-lg bg-[#333] hover:bg-[#444] text-sm">
+                                            Scan Tiket Berikutnya
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-16 text-gray-500">
+                                        <p className="text-4xl mb-3">▦</p>
+                                        <p className="text-sm">Belum ada tiket yang dipindai</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
