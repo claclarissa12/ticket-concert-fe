@@ -4,7 +4,7 @@ import SearchHome from "@/components/layout/Search";
 import UserNavbar from "@/components/layout/UserNavbar";
 import { MapPin, Calendar, Clock, Music, Guitar, Mic2, Disc3 } from "lucide-react";
 import Image from "next/image";
-import { apiFetch } from "../../../../lib/api";
+import { apiFetch, authApi } from "../../../../lib/api";
 
 // ---------- Helper format ----------
 function formatRupiah(angka) {
@@ -26,11 +26,20 @@ function formatTanggalLengkap(iso) {
   });
 }
 
+function getStartingPrice(konser) {
+  const prices = (konser.tiers ?? [])
+    .map((tier) => Number(tier.price))
+    .filter((price) => Number.isFinite(price));
+
+  return prices.length > 0 ? Math.min(...prices) : null;
+}
+
 export default async function Home() {
   // ---------- Ambil data dari BE ----------
   let data = [];
   try {
-    data = await apiFetch("/api/concert");
+   const res =  await apiFetch("/concerts");
+   data = res.data?.items ?? [];
   } catch (err) {
     console.error("Gagal ambil data konser:", err.message);
   }
@@ -63,9 +72,9 @@ export default async function Home() {
             { icon: <Mic2 size={24} className="text-[#0f0f11]" />, label: "Indie & Acoustic" },
           ].map((cat, idx) => {
             // hitung jumlah event per kategori dari data asli
-            const jumlah = data.filter(
-              (k) => (k.kategori ?? "").toLowerCase() === cat.label.toLowerCase() // ⬅️ SESUAIKAN KEY kategori
-            ).length;
+            // const jumlah = data.filter(
+            //   (k) => (k.category ?? "").toLowerCase() === cat.label.toLowerCase() // ⬅️ SESUAIKAN KEY kategori
+            // ).length;
             return (
               <div
                 key={idx}
@@ -76,7 +85,7 @@ export default async function Home() {
                 </div>
                 <div className="flex flex-col">
                   <span className="font-bold text-sm text-white mb-0.5">{cat.label}</span>
-                  <span className="text-xs text-gray-400">{jumlah} Events</span>
+                  {/* <span className="text-xs text-gray-400">{jumlah} Events</span> */}
                 </div>
               </div>
             );
@@ -96,20 +105,20 @@ export default async function Home() {
           {featured ? (
             <div className="lg:col-span-7 relative h-[400px] rounded-2xl overflow-hidden group cursor-pointer">
               <Image
-                src={featured.gambar}          // ⬅️ SESUAIKAN KEY gambar
-                alt={featured.nama}            // ⬅️ SESUAIKAN KEY nama
+                src={featured.banner_url}          // ⬅️ SESUAIKAN KEY gambar
+                alt={featured.title}            // ⬅️ SESUAIKAN KEY nama
                 fill
                 sizes="(max-width: 1024px) 100vw, 60vw"
                 className="object-cover group-hover:scale-105 transition duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f11] via-[#0f0f11]/60 to-transparent"></div>
               <div className="absolute bottom-0 left-0 p-6 w-full flex flex-col gap-3">
-                <span className="text-white text-sm font-medium">{featured.kategori}</span> {/* ⬅️ KEY kategori */}
-                <h3 className="text-3xl font-bold text-white mb-2">{featured.nama}</h3>    {/* ⬅️ KEY nama */}
+                {/* <span className="text-white text-sm font-medium">{featured.category}</span> */}
+                <h3 className="text-3xl font-bold text-white mb-2">{featured.title}</h3>    {/* ⬅️ KEY nama */}
 
                 <div className="bg-[#1a1a1d]/90 backdrop-blur-md border border-white/5 rounded-xl p-4 w-full">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-400 text-xs">{featured.lokasi}</span>       {/* ⬅️ KEY lokasi */}
+                    <span className="text-gray-400 text-xs">{featured.location}</span>       {/* ⬅️ KEY lokasi */}
                     <span className="text-green-500 text-xs font-medium">
                       {featured.terjual ?? 0}% Sold Out                               {/* ⬅️ KEY terjual */}
                     </span>
@@ -125,7 +134,9 @@ export default async function Home() {
                       <span className="text-gray-400 text-[10px] mb-0.5">Mulai</span>
                       <div className="flex items-baseline gap-1">
                         <span className="text-white font-bold text-lg">
-                          {formatRupiah(featured.harga)}                        {/* ⬅️ KEY harga */}
+                          {getStartingPrice(featured) !== null
+                            ? formatRupiah(getStartingPrice(featured))
+                            : "Belum tersedia"}                    {/* ⬅️ KEY harga */}
                         </span>
                         <span className="text-gray-400 text-[10px]">/Tiket</span>
                       </div>
@@ -153,8 +164,8 @@ export default async function Home() {
                 className="relative h-[188px] rounded-2xl overflow-hidden group cursor-pointer"
               >
                 <Image
-                  src={konser.gambar}                                          // ⬅️ KEY gambar
-                  alt={konser.nama}                                            // ⬅️ KEY nama
+                  src={konser.banner_url}                                          // ⬅️ KEY gambar
+                  alt={konser.title}                                            // ⬅️ KEY nama
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
                   className="object-cover group-hover:scale-105 transition duration-700 object-top"
@@ -165,12 +176,14 @@ export default async function Home() {
                 </div>
                 <div className="absolute bottom-0 left-0 p-5 w-full flex justify-between items-end">
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-2xl font-bold text-white">{konser.nama}</h3>
-                    <p className="text-gray-400 text-xs">{konser.lokasi}</p>    {/* ⬅️ KEY lokasi */}
+                    <h3 className="text-2xl font-bold text-white">{konser.title}</h3>
+                    <p className="text-gray-400 text-xs">{konser.location}</p>    {/* ⬅️ KEY lokasi */}
                     <div className="flex items-baseline gap-1 mt-1">
                       <span className="text-gray-400 text-[10px]">Mulai</span>
                       <span className="text-white font-bold text-sm">
-                        {formatRupiah(konser.harga)}                           {/* ⬅️ KEY harga */}
+                        {getStartingPrice(featured) !== null
+                          ? formatRupiah(getStartingPrice(featured))
+                          : "Belum tersedia"}                          {/* ⬅️ KEY harga */}
                       </span>
                     </div>
                   </div>
@@ -226,7 +239,7 @@ export default async function Home() {
                 </div>
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-gray-400 text-sm">{konser.kategori}</p>   {/* ⬅️ KEY kategori */}
+                    {/* <p className="text-gray-400 text-sm">{konser.category}</p>    */}
                     <p className="text-green-500 text-sm">{konser.status ?? "Tersedia"}</p> {/* ⬅️ KEY status */}
                   </div>
                   <h3 className="text-2xl font-bold mb-1 text-white">{konser.title}</h3>
@@ -267,30 +280,32 @@ export default async function Home() {
             >
               <div className="relative w-full md:w-48 h-32 rounded-xl overflow-hidden shrink-0">
                 <Image
-                  src={konser.gambar}                                         // ⬅️ KEY gambar
-                  alt={konser.nama}                                           // ⬅️ KEY nama
+                  src={konser.banner_url}                                         // ⬅️ KEY gambar
+                  alt={konser.title}                                           // ⬅️ KEY nama
                   fill
                   sizes="200px"
                   className="object-cover"
                 />
               </div>
               <div className="flex-1 w-full">
-                <h3 className="text-lg font-bold mb-1">{konser.nama}</h3>
+                <h3 className="text-lg font-bold mb-1">{konser.title}</h3>
                 <div className="flex flex-col gap-1 text-xs text-gray-400 mb-2">
                   <div className="flex items-center gap-2">
-                    <Calendar size={14} /> {formatTanggalLengkap(konser.tanggal)} {/* ⬅️ KEY tanggal */}
+                    <Calendar size={14} /> {formatTanggalLengkap(konser.date)} {/* ⬅️ KEY tanggal */}
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock size={14} /> {konser.jam ?? "-"}                    {/* ⬅️ KEY jam (kalau ada) */}
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin size={14} /> {konser.lokasi}                       {/* ⬅️ KEY lokasi */}
+                    <MapPin size={14} /> {konser.location}                       {/* ⬅️ KEY lokasi */}
                   </div>
                 </div>
               </div>
               <div className="flex flex-col items-end w-full md:w-auto gap-3">
                 <p className="font-bold text-[#FBADCC] text-lg">
-                  {formatRupiah(konser.harga)}                                  {/* ⬅️ KEY harga */}
+                  {getStartingPrice(konser) !== null
+                    ? formatRupiah(getStartingPrice(featured))
+                    : "Belum tersedia"}                                {/* ⬅️ KEY harga */}
                 </p>
                 <a href={`/user/ticket-selection/${konser.id}`}>                {/* ⬅️ KEY id */}
                   <button className="bg-[#FBADCC] hover:bg-pink-300 text-black text-sm font-medium px-6 py-2 rounded-full transition w-full md:w-auto">
