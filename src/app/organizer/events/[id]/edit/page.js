@@ -248,7 +248,7 @@ export default function EditEvent() {
 
             alert("Konser dan kategori tiket berhasil diperbarui!")
 
-            router.push("/organizer/events")
+            router.push(`/organizer/events/${id}/detail`)
             router.refresh()
 
         } catch (err) {
