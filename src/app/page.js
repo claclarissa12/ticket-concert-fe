@@ -1,11 +1,20 @@
 "use client"
 import { Calendar, CreditCard, MapPin, MousePointerClick, QrCode, Ticket } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { concertApi } from "../../lib/api";
+import { useRouter } from "next/navigation";
 
 export default function Landing() {
   const [concerts, setConcerts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const formRef = useRef(null);
+  const router = useRouter();
+  const [countdown, setCountdown] = useState(5);
+  const [isOrganizerFormOpen, setIsOrganizerFormOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     const fetchConcert = async () => {
@@ -37,6 +46,58 @@ export default function Landing() {
       day: "numeric", month: "long", year: "numeric"
     });
   };
+
+useEffect(() => {
+  if (!submitSuccess) return;
+
+  if (countdown <= 0) {
+    setIsOrganizerFormOpen(false);
+    setSubmitSuccess(false);
+    setCountdown(5);
+    return;
+  }
+
+  const timer = setTimeout(() => {
+    setCountdown((prev) => prev - 1);
+  }, 1000);
+
+  return () => clearTimeout(timer);
+}, [submitSuccess, countdown]);
+
+  const handleOrganizerSubmit = async (e) => {
+  e.preventDefault();
+
+  setIsSubmitting(true);
+  setSubmitError("");
+  setSubmitSuccess(false);
+
+  
+  try {
+    const response = await fetch("https://formspree.io/f/xppdodal", {
+      method: "POST",
+      body: new FormData(formRef.current),
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    
+    if (response.ok) {
+    formRef.current.reset();
+    setCountdown(5);
+    setSubmitSuccess(true);
+  }
+    if (response.ok) {
+      formRef.current.reset();
+      setSubmitSuccess(true);
+    } else {
+      setSubmitError("Failed to submit registration. Please try again.");
+    }
+  } catch (error) {
+    setSubmitError("Something went wrong. Please check your connection.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <main className="min-h-screen bg-[#0f0f11] text-white font-sans">
@@ -276,21 +337,225 @@ export default function Landing() {
         <div className="flex flex-col gap-12">
 
           <div className="bg-[#1a1a1d] border border-[#E21D8F]/30 rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg shadow-[#E21D8F]/5">
+
             <div className="flex flex-col gap-2 text-center md:text-left">
               <h2 className="text-xl md:text-2xl font-bold text-white">
                 Punya Event Musik Sendiri?
               </h2>
+
               <p className="text-xs md:text-sm text-gray-400 max-w-xl leading-relaxed">
-                Bergabunglah menjadi Event Organizer di Ticket.COM. Kelola penjualan tiket konsermu dengan mudah, aman, dan jangkau jutaan penggemar musik.
+                Bergabunglah menjadi Event Organizer di Ticket.COM.
+                Kelola penjualan tiket konsermu dengan mudah, aman,
+                dan jangkau lebih banyak penggemar musik.
               </p>
             </div>
-            <a
-              href="/regis?role=event_organizer"
+
+            <button
+              onClick={() => {
+                setIsOrganizerFormOpen(true);
+                setSubmitSuccess(false);
+                setSubmitError("");
+              }}
               className="shrink-0 w-full md:w-auto px-6 py-3 bg-[#E21D8F] hover:bg-pink-600 text-white font-semibold text-sm rounded-xl transition duration-300 text-center shadow-lg shadow-[#E21D8F]/20"
             >
               Register Sebagai Organizer
-            </a>
+            </button>
           </div>
+
+          {isOrganizerFormOpen && (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+
+        {/* Background overlay */}
+        <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setIsOrganizerFormOpen(false)}
+        />
+
+        {/* Modal */}
+        <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-[#1a1a1d] border border-white/10 rounded-2xl shadow-2xl">
+
+            {/* Header */}
+            <div className="p-6 border-b border-white/10">
+
+                <div className="flex items-center justify-between mb-4">
+
+                    <div className="w-12 h-12 rounded-xl bg-[#E21D8F]/10 border border-[#E21D8F]/20 flex items-center justify-center">
+                        <Ticket className="text-[#E21D8F]" size={24} />
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={() => setIsOrganizerFormOpen(false)}
+                        className="text-gray-400 hover:text-white transition text-2xl"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+                <h2 className="text-2xl font-bold text-white">
+                    Daftar Event Organizer
+                </h2>
+
+                <p className="text-sm text-gray-400 mt-2">
+                    Lengkapi informasi berikut untuk mendaftarkan
+                    organisasi Anda sebagai Event Organizer.
+                </p>
+
+            </div>
+
+            {/* Form */}
+            <form
+                ref={formRef}
+                onSubmit={handleOrganizerSubmit}
+                className="p-6 flex flex-col gap-5"
+            >
+
+                {/* Organization name */}
+                <div className="flex flex-col gap-2">
+
+                    <label className="text-sm font-medium text-white">
+                        Nama Organisasi / Event Organizer
+                    </label>
+
+                    <input
+                        type="text"
+                        name="organization_name"
+                        placeholder="Contoh: Jakarta Music Production"
+                        required
+                        className="w-full bg-[#0f0f11] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#E21D8F] transition"
+                    />
+
+                </div>
+
+                {/* Applicant name */}
+                <div className="flex flex-col gap-2">
+
+                    <label className="text-sm font-medium text-white">
+                        Nama Penanggung Jawab
+                    </label>
+
+                    <input
+                        type="text"
+                        name="applicant_name"
+                        placeholder="Nama lengkap Anda"
+                        required
+                        className="w-full bg-[#0f0f11] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#E21D8F] transition"
+                    />
+
+                </div>
+
+                {/* Email */}
+                <div className="flex flex-col gap-2">
+
+                    <label className="text-sm font-medium text-white">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="organizer@email.com"
+                        required
+                        className="w-full bg-[#0f0f11] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#E21D8F] transition"
+                    />
+
+                </div>
+
+                {/* Phone */}
+                <div className="flex flex-col gap-2">
+
+                    <label className="text-sm font-medium text-white">
+                        Nomor WhatsApp
+                    </label>
+
+                    <input
+                        type="tel"
+                        name="phone"
+                        placeholder="08xxxxxxxxxx"
+                        required
+                        className="w-full bg-[#0f0f11] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#E21D8F] transition"
+                    />
+
+                </div>
+
+                {/* Instagram */}
+                <div className="flex flex-col gap-2">
+
+                    <label className="text-sm font-medium text-white">
+                        Instagram Organisasi
+                    </label>
+
+                    <input
+                        type="text"
+                        name="instagram"
+                        placeholder="@organisasianda"
+                        className="w-full bg-[#0f0f11] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#E21D8F] transition"
+                    />
+
+                </div>
+
+                {/* Description */}
+                <div className="flex flex-col gap-2">
+
+                    <label className="text-sm font-medium text-white">
+                        Tentang Organisasi
+                    </label>
+
+                    <textarea
+                        name="organization_description"
+                        placeholder="Ceritakan sedikit tentang organisasi Anda dan event yang pernah diselenggarakan..."
+                        rows={4}
+                        required
+                        className="w-full bg-[#0f0f11] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#E21D8F] transition resize-none"
+                    />
+
+                </div>
+
+                {/* Hidden subject */}
+                <input
+                    type="hidden"
+                    name="_subject"
+                    value="New Event Organizer Registration"
+                />
+
+                {/* Submit */}
+                <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#E21D8F] hover:bg-pink-600 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-[#E21D8F]/20"
+                >
+                    {isSubmitting ? "Submitting..." : "Submit Registration"}
+                </button>
+
+                  {submitSuccess && (
+                    <div className="text-center flex flex-col gap-2">
+                      <p className="text-green-400 font-semibold">
+                        Registration submitted successfully!
+                      </p>
+
+                      <p className="text-sm text-gray-400">
+                        Redirecting to homepage in {countdown} seconds...
+                      </p>
+                    </div>
+                  )}
+
+                  {submitError && (
+                    <p className="text-red-400 text-sm">
+                      {submitError}
+                    </p>
+                  )}
+
+                <p className="text-xs text-gray-500 text-center">
+                    Your registration will be reviewed by our administrator.
+                </p>
+
+            </form>
+
+        </div>
+
+    </div>
+)}
 
           <div className="flex flex-col md:flex-row justify-between gap-8">
             <div className="flex flex-col gap-3 max-w-xs">

@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@formspree/react": "^3.0.0",
     "@tabler/icons-react": "^3.51.0",
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^1.31.0",
