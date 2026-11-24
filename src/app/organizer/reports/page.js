@@ -1,297 +1,340 @@
 
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid,
     Tooltip, ResponsiveContainer, PieChart, Pie, Cell
-} from "recharts";
-import { Wallet, Ticket, Users, CalendarDays, Loader2, AlertCircle } from "lucide-react";
-import OrganizerSidebar from "@/components/EO/sidebarEO";
-import EoGuard from "@/components/EO/guardEO";
-import { organizerApi } from "../../../../lib/api";
-
-const tooltipStyle = {
-    backgroundColor: "#1a1a1d",
-    border: "1px solid #FBADCC",
-    borderRadius: 10,
-    color: "#fff"
-};
-
-const formatRupiah = (value) => new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0
-}).format(Number(value || 0));
-
-const getResponseData = (response) => response?.data?.data ?? response?.data ?? response;
+} from "recharts"
+import { Wallet, Ticket, Users, CalendarDays } from "lucide-react"
+import EoGuard from "@/components/EO/guardEO"
+import OrganizerSidebar from "@/components/EO/sidebarEO"
+import BackButton from "@/components/cards/back"
+import { organizerApi } from "../../../../lib/api"
 
 export default function ReportsPage() {
-    const [concerts, setConcerts] = useState([]);
-    const [selectedConcertId, setSelectedConcertId] = useState("");
-    const [report, setReport] = useState(null);
-    const [loadingConcerts, setLoadingConcerts] = useState(true);
-    const [loadingReport, setLoadingReport] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const [concerts, setConcerts] = useState([])
+    const [selectedConcertId, setSelectedConcertId] = useState("")
+    const [report, setReport] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [concertLoading, setConcertLoading] = useState(true)
+    const [error, setError] = useState("")
+
+    const getResponseData = (res) => res?.data?.data ?? res?.data ?? res
+
+    const formatRupiah = (value) => new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0
+    }).format(Number(value || 0))
 
     useEffect(() => {
         const fetchConcerts = async () => {
             try {
-                const response = await organizerApi.getMyConcert();
-                const result = getResponseData(response);
-                const items = Array.isArray(result) ? result : result?.rows || result?.items || result?.data || [];
+                const res = await organizerApi.getMyConcert()
+                const data = getResponseData(res)
+                const items = Array.isArray(data) ? data : data?.items || data?.rows || data?.data || []
 
-                setConcerts(items);
-                if (items.length > 0) setSelectedConcertId(String(items[0].id));
-            } catch (error) {
-                setErrorMessage(error.message || "Gagal mengambil daftar konser");
+                setConcerts(items)
+                if (items.length) setSelectedConcertId(String(items[0].id))
+            } catch (err) {
+                setError(err.message || "Gagal mengambil daftar konser")
             } finally {
-                setLoadingConcerts(false);
+                setConcertLoading(false)
             }
-        };
+        }
 
-        fetchConcerts();
-    }, []);
+        fetchConcerts()
+    }, [])
 
     useEffect(() => {
         if (!selectedConcertId) {
-            setReport(null);
-            return;
+            setReport(null)
+            setLoading(false)
+            return
         }
 
         const fetchReport = async () => {
             try {
-                setLoadingReport(true);
-                setErrorMessage("");
-
-                const response = await organizerApi.getConcertReport(selectedConcertId);
-                setReport(getResponseData(response));
-            } catch (error) {
-                setReport(null);
-                setErrorMessage(error.message || "Gagal mengambil laporan konser");
+                setLoading(true)
+                setError("")
+                const res = await organizerApi.getConcertReport(selectedConcertId)
+                setReport(getResponseData(res))
+            } catch (err) {
+                setReport(null)
+                setError(err.message || "Gagal mengambil laporan")
             } finally {
-                setLoadingReport(false);
+                setLoading(false)
             }
-        };
+        }
 
-        fetchReport();
-    }, [selectedConcertId]);
+        fetchReport()
+    }, [selectedConcertId])
 
-    const ticketsIssued = Number(report?.tickets_issued || 0);
-    const checkedIn = Number(report?.checked_in || 0);
-    const notCheckedIn = Math.max(0, ticketsIssued - checkedIn);
-    const attendancePercentage = ticketsIssued ? ((checkedIn / ticketsIssued) * 100).toFixed(1) : "0.0";
-    const availableTickets = (report?.tiers || []).reduce((total, tier) => total + Number(tier.available || 0), 0);
+    const ticketsIssued = Number(report?.tickets_issued || 0)
+    const checkedIn = Number(report?.checked_in || 0)
+    const availableTickets = (report?.tiers || []).reduce(
+        (total, tier) => total + Number(tier.available || 0), 0
+    )
+    const notCheckedIn = Math.max(0, ticketsIssued - checkedIn)
+    const attendance = ticketsIssued ? ((checkedIn / ticketsIssued) * 100).toFixed(1) : "0.0"
+
+    const stats = [
+        { title: "Total Revenue", value: formatRupiah(report?.revenue), icon: Wallet },
+        { title: "Tickets Issued", value: ticketsIssued.toLocaleString("id-ID"), icon: Ticket },
+        { title: "Attendance Rate", value: `${attendance}%`, icon: Users },
+        { title: "Paid Orders", value: Number(report?.paid_orders || 0).toLocaleString("id-ID"), icon: CalendarDays }
+    ]
 
     const ticketData = [
         { name: "Terbit", value: ticketsIssued },
         { name: "Tersedia", value: availableTickets }
-    ];
+    ]
 
     const attendanceData = [
         { name: "Hadir", value: checkedIn },
         { name: "Belum Hadir", value: notCheckedIn }
-    ];
+    ]
 
-    const tierSales = (report?.tiers || []).map((tier) => ({
+    const tierSales = (report?.tiers || []).map(tier => ({
         name: tier.name,
         sold: Number(tier.tickets_issued || 0)
-    }));
+    }))
 
-    const stats = [
-        { title: "Total Pendapatan", value: formatRupiah(report?.revenue), desc: "Dari transaksi berhasil", icon: Wallet },
-        { title: "Tiket Terbit", value: ticketsIssued.toLocaleString("id-ID"), desc: "Tiket dari pesanan berhasil dibayar", icon: Ticket },
-        { title: "Tingkat Kehadiran", value: `${attendancePercentage}%`, desc: `${checkedIn} dari ${ticketsIssued} tiket`, icon: Users },
-        { title: "Pesanan Dibayar", value: Number(report?.paid_orders || 0).toLocaleString("id-ID"), desc: "Total transaksi berhasil", icon: CalendarDays }
-    ];
+    const tooltipStyle = {
+        backgroundColor: "#1a1a1d",
+        border: "1px solid #FBADCC",
+        borderRadius: 10,
+        color: "#fff"
+    }
 
     return (
         <EoGuard>
-            <div className="min-h-screen flex bg-[#131313] text-white">
+            <div className="bg-[#131313] min-h-screen flex text-white">
                 <OrganizerSidebar />
-                <div className="flex-1 min-w-0 overflow-x-hidden">
-                    <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+
+                <div className="flex-1 overflow-x-hidden">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+                        <BackButton className="mb-5" />
+
+                        <div className=" flex justify-between">
                             <div>
-                                <h1 className="text-2xl font-bold">Reports</h1>
-                                <p className="text-gray-400 text-sm mt-1">Ringkasan performa penjualan dan acara kamu.</p>
+                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Reports</h1>
+                                <p className="text-gray-400 text-sm mt-1">
+                                    Overview of your concert sales and attendance
+                                </p>
                             </div>
-                            <select
-                                value={selectedConcertId}
-                                onChange={(e) => setSelectedConcertId(e.target.value)}
-                                disabled={loadingConcerts || concerts.length === 0}
-                                className="bg-[#1a1a1d] border border-[#FBADCC]/30 rounded-lg px-4 py-3 text-sm outline-none disabled:opacity-50"
-                            >
-                                {loadingConcerts ? (
-                                    <option value="">Memuat konser...</option>
-                                ) : concerts.length === 0 ? (
-                                    <option value="">Belum ada konser</option>
-                                ) : (
-                                    concerts.map((concert) => (
-                                        <option key={concert.id} value={String(concert.id)}>{concert.title}</option>
-                                    ))
-                                )}
-                            </select>
+                            <div className="mb-6">
+                                <label className="block text-sm text-gray-400 mb-2">Select Concert</label>
+                                <select
+                                    value={selectedConcertId}
+                                    onChange={(e) => setSelectedConcertId(e.target.value)}
+                                    disabled={concertLoading || !concerts.length}
+                                    className="w-full sm:w-96 px-4 py-3 bg-[#272727] rounded-xl border border-[#333] outline-none focus:border-[#FBADCC] text-sm disabled:opacity-50"
+                                >
+                                    {concertLoading ? (
+                                        <option value="">Loading concerts...</option>
+                                    ) : !concerts.length ? (
+                                        <option value="">No concerts found</option>
+                                    ) : (
+                                        concerts.map(concert => (
+                                            <option key={concert.id} value={String(concert.id)}>
+                                                {concert.title}
+                                            </option>
+                                        ))
+                                    )}
+                                </select>
+                            </div>
                         </div>
 
-                        {errorMessage && (
-                            <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl p-4 mb-6 text-sm">
-                                <AlertCircle size={19} />
-                                {errorMessage}
+
+
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm">
+                                {error}
                             </div>
                         )}
 
-                        {loadingReport || loadingConcerts ? (
-                            <div className="flex flex-col items-center justify-center min-h-[350px] text-gray-400 gap-3">
-                                <Loader2 size={30} className="animate-spin text-[#FBADCC]" />
-                                <p className="text-sm">Memuat laporan konser...</p>
+                        {loading || concertLoading ? (
+                            <div className="bg-[#272727] rounded-2xl border border-[#333] p-12 text-center text-gray-400">
+                                Loading report...
                             </div>
                         ) : !concerts.length ? (
-                            <div className="bg-[#1a1a1d] border border-white/5 rounded-2xl p-10 text-center">
-                                <Ticket size={35} className="mx-auto text-gray-500 mb-3" />
-                                <h2 className="font-semibold">Belum Ada Konser</h2>
-                                <p className="text-gray-500 text-sm mt-2">Buat konser terlebih dahulu untuk melihat laporan.</p>
+                            <div className="bg-[#272727] rounded-2xl border border-[#333] p-12 text-center text-gray-400">
+                                No concerts found
                             </div>
                         ) : report ? (
                             <>
-                                <div className="bg-[#1a1a1d] border border-white/5 rounded-2xl p-5 mb-6">
-                                    <p className="text-gray-500 text-xs mb-1">Laporan Konser</p>
-                                    <h2 className="text-lg font-semibold">{report.concert?.title}</h2>
-                                    <p className="text-gray-500 text-sm mt-1">
-                                        {report.concert?.date ? new Date(report.concert.date).toLocaleDateString("id-ID", {
-                                            day: "numeric", month: "long", year: "numeric"
-                                        }) : "-"}
+                                <div className="bg-[#272727] rounded-xl p-5 border border-[#333] mb-6">
+                                    <p className="text-sm text-gray-400">Concert Report</p>
+                                    <h2 className="text-lg font-semibold mt-1">
+                                        {report.concert?.title || "-"}
+                                    </h2>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        {report.concert?.date
+                                            ? new Date(report.concert.date).toLocaleDateString("id-ID", {
+                                                day: "numeric",
+                                                month: "long",
+                                                year: "numeric"
+                                            })
+                                            : "-"}
                                     </p>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-                                    {stats.map(({ title, value, desc, icon: Icon }) => (
-                                        <div key={title} className="bg-[#1a1a1d] border border-white/5 rounded-2xl p-5">
-                                            <div className="flex justify-between items-center mb-4">
-                                                <p className="text-gray-400 text-sm">{title}</p>
-                                                <div className="bg-[#FBADCC]/15 p-3 rounded-xl">
-                                                    <Icon size={21} className="text-[#FBADCC]" />
-                                                </div>
+                                    {stats.map(({ title, value, icon: Icon }) => (
+                                        <div key={title} className="bg-[#272727] rounded-xl p-4 border border-[#333]">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <p className="text-sm text-gray-400">{title}</p>
+                                                <Icon size={20} className="text-[#FBADCC]" />
                                             </div>
-                                            <h2 className="text-xl xl:text-2xl font-bold mb-2 break-words">{value}</h2>
-                                            <p className="text-xs text-gray-500">{desc}</p>
+                                            <p className="text-xl sm:text-2xl font-bold break-words">{value}</p>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-5">
-                                    <div className="bg-[#1a1a1d] border border-white/5 rounded-2xl p-5">
-                                        <h2 className="font-semibold text-lg">Perbandingan Tiket</h2>
-                                        <p className="text-gray-500 text-sm mt-1 mb-4">Jumlah tiket terbit dan tersisa</p>
-                                        <div className="flex flex-col sm:flex-row items-center gap-5">
-                                            <div className="w-full sm:w-1/2 h-[210px]">
-                                                <ResponsiveContainer width="100%" height="100%">
-                                                    <PieChart>
-                                                        <Pie data={ticketData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={85} paddingAngle={4} stroke="none">
-                                                            <Cell fill="#FBADCC" />
-                                                            <Cell fill="#51404a" />
-                                                        </Pie>
-                                                        <Tooltip contentStyle={tooltipStyle} />
-                                                    </PieChart>
-                                                </ResponsiveContainer>
-                                            </div>
-                                            <div className="flex-1 w-full space-y-5">
-                                                <div>
-                                                    <p className="text-gray-400 text-sm mb-1">Tiket Terbit</p>
-                                                    <h3 className="text-2xl font-bold">{ticketsIssued.toLocaleString("id-ID")}</h3>
-                                                </div>
-                                                <div>
-                                                    <p className="text-gray-400 text-sm mb-1">Tiket Tersedia</p>
-                                                    <h3 className="text-2xl font-bold">{availableTickets.toLocaleString("id-ID")}</h3>
-                                                </div>
-                                            </div>
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 mb-6">
+                                    <div className="bg-[#272727] rounded-2xl border border-[#333] p-5">
+                                        <h2 className="font-semibold text-lg">Ticket Comparison</h2>
+                                        <p className="text-gray-400 text-sm mt-1 mb-5">
+                                            Issued tickets and remaining tickets
+                                        </p>
+
+                                        <div className="h-[250px]">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <PieChart>
+                                                    <Pie
+                                                        data={ticketData}
+                                                        dataKey="value"
+                                                        nameKey="name"
+                                                        innerRadius={65}
+                                                        outerRadius={90}
+                                                        paddingAngle={4}
+                                                        stroke="none"
+                                                    >
+                                                        <Cell fill="#FBADCC" />
+                                                        <Cell fill="#51404a" />
+                                                    </Pie>
+                                                    <Tooltip contentStyle={tooltipStyle} />
+                                                </PieChart>
+                                            </ResponsiveContainer>
+                                        </div>
+
+                                        <div className="flex justify-center gap-8 text-sm">
+                                            <p className="text-gray-400">
+                                                Terbit: <span className="text-white font-semibold">{ticketsIssued}</span>
+                                            </p>
+                                            <p className="text-gray-400">
+                                                Tersedia: <span className="text-white font-semibold">{availableTickets}</span>
+                                            </p>
                                         </div>
                                     </div>
 
-                                    <div className="bg-[#1a1a1d] border border-white/5 rounded-2xl p-5">
-                                        <h2 className="font-semibold text-lg">Tingkat Kehadiran</h2>
-                                        <p className="text-gray-500 text-sm mt-1">Tiket yang sudah dan belum discan</p>
-                                        <div className="flex flex-col items-center justify-center">
-                                            <div className="relative w-48 h-48">
-                                                <ResponsiveContainer width="100%" height="100%">
-                                                    <PieChart>
-                                                        <Pie data={attendanceData} dataKey="value" innerRadius={65} outerRadius={85} startAngle={90} endAngle={-270} stroke="none">
-                                                            <Cell fill="#FBADCC" />
-                                                            <Cell fill="#51404a" />
-                                                        </Pie>
-                                                        <Tooltip contentStyle={tooltipStyle} />
-                                                    </PieChart>
-                                                </ResponsiveContainer>
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                                    <span className="text-3xl font-bold text-[#FBADCC]">{attendancePercentage}%</span>
-                                                    <span className="text-xs text-gray-500">Kehadiran</span>
-                                                </div>
+                                    <div className="bg-[#272727] rounded-2xl border border-[#333] p-5">
+                                        <h2 className="font-semibold text-lg">Attendance Rate</h2>
+                                        <p className="text-gray-400 text-sm mt-1">
+                                            Checked-in and not checked-in tickets
+                                        </p>
+
+                                        <div className="relative h-[250px]">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <PieChart>
+                                                    <Pie
+                                                        data={attendanceData}
+                                                        dataKey="value"
+                                                        nameKey="name"
+                                                        innerRadius={65}
+                                                        outerRadius={90}
+                                                        stroke="none"
+                                                    >
+                                                        <Cell fill="#FBADCC" />
+                                                        <Cell fill="#51404a" />
+                                                    </Pie>
+                                                    <Tooltip contentStyle={tooltipStyle} />
+                                                </PieChart>
+                                            </ResponsiveContainer>
+
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                                <span className="text-3xl font-bold text-[#FBADCC]">{attendance}%</span>
+                                                <span className="text-xs text-gray-400">Attendance</span>
                                             </div>
-                                            <div className="flex gap-10 mt-2">
-                                                <div className="text-center">
-                                                    <p className="text-sm text-gray-400">Hadir</p>
-                                                    <p className="font-bold">{checkedIn}</p>
-                                                </div>
-                                                <div className="text-center">
-                                                    <p className="text-sm text-gray-400">Belum Hadir</p>
-                                                    <p className="font-bold">{notCheckedIn}</p>
-                                                </div>
-                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-center gap-8 text-sm">
+                                            <p className="text-gray-400">
+                                                Hadir: <span className="text-white font-semibold">{checkedIn}</span>
+                                            </p>
+                                            <p className="text-gray-400">
+                                                Belum Hadir: <span className="text-white font-semibold">{notCheckedIn}</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="bg-[#1a1a1d] border border-white/5 rounded-2xl p-5 mb-5">
-                                    <h2 className="font-semibold text-lg">Penjualan Tiket per Kategori</h2>
-                                    <p className="text-gray-500 text-sm mt-1 mb-5">Jumlah tiket terbit pada setiap kategori</p>
+                                <div className="bg-[#272727] rounded-2xl border border-[#333] p-5 mb-6">
+                                    <h2 className="font-semibold text-lg">Ticket Sales by Category</h2>
+                                    <p className="text-gray-400 text-sm mt-1 mb-5">
+                                        Number of tickets issued for each category
+                                    </p>
+
                                     <div className="w-full h-[280px]">
-                                        {tierSales.length > 0 ? (
+                                        {tierSales.length ? (
                                             <ResponsiveContainer width="100%" height="100%">
                                                 <BarChart data={tierSales} margin={{ top: 10, right: 10, left: -15, bottom: 5 }}>
                                                     <CartesianGrid strokeDasharray="3 3" stroke="#33333a" vertical={false} />
                                                     <XAxis dataKey="name" tick={{ fill: "#aaa", fontSize: 12 }} axisLine={false} tickLine={false} />
                                                     <YAxis tick={{ fill: "#aaa", fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                                                    <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "#FBADCC", opacity: 0.06 }} />
-                                                    <Bar dataKey="sold" name="Tiket Terbit" fill="#FBADCC" radius={[7, 7, 0, 0]} barSize={42} />
+                                                    <Tooltip contentStyle={tooltipStyle} />
+                                                    <Bar dataKey="sold" name="Tickets Issued" fill="#FBADCC" radius={[7, 7, 0, 0]} barSize={42} />
                                                 </BarChart>
                                             </ResponsiveContainer>
                                         ) : (
-                                            <div className="h-full flex items-center justify-center text-gray-500 text-sm">Belum ada data penjualan tiket.</div>
+                                            <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                                                No ticket sales data
+                                            </div>
                                         )}
                                     </div>
                                 </div>
 
-                                <div className="bg-[#1a1a1d] border border-white/5 rounded-2xl p-5">
-                                    <h2 className="font-semibold text-lg">Rincian Kategori Tiket</h2>
-                                    <p className="text-gray-500 text-sm mt-1 mb-5">Rincian penjualan dan pendapatan setiap kategori</p>
+                                <div className="bg-[#272727] rounded-2xl border border-[#333] p-5">
+                                    <h2 className="font-semibold text-lg">Ticket Category Details</h2>
+                                    <p className="text-gray-400 text-sm mt-1 mb-5">
+                                        Sales and revenue details for each ticket category
+                                    </p>
+
                                     <div className="overflow-x-auto">
                                         <table className="w-full min-w-[700px] text-sm text-left">
-                                            <thead className="text-gray-400 border-b border-white/10">
+                                            <thead className="bg-[#1a1a1a] text-xs uppercase tracking-wider text-gray-400">
                                                 <tr>
-                                                    <th className="py-3 pr-4">Kategori</th>
-                                                    <th className="py-3 pr-4">Harga</th>
-                                                    <th className="py-3 pr-4">Kuota</th>
-                                                    <th className="py-3 pr-4">Terbit</th>
-                                                    <th className="py-3 pr-4">Check-in</th>
-                                                    <th className="py-3 pr-4">Tersedia</th>
-                                                    <th className="py-3">Pendapatan</th>
+                                                    <th className="px-4 py-4">Category</th>
+                                                    <th className="px-4 py-4">Price</th>
+                                                    <th className="px-4 py-4">Quota</th>
+                                                    <th className="px-4 py-4">Issued</th>
+                                                    <th className="px-4 py-4">Check-in</th>
+                                                    <th className="px-4 py-4">Available</th>
+                                                    <th className="px-4 py-4">Revenue</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-white/5">
-                                                {(report.tiers || []).map((tier) => (
-                                                    <tr key={tier.tier_id} className="text-gray-300">
-                                                        <td className="py-4 pr-4 font-medium text-white">{tier.name}</td>
-                                                        <td className="py-4 pr-4">{formatRupiah(tier.price)}</td>
-                                                        <td className="py-4 pr-4">{tier.quota}</td>
-                                                        <td className="py-4 pr-4">{tier.tickets_issued}</td>
-                                                        <td className="py-4 pr-4">{tier.checked_in}</td>
-                                                        <td className="py-4 pr-4">{tier.available}</td>
-                                                        <td className="py-4 text-[#FBADCC] font-medium">{formatRupiah(tier.revenue)}</td>
+                                            <tbody>
+                                                {(report.tiers || []).map(tier => (
+                                                    <tr key={tier.tier_id} className="border-t border-[#333] hover:bg-[#303030]">
+                                                        <td className="px-4 py-4 font-medium">{tier.name}</td>
+                                                        <td className="px-4 py-4">{formatRupiah(tier.price)}</td>
+                                                        <td className="px-4 py-4">{tier.quota}</td>
+                                                        <td className="px-4 py-4">{tier.tickets_issued}</td>
+                                                        <td className="px-4 py-4">{tier.checked_in}</td>
+                                                        <td className="px-4 py-4">{tier.available}</td>
+                                                        <td className="px-4 py-4 text-[#FBADCC] font-semibold">
+                                                            {formatRupiah(tier.revenue)}
+                                                        </td>
                                                     </tr>
                                                 ))}
-                                                {(!report.tiers || report.tiers.length === 0) && (
+
+                                                {!report.tiers?.length && (
                                                     <tr>
-                                                        <td colSpan={7} className="py-8 text-center text-gray-500">Belum ada data kategori tiket.</td>
+                                                        <td colSpan="7" className="p-10 text-center text-gray-400">
+                                                            No ticket category data
+                                                        </td>
                                                     </tr>
                                                 )}
                                             </tbody>
@@ -300,9 +343,9 @@ export default function ReportsPage() {
                                 </div>
                             </>
                         ) : null}
-                    </main>
+                    </div>
                 </div>
             </div>
         </EoGuard>
-    );
+    )
 }

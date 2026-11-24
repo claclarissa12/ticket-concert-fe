@@ -311,11 +311,10 @@ export default function TicketsPage() {
                                     return (
                                         <div
                                             key={ticket.id}
-                                            className={`grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 items-center hover:bg-[#2f2f2f] transition-colors ${
-                                                index !== filteredTickets.length - 1
-                                                    ? "border-b border-[#333]"
-                                                    : ""
-                                            }`}
+                                            className={`grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 items-center hover:bg-[#2f2f2f] transition-colors ${index !== filteredTickets.length - 1
+                                                ? "border-b border-[#333]"
+                                                : ""
+                                                }`}
                                         >
                                             <div className="lg:col-span-3">
                                                 <p className="font-medium text-sm">
@@ -356,7 +355,7 @@ export default function TicketsPage() {
 
                                             <div className="lg:col-span-2 flex lg:justify-end">
                                                 <Link
-                                                    href={`/organizer/events/${ticket.concertId}/tickets`}
+                                                    href={`/organizer/events/${ticket.concertId}/detail`}
                                                     className="px-4 py-2 bg-[#1a1a1a] rounded-lg text-xs hover:bg-[#333] transition-colors"
                                                 >
                                                     Manage

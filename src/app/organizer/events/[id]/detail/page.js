@@ -22,6 +22,7 @@ export default function DetailEvent() {
     const [publishing, setPublishing] = useState(false)
     const [publishMessage, setPublishMessage] = useState("")
     const [publishError, setPublishError] = useState("")
+    const [canceling, setCanceling] = useState(false)
     const [deleting, setDeleting] = useState(false)
 
     const fetchDetail = useCallback(async () => {
@@ -63,6 +64,24 @@ export default function DetailEvent() {
         } catch (err) {
             console.error("PUBLISH CONCERT ERROR:", err)
             setPublishError(err.message || "Gagal mempublikasikan konser")
+        } finally {
+            setPublishing(false)
+        }
+    }
+    const handleCancel = async () => {
+        if (!window.confirm("Apakah kamu yakin ingin Cancel konser ini?")) return
+
+        setCanceling(true)
+        setPublishMessage("")
+        setPublishError("")
+
+        try {
+            await organizerApi.cancelConcert(id)
+            setPublishMessage("Konser berhasil Dicancel!")
+            await fetchDetail()
+        } catch (err) {
+            console.error("PUBLISH CONCERT ERROR:", err)
+            setPublishError(err.message || "Gagal cancel konser")
         } finally {
             setPublishing(false)
         }
@@ -124,7 +143,7 @@ export default function DetailEvent() {
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                             <div>
-                                <BackButton className="mb-4"/>
+                                <BackButton className="mb-4" />
                                 <div className="flex items-center gap-3">
                                     <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Event Details & Manage Tickets</h1>
                                 </div>
@@ -324,13 +343,22 @@ export default function DetailEvent() {
                                             </svg>
                                             Edit Event
                                         </Link>
-                                        <Link href={`/organizer/events/${concert.id}/transactions`} onClick={(e) => e.stopPropagation()}
-                                            className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] transition-colors border border-[#333] flex items-center gap-2">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                                            </svg>
-                                             Transactions
-                                        </Link>
+                                       
+
+                                        {concert.status !== "cancelled" && (
+                                            <button
+                                                type="button"
+                                                onClick={handleCancel}
+                                                disabled={canceling || publishing || deleting}
+                                                className="w-full px-4 py-2.5 bg-[#1a1a1a]  rounded-xl text-sm  hover:bg-[#222] border-[#333] transition-colors disabled:opacity-50 flex items-center gap-2"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                                </svg>
+                                                {canceling ? "Cancelling..." : "Cancel Event"}
+                                            </button>
+                                        )}
+
                                         <Link href="/organizer/attendees" className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] transition-colors border border-[#333] flex items-center gap-2">
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -341,7 +369,7 @@ export default function DetailEvent() {
                                             {deleting ? "Deleting..." : "Delete Event"}
                                         </button>
                                     </div>
-                                </div>  
+                                </div>
                             </div>
                         </div>
                     </div>

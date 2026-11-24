@@ -289,7 +289,7 @@ export default function DetailEvent() {
                                         disabled={deletingId === concert.id}
                                         className="w-full px-4 py-2.5 bg-red-500/20 text-red-400 text-sm font-medium rounded-lg hover:bg-red-500/30 disabled:opacity-50 transition-colors"
                                     >
-                                        {deletingId === concert.id ? "Deleting..." : "Delete Concert"}
+                                        {deletingId === concert.id ? "Removing..." : "Remove Concert"}
                                     </button>
                                 </div>
                             </div>

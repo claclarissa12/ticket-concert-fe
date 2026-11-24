@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect, useRef, useState } from "react"
@@ -17,13 +18,17 @@ export default function AttendeesPage() {
     const [result, setResult] = useState(null)
     const [error, setError] = useState("")
 
+    const [attendees, setAttendees] = useState([])
+    const [attendeeLoading, setAttendeeLoading] = useState(false)
+    const [attendeeError, setAttendeeError] = useState("")
+    const [totalAttendees, setTotalAttendees] = useState(0)
+
     const loadConcerts = async () => {
         try {
             setConcertLoading(true)
             setError("")
 
             const response = await organizerApi.getMyConcert()
-
             const payload = response?.data?.data ?? response?.data ?? response
 
             const list =
@@ -34,12 +39,7 @@ export default function AttendeesPage() {
                 []
 
             setConcerts(list)
-
-            if (list.length > 0) {
-                setSelectedConcert(String(list[0].id))
-            } else {
-                setSelectedConcert("")
-            }
+            setSelectedConcert(list.length > 0 ? String(list[0].id) : "")
         } catch (err) {
             console.error("getMyConcert error:", err)
             setConcerts([])
@@ -54,10 +54,42 @@ export default function AttendeesPage() {
         }
     }
 
+    const loadAttendees = async () => {
+        if (!selectedConcert) {
+            setAttendees([])
+            setTotalAttendees(0)
+            return
+        }
+
+        try {
+            setAttendeeLoading(true)
+            setAttendeeError("")
+
+            const response = await organizerApi.getAttendees(selectedConcert)
+            const payload = response?.data?.data ?? response?.data ?? response
+            const items = payload?.items ?? []
+
+            setAttendees(Array.isArray(items) ? items : [])
+            setTotalAttendees(payload?.pagination?.total ?? items.length)
+        } catch (err) {
+            console.error("getAttendees error:", err)
+            setAttendees([])
+            setTotalAttendees(0)
+            setAttendeeError(
+                err?.response?.data?.message ||
+                err.message ||
+                "Gagal mengambil data attendees"
+            )
+        } finally {
+            setAttendeeLoading(false)
+        }
+    }
+
     const stopScanner = async () => {
         if (scannerRef.current) {
             const scanner = scannerRef.current
             scannerRef.current = null
+
             try {
                 await scanner.stop()
                 await scanner.clear()
@@ -65,6 +97,7 @@ export default function AttendeesPage() {
                 console.log("Scanner stop:", err)
             }
         }
+
         setScanning(false)
     }
 
@@ -84,7 +117,6 @@ export default function AttendeesPage() {
 
         try {
             const { Html5Qrcode } = await import("html5-qrcode")
-
             const scanner = new Html5Qrcode("qr-reader")
             scannerRef.current = scanner
 
@@ -132,6 +164,8 @@ export default function AttendeesPage() {
                                 message: beMessage,
                                 ticket: data
                             })
+
+                            await loadAttendees()
                         }
                     } catch (err) {
                         const respData = err?.response?.data
@@ -165,8 +199,10 @@ export default function AttendeesPage() {
                     await scannerRef.current.stop()
                     await scannerRef.current.clear()
                 } catch { }
+
                 scannerRef.current = null
             }
+
             setScanning(false)
         }
     }
@@ -176,9 +212,9 @@ export default function AttendeesPage() {
         setError("")
     }
 
-    // ==== INIT ====
     useEffect(() => {
         loadConcerts()
+
         return () => {
             if (scannerRef.current) {
                 scannerRef.current.stop().catch(() => { })
@@ -189,6 +225,7 @@ export default function AttendeesPage() {
     useEffect(() => {
         setResult(null)
         setError("")
+        loadAttendees()
     }, [selectedConcert])
 
     const hasConcert = concerts.length > 0
@@ -255,12 +292,11 @@ export default function AttendeesPage() {
                                         </p>
                                     </div>
 
-                                    <span
-                                        className={`text-xs px-3 py-1 rounded-full ${scanning
-                                                ? "bg-green-500/20 text-green-400"
-                                                : "bg-gray-500/20 text-gray-400"
-                                            }`}
-                                    >
+                                    <span className={`text-xs px-3 py-1 rounded-full ${
+                                        scanning
+                                            ? "bg-green-500/20 text-green-400"
+                                            : "bg-gray-500/20 text-gray-400"
+                                    }`}>
                                         {scanning ? "Camera Active" : "Camera Off"}
                                     </span>
                                 </div>
@@ -315,23 +351,20 @@ export default function AttendeesPage() {
                                         <p className="text-gray-300">Memverifikasi tiket...</p>
                                     </div>
                                 ) : result ? (
-                                    <div
-                                        className={`rounded-xl p-5 border ${result.success
-                                                ? "bg-green-500/10 border-green-500/30"
-                                                : "bg-red-500/10 border-red-500/30"
-                                            }`}
-                                    >
+                                    <div className={`rounded-xl p-5 border ${
+                                        result.success
+                                            ? "bg-green-500/10 border-green-500/30"
+                                            : "bg-red-500/10 border-red-500/30"
+                                    }`}>
                                         <div className="flex items-center gap-3 mb-4">
                                             <span className="text-3xl">
                                                 {result.success ? "✓" : "✕"}
                                             </span>
+
                                             <div>
-                                                <h3
-                                                    className={`font-semibold ${result.success
-                                                            ? "text-green-400"
-                                                            : "text-red-400"
-                                                        }`}
-                                                >
+                                                <h3 className={`font-semibold ${
+                                                    result.success ? "text-green-400" : "text-red-400"
+                                                }`}>
                                                     {result.success ? "Tiket Valid" : "Tiket Tidak Valid"}
                                                 </h3>
                                                 <p className="text-sm text-gray-300">{result.message}</p>
@@ -375,6 +408,94 @@ export default function AttendeesPage() {
                                 )}
                             </div>
                         </div>
+
+                        <div className="bg-[#272727] border border-[#333] rounded-2xl p-5 mt-6">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                                <div>
+                                    <h2 className="text-lg font-semibold">Daftar Attendees</h2>
+                                    <p className="text-sm text-gray-400 mt-1">
+                                        Daftar pemilik tiket konser yang dipilih
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <span className="text-sm text-gray-400">
+                                        Total: <span className="text-white font-semibold">{totalAttendees}</span> tiket
+                                    </span>
+
+                                    <button
+                                        onClick={loadAttendees}
+                                        disabled={attendeeLoading || !selectedConcert}
+                                        className="bg-[#FBADCC] text-black px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 disabled:opacity-40"
+                                    >
+                                        {attendeeLoading ? "Memuat..." : "Refresh"}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {attendeeError && (
+                                <p className="text-sm text-red-400 mb-4">{attendeeError}</p>
+                            )}
+
+                            {attendeeLoading ? (
+                                <div className="text-center py-12 text-gray-400">
+                                    Memuat daftar attendees...
+                                </div>
+                            ) : attendees.length === 0 ? (
+                                <div className="text-center py-12 text-gray-500">
+                                    <p className="text-4xl mb-3">♙</p>
+                                    <p className="text-sm">Belum ada tiket untuk konser ini.</p>
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm text-left min-w-[700px]">
+                                        <thead>
+                                            <tr className="border-b border-[#444] text-gray-400">
+                                                <th className="px-4 py-4 font-medium">Ticket ID</th>
+                                                <th className="px-4 py-4 font-medium">Nama Pemilik</th>
+                                                <th className="px-4 py-4 font-medium">Email</th>
+                                                <th className="px-4 py-4 font-medium">Ticket Tier</th>
+                                                <th className="px-4 py-4 font-medium">Status</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {attendees.map((ticket) => (
+                                                <tr
+                                                    key={ticket.id}
+                                                    className="border-b border-[#333] hover:bg-[#303030]"
+                                                >
+                                                    <td className="px-4 py-4 text-gray-300">
+                                                        #{ticket.id}
+                                                    </td>
+                                                    <td className="px-4 py-4 font-medium">
+                                                        {ticket.owner?.name || "-"}
+                                                    </td>
+                                                    <td className="px-4 py-4 text-gray-400">
+                                                        {ticket.owner?.email || "-"}
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        {ticket.tier?.name || "-"}
+                                                    </td>
+                                                    <td className="px-4 py-4">
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                                            ticket.status === "used"
+                                                                ? "bg-green-500/20 text-green-400"
+                                                                : ticket.status === "cancelled"
+                                                                ? "bg-red-500/20 text-red-400"
+                                                                : "bg-yellow-500/20 text-yellow-400"
+                                                        }`}>
+                                                            {ticket.status || "-"}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+
                     </div>
                 </div>
             </div>

@@ -74,7 +74,7 @@ export default function OrganizerProfile() {
             <div className="bg-[#131313] min-h-screen flex text-white">
                 <OrganizerSidebar />
                 <div className="flex-1 overflow-x-hidden">
-                    <div className="max-w-6xl mx-auto px-6 lg:px-8 py-8">
+                    <div className="max-w-full mx-auto px-6 lg:px-8 py-8">
                         <div className="mb-8">
                             <h1 className="text-2xl sm:text-3xl font-bold">Profil Organizer</h1>
                             <p className="text-gray-400 text-sm mt-1">Kelola informasi akun penyelenggara acara Anda</p>
