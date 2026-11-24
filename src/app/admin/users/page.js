@@ -86,6 +86,7 @@ export default function SuperAdminUsers() {
                                 className="w-full pl-9 pr-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none text-sm transition-colors"
                             />
                         </div>
+
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                             <div className="bg-[#272727] rounded-2xl p-5 border border-[#333]">
                                 <h2 className="text-sm font-semibold mb-2">User Registration Trend</h2>
@@ -171,7 +172,7 @@ export default function SuperAdminUsers() {
                                     </div>
                                 </div>
                             ))}
-                        </div>
+                        </div>  
                     </div>
                 </div>
             </div>

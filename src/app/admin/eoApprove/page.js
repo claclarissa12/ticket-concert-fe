@@ -4,6 +4,7 @@ import AdminGuard from "@/components/admin/guardAdmin"
 import SidebarAdmin from "@/components/admin/sidebarADM"
 import { useCallback, useEffect, useState } from "react"
 import { adminApi } from "../../../../lib/api"
+import Link from "next/link"
 
 export default function SuperAdminEO() {
     const [eos, setEos] = useState([])
@@ -71,13 +72,21 @@ export default function SuperAdminEO() {
                                     Kelola pendaftaran dan status Event Organizer
                                 </p>
                             </div>
-                            <button
-                                onClick={fetchEO}
-                                disabled={loading}
-                                className="px-4 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333] disabled:opacity-50"
-                            >
-                                {loading ? "Loading..." : "Refresh"}
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={fetchEO}
+                                    disabled={loading}
+                                    className="px-4 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#333] disabled:opacity-50"
+                                >
+                                    {loading ? "Loading..." : "Refresh"}
+                                </button>
+                                <Link
+                                    href="/admin/users/create"
+                                    className="px-6 py-3 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all hover:scale-[1.02] shadow-lg shadow-[#E21D8F]/25"
+                                >
+                                    Buat Akun EO
+                                </Link>
+                            </div>
                         </div>
 
                         {error && (
