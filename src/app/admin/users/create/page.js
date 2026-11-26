@@ -68,7 +68,7 @@ export default function CreateAccount() {
             <div className="bg-[#131313] min-h-screen flex text-white">
                 <SidebarAdmin />
                 <div className="flex-1 overflow-x-hidden">
-                    <div className="max-w-3xl mx-auto px-6 lg:px-8 py-8">
+                    <div className="max-w-5xl  px-6 lg:px-8 py-8">
                         <div className="flex items-center gap-3">
                             <Link href="/admin/users" className="text-gray-400 hover:text-white transition-colors">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,7 +163,7 @@ export default function CreateAccount() {
                                                 name="password"
                                                 value={form.password}
                                                 onChange={handleChange}
-                                                placeholder="Min 6 karakter"
+                                                placeholder="Min 8 karakter"
                                                 className={inputClass}
                                             />
                                         </div>

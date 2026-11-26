@@ -96,6 +96,29 @@ export default function TicketsPage() {
         }
     }
 
+
+    const handleTierChange = (index, e) => {
+        const { name, value } = e.target
+
+        setTiers(prev => prev.map((tier, i) =>
+            i === index ? { ...tier, [name]: value } : tier
+        ))
+    }
+
+    const removeTier = (index) => {
+        setTiers(prev => {
+            const selected = prev[index]
+
+            if (selected.id) {
+                return prev.map((tier, i) =>
+                    i === index ? { ...tier, deleted: true } : tier
+                )
+            }
+
+            return prev.filter((_, i) => i !== index)
+        })
+    }
+
     useEffect(() => {
         fetchTickets()
     }, [])

@@ -1,89 +1,88 @@
 
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import EoGuard from "@/components/EO/guardEO"
 import OrganizerSidebar from "@/components/EO/sidebarEO"
 import Link from "next/link"
-import { organizerApi } from "../../../../../../lib/api"
+import { organizerApi, assetUrl } from "../../../../../../lib/api"
 import BackButton from "@/components/cards/back"
 
 export default function DetailEvent() {
-    const params = useParams()
+    const { id } = useParams()
     const router = useRouter()
-    const id = params.id
 
     const [concert, setConcert] = useState(null)
     const [ticketTiers, setTicketTiers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
-    const [activeTab, setActiveTab] = useState("all")
     const [publishing, setPublishing] = useState(false)
-    const [publishMessage, setPublishMessage] = useState("")
-    const [publishError, setPublishError] = useState("")
     const [canceling, setCanceling] = useState(false)
     const [deleting, setDeleting] = useState(false)
+    const [message, setMessage] = useState("")
+    const [publishError, setPublishError] = useState("")
 
-    const fetchDetail = useCallback(async () => {
+    const fetchDetail = async () => {
         if (!id) return
 
-        setLoading(true)
-        setError("")
-
         try {
+            setLoading(true)
+            setError("")
+
             const [concertRes, tierRes] = await Promise.all([
                 organizerApi.getMyConcertById(id),
                 organizerApi.getTiers(id)
             ])
 
-            const concertData = concertRes.data?.concert || concertRes.data
-            const tierData = tierRes.data?.items || tierRes.data?.tiers || tierRes.data || []
+            setConcert(concertRes.data?.concert || concertRes.data)
 
-            setConcert(concertData)
-            setTicketTiers(Array.isArray(tierData) ? tierData : [])
+            const tiers = tierRes.data?.items || tierRes.data?.tiers || tierRes.data || []
+            setTicketTiers(Array.isArray(tiers) ? tiers : [])
         } catch (err) {
-            console.error("GET DETAIL ERROR:", err)
             setError(err.message || "Gagal memuat detail konser")
         } finally {
             setLoading(false)
         }
+    }
+
+    useEffect(() => {
+        fetchDetail()
     }, [id])
 
     const handlePublish = async () => {
         if (!window.confirm("Apakah kamu yakin ingin mempublikasikan konser ini?")) return
 
-        setPublishing(true)
-        setPublishMessage("")
-        setPublishError("")
-
         try {
+            setPublishing(true)
+            setMessage("")
+            setPublishError("")
+
             await organizerApi.publishConcert(id)
-            setPublishMessage("Konser berhasil dipublikasikan!")
+            setMessage("Konser berhasil dipublikasikan!")
             await fetchDetail()
         } catch (err) {
-            console.error("PUBLISH CONCERT ERROR:", err)
             setPublishError(err.message || "Gagal mempublikasikan konser")
         } finally {
             setPublishing(false)
         }
     }
+
     const handleCancel = async () => {
         if (!window.confirm("Apakah kamu yakin ingin Cancel konser ini?")) return
 
-        setCanceling(true)
-        setPublishMessage("")
-        setPublishError("")
-
         try {
+            setCanceling(true)
+            setMessage("")
+            setPublishError("")
+
             await organizerApi.cancelConcert(id)
-            setPublishMessage("Konser berhasil Dicancel!")
+            setMessage("Konser berhasil dicancel!")
             await fetchDetail()
         } catch (err) {
-            console.error("PUBLISH CONCERT ERROR:", err)
             setPublishError(err.message || "Gagal cancel konser")
         } finally {
-            setPublishing(false)
+            setCanceling(false)
         }
     }
 
@@ -92,21 +91,18 @@ export default function DetailEvent() {
 
         try {
             setDeleting(true)
+
             const result = await organizerApi.deleteConcert(id)
             alert(result.message || "Konser berhasil dihapus")
+
             router.push("/organizer/events")
             router.refresh()
         } catch (err) {
-            console.error("DELETE CONCERT ERROR:", err)
             alert(err.message || "Gagal menghapus konser")
         } finally {
             setDeleting(false)
         }
     }
-
-    useEffect(() => {
-        fetchDetail()
-    }, [fetchDetail])
 
     if (loading || error || !concert) {
         return (
@@ -123,17 +119,19 @@ export default function DetailEvent() {
         )
     }
 
-    const filteredTiers = ticketTiers.filter((tier) => {
-        if (activeTab === "all") return true
-        if (activeTab === "active") return (tier.status || "").toLowerCase() === "active"
-        if (activeTab === "sold out") return (tier.sold || 0) >= (tier.quota || 0)
-        if (activeTab === "upcoming") return tier.sale_start && new Date(tier.sale_start) > new Date()
-        return true
-    })
-
     const totalQuota = ticketTiers.reduce((total, tier) => total + (Number(tier.quota) || 0), 0)
     const totalSold = ticketTiers.reduce((total, tier) => total + (Number(tier.sold) || 0), 0)
     const totalAvailable = totalQuota - totalSold
+
+    const formatRupiah = (price) => {
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+        }).format(Number(price) || 0)
+    }
+
+    const formatNumber = (number) => Number(number || 0).toLocaleString("id-ID")
 
     return (
         <EoGuard>
@@ -144,42 +142,35 @@ export default function DetailEvent() {
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                             <div>
                                 <BackButton className="mb-4" />
-                                <div className="flex items-center gap-3">
-                                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Event Details & Manage Tickets</h1>
-                                </div>
+                                <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Event Details & Manage Tickets</h1>
                                 <p className="text-gray-400 text-sm mt-1">{concert.title} - Complete event information & ticket tiers</p>
                             </div>
 
-                            <div className="flex flex-wrap items-center justify-end gap-3">
-
-
-                                {concert.status === "published" ? (
-                                    <span className="px-4 py-2.5 bg-green-500/20 text-green-400 rounded-xl text-sm font-semibold flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-green-400" />
-                                        Published
-                                    </span>
-                                ) : concert.status === "cancelled" ? (
-                                    <span className="px-4 py-2.5 bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-red-400" />
-                                        Cancelled
-                                    </span>
-                                ) : (
-                                    <button
-                                        onClick={handlePublish}
-                                        disabled={publishing}
-                                        className="px-4 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {publishing ? "Publishing..." : "Publish Event"}
-                                    </button>
-                                )}
-                            </div>
+                            {concert.status === "published" ? (
+                                <span className="px-4 py-2.5 bg-green-500/20 text-green-400 rounded-xl text-sm font-semibold">
+                                    Published
+                                </span>
+                            ) : concert.status === "cancelled" ? (
+                                <span className="px-4 py-2.5 bg-red-500/20 text-red-400 rounded-xl text-sm font-semibold">
+                                    Cancelled
+                                </span>
+                            ) : (
+                                <button
+                                    onClick={handlePublish}
+                                    disabled={publishing || canceling || deleting}
+                                    className="px-4 py-2.5 bg-[#FBADCC] rounded-xl text-sm font-semibold text-black hover:opacity-90 disabled:opacity-50"
+                                >
+                                    {publishing ? "Publishing..." : "Publish Event"}
+                                </button>
+                            )}
                         </div>
 
-                        {publishMessage && (
+                        {message && (
                             <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl mb-5 text-sm">
-                                {publishMessage}
+                                {message}
                             </div>
                         )}
+
                         {publishError && (
                             <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl mb-5 text-sm">
                                 {publishError}
@@ -190,33 +181,27 @@ export default function DetailEvent() {
                             <div className="lg:col-span-2 space-y-6">
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                     <div className="flex items-start gap-6">
-                                        <img src={concert.banner_url} alt={concert.title} className="w-48 h-32 rounded-xl object-cover" />
+                                        <img
+                                            src={assetUrl(concert.banner_url)}
+                                            alt={concert.title}
+                                            className="w-48 h-32 rounded-xl object-cover"
+                                        />
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-2">
                                                 <h2 className="text-2xl font-bold">{concert.title}</h2>
-                                                <span className={`text-xs px-3 py-1 rounded-full ${concert.status === "published"
-                                                    ? "bg-green-500/20 text-green-400"
-                                                    : concert.status === "cancelled"
-                                                        ? "bg-red-500/20 text-red-400"
-                                                        : "bg-yellow-500/20 text-yellow-400"
-                                                    }`}>
+                                                <span className={`text-xs px-3 py-1 rounded-full ${
+                                                    concert.status === "published"
+                                                        ? "bg-green-500/20 text-green-400"
+                                                        : concert.status === "cancelled"
+                                                            ? "bg-red-500/20 text-red-400"
+                                                            : "bg-yellow-500/20 text-yellow-400"
+                                                }`}>
                                                     {concert.status?.charAt(0).toUpperCase() + concert.status?.slice(1)}
                                                 </span>
                                             </div>
                                             <div className="space-y-1 text-sm text-gray-400">
-                                                <div className="flex items-center gap-2">
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                    </svg>
-                                                    <span>{concert.date}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    </svg>
-                                                    <span>{concert.venue}, {concert.location}</span>
-                                                </div>
+                                                <p>📅 {concert.date}</p>
+                                                <p>📍 {concert.venue}, {concert.location}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -225,8 +210,57 @@ export default function DetailEvent() {
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                     <div className="flex items-center justify-between mb-4">
                                         <h2 className="text-lg font-semibold">Stage Layout</h2>
-                                        <span className="text-xs px-3 py-1 rounded-full bg-[#FBADCC]/20 text-[#FBADCC]">Catwalk Design</span>
+                                        <span className="text-xs px-3 py-1 rounded-full bg-[#FBADCC]/20 text-[#FBADCC]">
+                                            Venue Design
+                                        </span>
                                     </div>
+
+                                    {concert.layout_url ? (
+                                        <img
+                                            src={assetUrl(concert.layout_url)}
+                                            alt="Stage Layout"
+                                            className="w-full max-h-[500px] object-contain rounded-xl border border-[#383838] bg-[#1a1a1a]"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-400 text-sm">Stage layout belum tersedia.</p>
+                                    )}
+                                </div>
+
+                                <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
+                                    <h2 className="text-lg font-semibold mb-4">Venue Location</h2>
+
+                                    <div className="flex items-start gap-3 mb-4">
+                                        <div className="w-10 h-10 rounded-xl bg-[#FBADCC]/20 flex items-center justify-center shrink-0">
+                                            <svg className="w-5 h-5 text-[#FBADCC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-medium">{concert.venue}</p>
+                                            <p className="text-sm text-gray-400 mt-1">{concert.location}</p>
+                                        </div>
+                                    </div>
+
+                                    {concert.map_url?.includes("/maps/embed") ? (
+                                        <iframe
+                                            src={concert.map_url}
+                                            className="w-full h-72 rounded-xl border border-[#383838]"
+                                            loading="lazy"
+                                            referrerPolicy="no-referrer-when-downgrade"
+                                            allowFullScreen
+                                            title="Lokasi Venue"
+                                        />
+                                    ) : (
+                                        <div className="w-full min-h-48 flex flex-col items-center justify-center bg-[#1a1a1a] border border-dashed border-[#444] rounded-xl p-6 text-center">
+                                            <svg className="w-10 h-10 text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <p className="text-gray-400 text-sm">Lokasi Google Maps belum tersedia</p>
+                                            <p className="text-xs text-gray-500 mt-1">Embed URL Google Maps akan ditampilkan di sini.</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
@@ -236,13 +270,14 @@ export default function DetailEvent() {
                                     </div>
 
                                     <div className="space-y-3">
-                                        {filteredTiers.length === 0 ? (
+                                        {ticketTiers.length === 0 ? (
                                             <p className="text-center text-gray-400 py-8">Belum ada ticket tier.</p>
                                         ) : (
-                                            filteredTiers.map((tier) => {
+                                            ticketTiers.map((tier) => {
                                                 const quota = Number(tier.quota) || 0
                                                 const sold = Number(tier.sold) || 0
                                                 const available = Math.max(quota - sold, 0)
+
                                                 let status = "Active"
 
                                                 if (available === 0) status = "Sold Out"
@@ -258,30 +293,31 @@ export default function DetailEvent() {
                                                                 </div>
                                                                 <div>
                                                                     <h3 className="font-semibold text-lg">{tier.name}</h3>
-                                                                    <p className="text-[#FBADCC] font-medium text-sm">
-                                                                        {new Intl.NumberFormat("id-ID", {
-                                                                            style: "currency",
-                                                                            currency: "IDR",
-                                                                            maximumFractionDigits: 0
-                                                                        }).format(Number(tier.price) || 0)}
-                                                                    </p>
+                                                                    <p className="text-[#FBADCC] font-medium text-sm">{formatRupiah(tier.price)}</p>
                                                                     <p className="text-xs text-gray-400 mt-1">
-                                                                        Quota: {quota.toLocaleString("id-ID")} · Sold: {sold.toLocaleString("id-ID")} · Available: {available.toLocaleString("id-ID")}
+                                                                        Quota: {formatNumber(quota)} · Sold: {formatNumber(sold)} · Available: {formatNumber(available)}
                                                                     </p>
                                                                 </div>
                                                             </div>
 
                                                             <div className="flex items-center gap-3">
-                                                                <span className={`text-xs px-3 py-1 rounded-full ${status === "Sold Out"
-                                                                    ? "bg-red-500/20 text-red-400" : status === "Upcoming"
-                                                                        ? "bg-yellow-500/20 text-yellow-400" : status === "Ended"
-                                                                            ? "bg-gray-500/20 text-gray-400" : "bg-green-500/20 text-green-400"
-                                                                    }`}>
+                                                                <span className={`text-xs px-3 py-1 rounded-full ${
+                                                                    status === "Sold Out"
+                                                                        ? "bg-red-500/20 text-red-400"
+                                                                        : status === "Upcoming"
+                                                                            ? "bg-yellow-500/20 text-yellow-400"
+                                                                            : status === "Ended"
+                                                                                ? "bg-gray-500/20 text-gray-400"
+                                                                                : "bg-green-500/20 text-green-400"
+                                                                }`}>
                                                                     {status}
                                                                 </span>
                                                                 <div className="w-24">
                                                                     <div className="w-full bg-[#333] rounded-full h-2">
-                                                                        <div className="bg-[#FBADCC] rounded-full h-2" style={{ width: `${quota > 0 ? Math.min((sold / quota) * 100, 100) : 0}%` }} />
+                                                                        <div
+                                                                            className="bg-[#FBADCC] rounded-full h-2"
+                                                                            style={{ width: `${quota > 0 ? Math.min((sold / quota) * 100, 100) : 0}%` }}
+                                                                        />
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -301,7 +337,7 @@ export default function DetailEvent() {
                                         <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
                                             <div>
                                                 <p className="text-sm text-gray-400">Total Tickets</p>
-                                                <p className="text-xl font-bold">{totalQuota.toLocaleString("id-ID")}</p>
+                                                <p className="text-xl font-bold">{formatNumber(totalQuota)}</p>
                                             </div>
                                             <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
                                                 <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -309,10 +345,11 @@ export default function DetailEvent() {
                                                 </svg>
                                             </div>
                                         </div>
+
                                         <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
                                             <div>
                                                 <p className="text-sm text-gray-400">Sold</p>
-                                                <p className="text-xl font-bold text-green-400">{totalSold.toLocaleString("id-ID")}</p>
+                                                <p className="text-xl font-bold text-green-400">{formatNumber(totalSold)}</p>
                                             </div>
                                             <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
                                                 <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -320,10 +357,11 @@ export default function DetailEvent() {
                                                 </svg>
                                             </div>
                                         </div>
+
                                         <div className="flex justify-between items-center p-3 bg-[#1a1a1a] rounded-xl">
                                             <div>
                                                 <p className="text-sm text-gray-400">Available</p>
-                                                <p className="text-xl font-bold text-[#FBADCC]">{totalAvailable.toLocaleString("id-ID")}</p>
+                                                <p className="text-xl font-bold text-[#FBADCC]">{formatNumber(totalAvailable)}</p>
                                             </div>
                                             <div className="w-12 h-12 rounded-xl bg-[#FBADCC]/20 flex items-center justify-center">
                                                 <svg className="w-6 h-6 text-[#FBADCC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -337,35 +375,35 @@ export default function DetailEvent() {
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                     <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
                                     <div className="space-y-3">
-                                        <Link href={`/organizer/events/${concert.id}/edit`} className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] transition-colors border border-[#333] flex items-center gap-2">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                            </svg>
+                                        <Link
+                                            href={`/organizer/events/${concert.id}/edit`}
+                                            className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] transition-colors border border-[#333] flex items-center gap-2"
+                                        >
                                             Edit Event
                                         </Link>
-                                       
 
                                         {concert.status !== "cancelled" && (
                                             <button
-                                                type="button"
                                                 onClick={handleCancel}
                                                 disabled={canceling || publishing || deleting}
-                                                className="w-full px-4 py-2.5 bg-[#1a1a1a]  rounded-xl text-sm  hover:bg-[#222] border-[#333] transition-colors disabled:opacity-50 flex items-center gap-2"
+                                                className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] border border-[#333] transition-colors disabled:opacity-50"
                                             >
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                                                </svg>
                                                 {canceling ? "Cancelling..." : "Cancel Event"}
                                             </button>
                                         )}
 
-                                        <Link href="/organizer/attendees" className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] transition-colors border border-[#333] flex items-center gap-2">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                            </svg>
+                                        <Link
+                                            href="/organizer/attendees"
+                                            className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] transition-colors border border-[#333] flex items-center gap-2"
+                                        >
                                             View Attendees
                                         </Link>
-                                        <button type="button" onClick={handleDelete} disabled={deleting || publishing} className="w-full px-5 py-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-50">
+
+                                        <button
+                                            onClick={handleDelete}
+                                            disabled={deleting || publishing || canceling}
+                                            className="w-full px-5 py-2.5 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                                        >
                                             {deleting ? "Deleting..." : "Delete Event"}
                                         </button>
                                     </div>

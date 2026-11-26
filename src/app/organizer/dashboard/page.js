@@ -105,15 +105,7 @@ export default function OrganizerDashboard() {
                                 <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
                                 <p className="text-gray-400 text-sm mt-2">Welcome back, Event Organizer!</p>
                             </div>
-                            <div className="flex gap-3">
-                                <button onClick={fetchDashboard} disabled={loading} className="p-3 rounded-xl bg-[#272727] border border-[#383838] hover:bg-[#383838] disabled:opacity-50 transition-colors">
-                                    <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
-                                </button>
-                                <Link href="/organizer/create-event" className="flex items-center gap-2 bg-[#FBADCC] text-black px-4 py-3 rounded-xl font-semibold hover:bg-[#f99fc3] transition-colors">
-                                    <Plus size={18} />
-                                    Create Event
-                                </Link>
-                            </div>
+                           
                         </div>
 
                         {error && (

@@ -1,4 +1,3 @@
-
 "use client"
 
 import AdminGuard from "@/components/admin/guardAdmin"
@@ -8,7 +7,7 @@ import { useCallback, useEffect, useState } from "react"
 import { adminApi } from "../../../../lib/api"
 
 export default function SuperAdminEvents() {
-    const [activeTab, setActiveTab] = useState("all")
+    const [activeTab, setActiveTab] = useState("published")
     const [searchTerm, setSearchTerm] = useState("")
     const [concert, setConcert] = useState([])
     const [loading, setLoading] = useState(false)
@@ -18,7 +17,11 @@ export default function SuperAdminEvents() {
         try {
             const res = await adminApi.getConcert()
             const payload = res?.data?.data ?? res?.data ?? res
-            setConcert(Array.isArray(payload) ? payload : payload?.items ?? [])
+            const list = Array.isArray(payload) ? payload : payload?.items ?? []
+
+            setConcert(
+                list.filter(c => c.status === "published" || c.status === "cancelled")
+            )
         } catch (err) {
             console.error(err)
         } finally {
@@ -32,13 +35,14 @@ export default function SuperAdminEvents() {
 
     const getStatusColor = (status) => ({
         published: "bg-green-500/20 text-green-400",
-        draft: "bg-yellow-500/20 text-yellow-400",
         cancelled: "bg-red-500/20 text-red-400"
     }[status] || "bg-gray-500/20 text-gray-400")
 
     const filteredEvents = concert.filter(c => {
         const name = (c.title ?? c.name ?? "").toLowerCase()
-        return name.includes(searchTerm.toLowerCase()) && (activeTab === "all" || c.status === activeTab)
+        const matchSearch = name.includes(searchTerm.toLowerCase())
+        const matchTab = c.status === activeTab
+        return matchSearch && matchTab
     })
 
     return (
@@ -49,17 +53,15 @@ export default function SuperAdminEvents() {
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                             <div>
-                                <h1 className="text-2xl sm:text-3xl font-bold">Memantau Event</h1>
+                                <h1 className="text-2xl sm:text-3xl font-bold"> Events</h1>
                                 <p className="text-gray-400 text-sm mt-1">Monitor all events across platform</p>
                             </div>
-                            <button onClick={fetchConcert} disabled={loading} className="px-4 py-2.5 bg-[#272727] rounded-xl text-sm border border-[#333]">
-                                {loading ? "Loading..." : "Refresh"}
-                            </button>
+
                         </div>
 
                         <div className="flex flex-wrap items-center gap-3 mb-6">
                             <div className="flex bg-[#272727] rounded-xl p-1 border border-[#333]">
-                                {["all", "published", "draft", "cancelled"].map(tab => (
+                                {["published", "cancelled"].map(tab => (
                                     <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-1.5 rounded-lg text-sm capitalize ${activeTab === tab ? "bg-[#FBADCC] text-black" : "text-gray-400 hover:text-white"}`}>
                                         {tab}
                                     </button>
@@ -91,8 +93,19 @@ export default function SuperAdminEvents() {
                                                     <span className={`text-[11px] px-2 py-0.5 rounded font-medium ${getStatusColor(c.status)}`}>{c.status}</span>
                                                 </div>
 
-                                                <p className="text-xs text-neutral-500 mt-2">
-                                                    {c.start_date ? new Date(c.start_date).toLocaleDateString("id-ID") : "-"} · {c.venue ?? "-"}
+                                                <p className="text-xs text-neutral-500 mt-2 flex gap-1.5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" color="#FBADCC"
+                                                        fill="currentColor" viewBox="0 0 24 24" >
+                                                        <path d="m22 5-5-2v4.42c-1.34-.24-2.75-.36-4-.4V5.2L16 4l-5-2v5.02c-1.25.04-2.66.16-4 .4V6.2L10 5 5 3v4.89c-1.73.54-3 1.37-3 2.61v8C2 21.26 8.29 22 12 22s10-.74 10-3.5v-8c0-1.24-1.27-2.07-3-2.61V6.2zM10 19.93V18h4v1.93c-.62.04-1.28.07-2 .07s-1.38-.03-2-.07m6-.21V17c0-.55-.45-1-1-1H9c-.55 0-1 .45-1 1v2.72c-2.4-.35-3.76-.96-4-1.29v-5.69c2.16.95 5.61 1.26 8 1.26s5.84-.31 8-1.26v5.69c-.24.33-1.6.94-4 1.29M12 12c-4.75 0-7.4-.99-7.94-1.5C4.6 9.99 7.25 9 12 9s7.4.99 7.94 1.5c-.54.51-3.19 1.5-7.94 1.5"></path>
+                                                    </svg>
+                                                    {c.venue ?? "-"}
+                                                </p>
+                                                <p className="text-xs text-neutral-500 mt-2 flex gap-1.5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" color="#FBADCC"
+                                                        fill="currentColor" viewBox="0 0 24 24" >
+                                                        <path d="M16 10c0-2.21-1.79-4-4-4s-4 1.79-4 4 1.79 4 4 4 4-1.79 4-4m-6 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2"></path><path d="M11.42 21.81c.17.12.38.19.58.19s.41-.06.58-.19c.3-.22 7.45-5.37 7.42-11.82 0-4.41-3.59-8-8-8s-8 3.59-8 8c-.03 6.44 7.12 11.6 7.42 11.82M12 4c3.31 0 6 2.69 6 6 .02 4.44-4.39 8.43-6 9.74-1.61-1.31-6.02-5.29-6-9.74 0-3.31 2.69-6 6-6"></path>
+                                                    </svg>
+                                                    {c.location ?? "-"}
                                                 </p>
 
                                                 <div className="flex flex-wrap items-center gap-x-5 gap-y-1 mt-3 text-xs text-neutral-400">

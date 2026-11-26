@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import AdminGuard from "@/components/admin/guardAdmin"
-import { adminApi, concertApi } from "../../../../../lib/api"
+import { adminApi, assetUrl } from "../../../../../lib/api"
 import SidebarAdmin from "@/components/admin/sidebarADM"
 
 export default function DetailEvent() {
@@ -24,7 +24,7 @@ export default function DetailEvent() {
         setLoading(true)
         setError("")
         try {
-            const res = await concertApi.getDetailConcert(id)
+            const res = await adminApi.getConcertById(id)
             const data = res.data || {}
 
             setConcert(data)
@@ -171,8 +171,57 @@ export default function DetailEvent() {
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                     <div className="flex items-center justify-between mb-4">
                                         <h2 className="text-lg font-semibold">Stage Layout</h2>
-                                        <span className="text-xs px-3 py-1 rounded-full bg-[#FBADCC]/20 text-[#FBADCC]">Catwalk Design</span>
+                                        <span className="text-xs px-3 py-1 rounded-full bg-[#FBADCC]/20 text-[#FBADCC]">
+                                            Venue Design
+                                        </span>
                                     </div>
+
+                                    {concert.layout_url ? (
+                                        <img
+                                            src={assetUrl(concert.layout_url)}
+                                            alt="Stage Layout"
+                                            className="w-full max-h-[500px] object-contain rounded-xl border border-[#383838] bg-[#1a1a1a]"
+                                        />
+                                    ) : (
+                                        <p className="text-gray-400 text-sm">Stage layout belum tersedia.</p>
+                                    )}
+                                </div>
+
+                                <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
+                                    <h2 className="text-lg font-semibold mb-4">Venue Location</h2>
+
+                                    <div className="flex items-start gap-3 mb-4">
+                                        <div className="w-10 h-10 rounded-xl bg-[#FBADCC]/20 flex items-center justify-center shrink-0">
+                                            <svg className="w-5 h-5 text-[#FBADCC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-medium">{concert.venue}</p>
+                                            <p className="text-sm text-gray-400 mt-1">{concert.location}</p>
+                                        </div>
+                                    </div>
+
+                                    {concert.map_url?.includes("/maps/embed") ? (
+                                        <iframe
+                                            src={concert.map_url}
+                                            className="w-full h-72 rounded-xl border border-[#383838]"
+                                            loading="lazy"
+                                            referrerPolicy="no-referrer-when-downgrade"
+                                            allowFullScreen
+                                            title="Lokasi Venue"
+                                        />
+                                    ) : (
+                                        <div className="w-full min-h-48 flex flex-col items-center justify-center bg-[#1a1a1a] border border-dashed border-[#444] rounded-xl p-6 text-center">
+                                            <svg className="w-10 h-10 text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <p className="text-gray-400 text-sm">Lokasi Google Maps belum tersedia</p>
+                                            <p className="text-xs text-gray-500 mt-1">Embed URL Google Maps akan ditampilkan di sini.</p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="bg-[#272727] rounded-2xl border border-[#333] overflow-hidden">

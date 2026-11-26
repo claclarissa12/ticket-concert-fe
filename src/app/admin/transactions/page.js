@@ -106,7 +106,7 @@ export default function SuperAdminTransactions() {
                 <div className="flex-1 overflow-x-hidden">
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
                         <div className="mb-6">
-                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Memantau Transaksi</h1>
+                            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight"> Transactions</h1>
                             <p className="text-gray-400 text-sm mt-1">Monitor all transactions across platform</p>
                         </div>
                         <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -158,7 +158,6 @@ export default function SuperAdminTransactions() {
                                     <div className="text-center py-16 text-red-400">{error}</div>
                                 ) : filteredTransactions.length === 0 ? (
                                     <div className="text-center py-16">
-                                        <div className="text-6xl mb-4">💳</div>
                                         <h3 className="text-xl font-semibold mb-2">No transactions found</h3>
                                         <p className="text-gray-400">No transactions match your current filter</p>
                                     </div>

@@ -292,11 +292,10 @@ export default function AttendeesPage() {
                                         </p>
                                     </div>
 
-                                    <span className={`text-xs px-3 py-1 rounded-full ${
-                                        scanning
+                                    <span className={`text-xs px-3 py-1 rounded-full ${scanning
                                             ? "bg-green-500/20 text-green-400"
                                             : "bg-gray-500/20 text-gray-400"
-                                    }`}>
+                                        }`}>
                                         {scanning ? "Camera Active" : "Camera Off"}
                                     </span>
                                 </div>
@@ -351,20 +350,18 @@ export default function AttendeesPage() {
                                         <p className="text-gray-300">Memverifikasi tiket...</p>
                                     </div>
                                 ) : result ? (
-                                    <div className={`rounded-xl p-5 border ${
-                                        result.success
+                                    <div className={`rounded-xl p-5 border ${result.success
                                             ? "bg-green-500/10 border-green-500/30"
                                             : "bg-red-500/10 border-red-500/30"
-                                    }`}>
+                                        }`}>
                                         <div className="flex items-center gap-3 mb-4">
                                             <span className="text-3xl">
                                                 {result.success ? "✓" : "✕"}
                                             </span>
 
                                             <div>
-                                                <h3 className={`font-semibold ${
-                                                    result.success ? "text-green-400" : "text-red-400"
-                                                }`}>
+                                                <h3 className={`font-semibold ${result.success ? "text-green-400" : "text-red-400"
+                                                    }`}>
                                                     {result.success ? "Tiket Valid" : "Tiket Tidak Valid"}
                                                 </h3>
                                                 <p className="text-sm text-gray-300">{result.message}</p>
@@ -478,13 +475,12 @@ export default function AttendeesPage() {
                                                         {ticket.tier?.name || "-"}
                                                     </td>
                                                     <td className="px-4 py-4">
-                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                                            ticket.status === "used"
+                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${ticket.status === "used"
                                                                 ? "bg-green-500/20 text-green-400"
                                                                 : ticket.status === "cancelled"
-                                                                ? "bg-red-500/20 text-red-400"
-                                                                : "bg-yellow-500/20 text-yellow-400"
-                                                        }`}>
+                                                                    ? "bg-red-500/20 text-red-400"
+                                                                    : "bg-yellow-500/20 text-yellow-400"
+                                                            }`}>
                                                             {ticket.status || "-"}
                                                         </span>
                                                     </td>
