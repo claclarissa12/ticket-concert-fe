@@ -82,14 +82,9 @@ export default function OrganizerDashboard() {
         { name: "Cancelled", value: data.concert.cancelled, color: "#F87171" }
     ]
 
-    const concertStats = [
-        { label: "Published", value: data.concert.published, color: "bg-[#FBADCC]", icon: CheckCircle2, textColor: "text-[#FBADCC]" },
-        { label: "Draft", value: data.concert.draft, color: "bg-purple-400", icon: Clock, textColor: "text-purple-400" },
-        { label: "Cancelled", value: data.concert.cancelled, color: "bg-red-400", icon: XCircle, textColor: "text-red-400" }
-    ]
 
     const quickActions = [
-        { title: "Create Event", description: "Buat konser baru", href: "/organizer/create-event", icon: Plus },
+        { title: "Create Event", description: "Buat konser baru", href: "/organizer/create", icon: Plus },
         { title: "Manage Events", description: "Kelola seluruh konser", href: "/organizer/events", icon: CalendarDays },
         { title: "Transactions", description: "Lihat pembayaran tiket", href: "/organizer/transactions", icon: Wallet }
     ]
@@ -241,26 +236,6 @@ export default function OrganizerDashboard() {
                             </div>
                         </div>
 
-                        <div className="bg-[#272727] border border-[#333] rounded-2xl p-6 mb-6">
-                            <h2 className="font-semibold text-lg mb-5">Event Status Overview</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                {concertStats.map(item => {
-                                    const Icon = item.icon
-                                    return (
-                                        <div key={item.label} className="bg-[#1a1a1a] rounded-xl p-4 flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <Icon className={item.textColor} size={22} />
-                                                <div>
-                                                    <p className="text-sm text-gray-400">{item.label}</p>
-                                                    <p className="text-xl font-bold mt-1">{formatNumber(item.value)}</p>
-                                                </div>
-                                            </div>
-                                            <div className={`w-2 h-10 rounded-full ${item.color}`} />
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </div>
 
                         <div className="bg-[#272727] border border-[#333] rounded-2xl p-6">
                             <div className="flex items-center justify-between mb-5">
@@ -268,7 +243,6 @@ export default function OrganizerDashboard() {
                                     <h2 className="font-semibold text-lg">Quick Actions</h2>
                                     <p className="text-xs text-gray-400 mt-1">Akses cepat pengelolaan konser</p>
                                 </div>
-                                <ArrowUpRight className="text-gray-400" size={20} />
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 {quickActions.map(item => {

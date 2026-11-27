@@ -1,492 +1,459 @@
 
-"use client"
+    "use client"
 
-import { useEffect, useRef, useState } from "react"
-import EoGuard from "@/components/EO/guardEO"
-import OrganizerSidebar from "@/components/EO/sidebarEO"
-import { organizerApi } from "../../../../lib/api"
+    import { useEffect, useRef, useState } from "react"
+    import EoGuard from "@/components/EO/guardEO"
+    import OrganizerSidebar from "@/components/EO/sidebarEO"
+    import { organizerApi } from "../../../../lib/api"
 
-export default function AttendeesPage() {
-    const scannerRef = useRef(null)
-    const scanLockRef = useRef(false)
+    export default function AttendeesPage() {
+        const scannerRef = useRef(null)
+        const scanLockRef = useRef(false)
 
-    const [concerts, setConcerts] = useState([])
-    const [selectedConcert, setSelectedConcert] = useState("")
-    const [scanning, setScanning] = useState(false)
-    const [loading, setLoading] = useState(false)
-    const [concertLoading, setConcertLoading] = useState(true)
-    const [result, setResult] = useState(null)
-    const [error, setError] = useState("")
+        const [concerts, setConcerts] = useState([])
+        const [lastConcert, setLastConcert] = useState("")
+        const [scanning, setScanning] = useState(false)
+        const [loading, setLoading] = useState(false)
+        const [concertLoading, setConcertLoading] = useState(true)
+        const [result, setResult] = useState(null)
+        const [error, setError] = useState("")
 
-    const [attendees, setAttendees] = useState([])
-    const [attendeeLoading, setAttendeeLoading] = useState(false)
-    const [attendeeError, setAttendeeError] = useState("")
-    const [totalAttendees, setTotalAttendees] = useState(0)
+        const [attendees, setAttendees] = useState([])
+        const [attendeeLoading, setAttendeeLoading] = useState(false)
+        const [attendeeError, setAttendeeError] = useState("")
+        const [totalAttendees, setTotalAttendees] = useState(0)
 
-    const loadConcerts = async () => {
-        try {
-            setConcertLoading(true)
-            setError("")
-
-            const response = await organizerApi.getMyConcert()
-            const payload = response?.data?.data ?? response?.data ?? response
-
-            const list =
-                (Array.isArray(payload) && payload) ||
-                (Array.isArray(payload?.items) && payload.items) ||
-                (Array.isArray(payload?.rows) && payload.rows) ||
-                (Array.isArray(payload?.data) && payload.data) ||
-                []
-
-            setConcerts(list)
-            setSelectedConcert(list.length > 0 ? String(list[0].id) : "")
-        } catch (err) {
-            console.error("getMyConcert error:", err)
-            setConcerts([])
-            setSelectedConcert("")
-            setError(
-                err?.response?.data?.message ||
-                err.message ||
-                "Gagal mengambil daftar konser"
-            )
-        } finally {
-            setConcertLoading(false)
-        }
-    }
-
-    const loadAttendees = async () => {
-        if (!selectedConcert) {
-            setAttendees([])
-            setTotalAttendees(0)
-            return
-        }
-
-        try {
-            setAttendeeLoading(true)
-            setAttendeeError("")
-
-            const response = await organizerApi.getAttendees(selectedConcert)
-            const payload = response?.data?.data ?? response?.data ?? response
-            const items = payload?.items ?? []
-
-            setAttendees(Array.isArray(items) ? items : [])
-            setTotalAttendees(payload?.pagination?.total ?? items.length)
-        } catch (err) {
-            console.error("getAttendees error:", err)
-            setAttendees([])
-            setTotalAttendees(0)
-            setAttendeeError(
-                err?.response?.data?.message ||
-                err.message ||
-                "Gagal mengambil data attendees"
-            )
-        } finally {
-            setAttendeeLoading(false)
-        }
-    }
-
-    const stopScanner = async () => {
-        if (scannerRef.current) {
-            const scanner = scannerRef.current
-            scannerRef.current = null
-
+        const loadConcerts = async () => {
             try {
-                await scanner.stop()
-                await scanner.clear()
+                setConcertLoading(true)
+                setError("")
+
+                const response = await organizerApi.getMyConcert()
+                const payload = response?.data?.data ?? response?.data ?? response
+
+                const list =
+                    (Array.isArray(payload) && payload) ||
+                    (Array.isArray(payload?.items) && payload.items) ||
+                    (Array.isArray(payload?.rows) && payload.rows) ||
+                    (Array.isArray(payload?.data) && payload.data) ||
+                    []
+
+                setConcerts(list)
             } catch (err) {
-                console.log("Scanner stop:", err)
+                setConcerts([])
+                setError(
+                    err?.response?.data?.message ||
+                    err.message ||
+                    "Gagal mengambil daftar konser"
+                )
+            } finally {
+                setConcertLoading(false)
             }
         }
 
-        setScanning(false)
-    }
+        const loadAttendees = async (concertId) => {
+            if (!concertId) return
 
-    const startScanner = async () => {
-        setError("")
-        setResult(null)
+            try {
+                setAttendeeLoading(true)
+                setAttendeeError("")
 
-        if (!selectedConcert) {
-            setError("Pilih konser terlebih dahulu sebelum scan.")
-            return
+                const response = await organizerApi.getAttendees(concertId)
+                const payload = response?.data?.data ?? response?.data
+                const items = payload?.items ?? []
+
+                setAttendees(Array.isArray(items) ? items : [])
+                setTotalAttendees(payload?.pagination?.total ?? items.length)
+            } catch (err) {
+                setAttendeeError(
+                    err?.response?.data?.message ||
+                    err.message ||
+                    "Gagal mengambil data attendees"
+                )
+            } finally {
+                setAttendeeLoading(false)
+            }
         }
 
-        if (!navigator.mediaDevices?.getUserMedia) {
-            setError("Browser tidak mendukung kamera. Gunakan HTTPS atau localhost.")
-            return
+        const stopScanner = async () => {
+            if (scannerRef.current) {
+                const scanner = scannerRef.current
+                scannerRef.current = null
+
+                try {
+                    await scanner.stop()
+                    await scanner.clear()
+                } catch (err) {
+                    console.log("Scanner stop:", err)
+                }
+            }
+
+            setScanning(false)
         }
 
-        try {
-            const { Html5Qrcode } = await import("html5-qrcode")
-            const scanner = new Html5Qrcode("qr-reader")
-            scannerRef.current = scanner
+        const startScanner = async () => {
+            setError("")
+            setResult(null)
 
-            await scanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                async (decodedText) => {
-                    if (scanLockRef.current) return
+            if (concertLoading) {
+                setError("Tunggu sampai data konser selesai dimuat.")
+                return
+            }
 
-                    scanLockRef.current = true
-                    setLoading(true)
+            if (concerts.length === 0) {
+                setError("Belum ada konser yang tersedia.")
+                return
+            }
 
-                    await stopScanner()
+            if (!navigator.mediaDevices?.getUserMedia) {
+                setError("Browser tidak mendukung kamera. Gunakan HTTPS atau localhost.")
+                return
+            }
 
-                    const selected = concerts.find(
-                        (c) => String(c.id) === String(selectedConcert)
-                    )
+            try {
+                const { Html5Qrcode } = await import("html5-qrcode")
+                const scanner = new Html5Qrcode("qr-reader")
+                scannerRef.current = scanner
 
-                    try {
-                        const response = await organizerApi.scanTicket({
-                            qr_code: decodedText,
-                            concert_id: Number(selectedConcert)
-                        })
+                await scanner.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    async (decodedText) => {
+                        if (scanLockRef.current) return
 
-                        const data = response?.data?.data ?? response?.data
-                        const beMessage = response?.message || "Valid ticket: entry granted"
+                        scanLockRef.current = true
+                        setLoading(true)
 
-                        const concertName = data?.concert ?? null
-                        const selectedName = selected?.title ?? null
+                        await stopScanner()
 
-                        if (
-                            selectedName &&
-                            concertName &&
-                            String(concertName).trim().toLowerCase() !==
-                            String(selectedName).trim().toLowerCase()
-                        ) {
-                            setResult({
-                                success: false,
-                                message: `Tiket ini milik konser "${concertName}", bukan "${selectedName}". Verifikasi ditolak.`,
-                                ticket: data
+                        try {
+                            const response = await organizerApi.scanTicket({
+                                qr_code: decodedText
                             })
-                        } else {
+
+                            const data = response?.data?.data ?? response?.data
+                            const beMessage = response?.message || "Valid ticket: entry granted"
+
                             setResult({
                                 success: true,
                                 message: beMessage,
                                 ticket: data
                             })
 
-                            await loadAttendees()
+                            const concert = concerts.find(
+                                (c) =>
+                                    c.title?.trim().toLowerCase() ===
+                                    data?.concert?.trim().toLowerCase()
+                            )
+
+                            if (concert) {
+                                setLastConcert(concert.title)
+                                await loadAttendees(concert.id)
+                            } else {
+                                setAttendees([])
+                                setTotalAttendees(0)
+                                setAttendeeError("Konser dari tiket tidak ditemukan dalam daftar konser EO.")
+                            }
+                        } catch (err) {
+                            const respData = err?.response?.data
+                            const checkInAt = respData?.data?.check_in_at
+
+                            let errMsg =
+                                respData?.message ||
+                                err.message ||
+                                "Gagal memverifikasi tiket"
+
+                            if (checkInAt) {
+                                errMsg = `${errMsg} (check-in: ${new Date(checkInAt).toLocaleString("id-ID")})`
+                            }
+
+                            setResult({
+                                success: false,
+                                message: errMsg
+                            })
+                        } finally {
+                            setLoading(false)
+                            scanLockRef.current = false
                         }
-                    } catch (err) {
-                        const respData = err?.response?.data
-                        const checkInAt = respData?.data?.check_in_at
+                    },
+                    () => { }
+                )
 
-                        let errMsg =
-                            respData?.message ||
-                            err.message ||
-                            "Gagal memverifikasi tiket"
+                setScanning(true)
+            } catch (err) {
+                console.error("Scanner error:", err)
+                setError(err.message || "Kamera gagal diaktifkan.")
 
-                        if (checkInAt) {
-                            errMsg = `${errMsg} (check-in: ${new Date(checkInAt).toLocaleString("id-ID")})`
-                        }
+                if (scannerRef.current) {
+                    try {
+                        await scannerRef.current.stop()
+                        await scannerRef.current.clear()
+                    } catch { }
 
-                        setResult({ success: false, message: errMsg })
-                    } finally {
-                        setLoading(false)
-                        scanLockRef.current = false
-                    }
-                },
-                () => { }
-            )
+                    scannerRef.current = null
+                }
 
-            setScanning(true)
-        } catch (err) {
-            console.error("Scanner error:", err)
-            setError(err.message || "Kamera gagal diaktifkan.")
-
-            if (scannerRef.current) {
-                try {
-                    await scannerRef.current.stop()
-                    await scannerRef.current.clear()
-                } catch { }
-
-                scannerRef.current = null
-            }
-
-            setScanning(false)
-        }
-    }
-
-    const resetResult = () => {
-        setResult(null)
-        setError("")
-    }
-
-    useEffect(() => {
-        loadConcerts()
-
-        return () => {
-            if (scannerRef.current) {
-                scannerRef.current.stop().catch(() => { })
+                setScanning(false)
             }
         }
-    }, [])
 
-    useEffect(() => {
-        setResult(null)
-        setError("")
-        loadAttendees()
-    }, [selectedConcert])
+        const resetResult = () => {
+            setResult(null)
+            setError("")
+        }
 
-    const hasConcert = concerts.length > 0
-    const canScan = !!selectedConcert && !concertLoading && !loading
+        useEffect(() => {
+            loadConcerts()
 
-    return (
-        <EoGuard>
-            <div className="bg-[#131313] min-h-screen flex text-white">
-                <OrganizerSidebar />
+            return () => {
+                if (scannerRef.current) {
+                    scannerRef.current.stop().catch(() => { })
+                }
+            }
+        }, [])
 
-                <div className="flex-1 overflow-x-hidden">
-                    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        const canScan = !concertLoading && concerts.length > 0 && !loading
 
-                        <div className="mb-8">
-                            <h1 className="text-2xl sm:text-3xl font-bold">Attendees</h1>
-                            <p className="text-gray-400 text-sm mt-1">
-                                Scan QR ticket untuk memverifikasi kehadiran pengunjung
-                            </p>
-                        </div>
+        return (
+            <EoGuard>
+                <div className="bg-[#131313] min-h-screen flex text-white">
+                    <OrganizerSidebar />
 
-                        <div className="bg-[#272727] border border-[#333] rounded-2xl p-5 mb-6">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                <div>
-                                    <h2 className="font-semibold">Pilih Konser</h2>
-                                    <p className="text-sm text-gray-400 mt-1">
-                                        Pilih konser terlebih dahulu sebelum scan tiket
-                                    </p>
-                                </div>
+                    <div className="flex-1 overflow-x-hidden">
+                        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
 
-                                <select
-                                    value={selectedConcert}
-                                    onChange={(e) => setSelectedConcert(e.target.value)}
-                                    disabled={concertLoading || !hasConcert}
-                                    className="bg-[#181818] border border-[#444] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#FBADCC] w-full sm:w-72 disabled:opacity-50"
-                                >
-                                    {concertLoading ? (
-                                        <option value="">Memuat konser...</option>
-                                    ) : !hasConcert ? (
-                                        <option value="">Belum ada konser</option>
-                                    ) : (
-                                        concerts.map((concert) => (
-                                            <option key={concert.id} value={concert.id}>
-                                                {concert.title}
-                                            </option>
-                                        ))
-                                    )}
-                                </select>
+                            <div className="mb-8">
+                                <h1 className="text-2xl sm:text-3xl font-bold">Attendees</h1>
+                                <p className="text-gray-400 text-sm mt-1">
+                                    Scan QR ticket untuk memverifikasi kehadiran pengunjung
+                                </p>
                             </div>
 
-                            {!hasConcert && !concertLoading && (
-                                <p className="text-xs text-yellow-400 mt-3">
-                                    Belum ada konser. Buat konser dulu untuk mulai scan.
+                            <div className="bg-[#272727] border border-[#333] rounded-2xl p-5 mb-6">
+                                <h2 className="font-semibold">Scan Tiket</h2>
+                                <p className="text-sm text-gray-400 mt-1">
+                                    Scan QR tiket tanpa perlu memilih konser terlebih dahulu.
                                 </p>
-                            )}
-                        </div>
+                                {lastConcert && (
+                                    <p className="text-sm text-[#FBADCC] mt-3">
+                                        {lastConcert}
+                                    </p>
+                                )}
+                            </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div className="bg-[#272727] border border-[#333] rounded-2xl p-5">
-                                <div className="flex items-center justify-between mb-5">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div className="bg-[#272727] border border-[#333] rounded-2xl p-5">
+                                    <div className="flex items-center justify-between mb-5">
+                                        <div>
+                                            <h2 className="text-lg font-semibold">QR Code Scanner</h2>
+                                            <p className="text-sm text-gray-400 mt-1">
+                                                Arahkan kamera ke QR Code tiket
+                                            </p>
+                                        </div>
+
+                                        <span className={`text-xs px-3 py-1 rounded-full ${scanning
+                                            ? "bg-green-500/20 text-green-400"
+                                            : "bg-gray-500/20 text-gray-400"
+                                            }`}>
+                                            {scanning ? "Camera Active" : "Camera Off"}
+                                        </span>
+                                    </div>
+
+                                    <div className="bg-black rounded-xl overflow-hidden min-h-[300px] flex items-center justify-center">
+                                        <div id="qr-reader" className="w-full"></div>
+
+                                        {!scanning && (
+                                            <div className="text-center text-gray-500 py-16">
+                                                <p className="text-5xl mb-3">▦</p>
+                                                <p className="text-sm">
+                                                    {canScan
+                                                        ? "Kamera belum diaktifkan"
+                                                        : concertLoading
+                                                            ? "Memuat data konser..."
+                                                            : "Belum ada konser"}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {error && (
+                                        <p className="text-sm text-red-400 mt-4">{error}</p>
+                                    )}
+
+                                    <div className="flex gap-3 mt-5">
+                                        {!scanning ? (
+                                            <button
+                                                onClick={startScanner}
+                                                disabled={!canScan}
+                                                className="flex-1 bg-[#FBADCC] text-black font-semibold py-3 rounded-xl hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                                            >
+                                                {concertLoading
+                                                    ? "Memuat..."
+                                                    : canScan
+                                                        ? "Mulai Scan"
+                                                        : "Belum Ada Konser"}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={stopScanner}
+                                                className="flex-1 bg-red-500/20 text-red-400 font-semibold py-3 rounded-xl hover:bg-red-500/30"
+                                            >
+                                                Hentikan Kamera
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="bg-[#272727] border border-[#333] rounded-2xl p-5">
+                                    <h2 className="text-lg font-semibold mb-2">Hasil Verifikasi</h2>
+                                    <p className="text-sm text-gray-400 mb-5">
+                                        Informasi tiket yang berhasil dipindai akan muncul di sini.
+                                    </p>
+
+                                    {loading ? (
+                                        <div className="text-center py-16">
+                                            <p className="text-gray-300">Memverifikasi tiket...</p>
+                                        </div>
+                                    ) : result ? (
+                                        <div className={`rounded-xl p-5 border ${result.success
+                                            ? "bg-green-500/10 border-green-500/30"
+                                            : "bg-red-500/10 border-red-500/30"
+                                            }`}>
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <span className="text-3xl">
+                                                    {result.success ? "✓" : "✕"}
+                                                </span>
+
+                                                <div>
+                                                    <h3 className={`font-semibold ${result.success ? "text-green-400" : "text-red-400"
+                                                        }`}>
+                                                        {result.success ? "Tiket Valid" : "Tiket Tidak Valid"}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-300">{result.message}</p>
+                                                </div>
+                                            </div>
+
+                                            {result.ticket && (
+                                                <div className="border-t border-white/10 pt-4 mt-4 space-y-3 text-sm">
+                                                    {[
+                                                        ["Ticket ID", result.ticket.ticket_id],
+                                                        ["Holder", result.ticket.holder],
+                                                        ["Ticket Tier", result.ticket.tier],
+                                                        ["Concert", result.ticket.concert],
+                                                        [
+                                                            "Check-in Time",
+                                                            result.ticket.check_in_at
+                                                                ? new Date(result.ticket.check_in_at).toLocaleString("id-ID")
+                                                                : "-"
+                                                        ]
+                                                    ].map(([label, value]) => (
+                                                        <div key={label} className="flex justify-between gap-4">
+                                                            <span className="text-gray-400">{label}</span>
+                                                            <span className="text-right break-all">{value ?? "-"}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            <button
+                                                onClick={resetResult}
+                                                className="w-full mt-5 py-2.5 rounded-lg bg-[#333] hover:bg-[#444] text-sm"
+                                            >
+                                                Scan Tiket Berikutnya
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-16 text-gray-500">
+                                            <p className="text-4xl mb-3">▦</p>
+                                            <p className="text-sm">Belum ada tiket yang dipindai</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="bg-[#272727] border border-[#333] rounded-2xl p-5 mt-6">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                                     <div>
-                                        <h2 className="text-lg font-semibold">QR Code Scanner</h2>
+                                        <h2 className="text-lg font-semibold">Daftar Attendees</h2>
                                         <p className="text-sm text-gray-400 mt-1">
-                                            Arahkan kamera ke QR Code tiket
+                                            {lastConcert
+                                                ? `Daftar pemilik tiket konser ${lastConcert}`
+                                                : "Daftar attendees akan muncul setelah tiket berhasil dipindai"}
                                         </p>
                                     </div>
 
-                                    <span className={`text-xs px-3 py-1 rounded-full ${scanning
-                                            ? "bg-green-500/20 text-green-400"
-                                            : "bg-gray-500/20 text-gray-400"
-                                        }`}>
-                                        {scanning ? "Camera Active" : "Camera Off"}
-                                    </span>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-sm text-gray-400">
+                                            Total: <span className="text-white font-semibold">{totalAttendees}</span> tiket
+                                        </span>
+                                    </div>
                                 </div>
 
-                                <div className="bg-black rounded-xl overflow-hidden min-h-[300px] flex items-center justify-center">
-                                    <div id="qr-reader" className="w-full"></div>
-
-                                    {!scanning && (
-                                        <div className="text-center text-gray-500 py-16">
-                                            <p className="text-5xl mb-3">▦</p>
-                                            <p className="text-sm">
-                                                {canScan
-                                                    ? "Kamera belum diaktifkan"
-                                                    : "Pilih konser terlebih dahulu"}
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {error && (
-                                    <p className="text-sm text-red-400 mt-4">{error}</p>
+                                {attendeeError && (
+                                    <p className="text-sm text-red-400 mb-4">{attendeeError}</p>
                                 )}
 
-                                <div className="flex gap-3 mt-5">
-                                    {!scanning ? (
-                                        <button
-                                            onClick={startScanner}
-                                            disabled={!canScan}
-                                            className="flex-1 bg-[#FBADCC] text-black font-semibold py-3 rounded-xl hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-                                        >
-                                            {canScan ? "Mulai Scan" : "Pilih Konser Dulu"}
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={stopScanner}
-                                            className="flex-1 bg-red-500/20 text-red-400 font-semibold py-3 rounded-xl hover:bg-red-500/30"
-                                        >
-                                            Hentikan Kamera
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="bg-[#272727] border border-[#333] rounded-2xl p-5">
-                                <h2 className="text-lg font-semibold mb-2">Hasil Verifikasi</h2>
-                                <p className="text-sm text-gray-400 mb-5">
-                                    Informasi tiket yang berhasil dipindai akan muncul di sini.
-                                </p>
-
-                                {loading ? (
-                                    <div className="text-center py-16">
-                                        <p className="text-gray-300">Memverifikasi tiket...</p>
+                                {attendeeLoading ? (
+                                    <div className="text-center py-12 text-gray-400">
+                                        Memuat daftar attendees...
                                     </div>
-                                ) : result ? (
-                                    <div className={`rounded-xl p-5 border ${result.success
-                                            ? "bg-green-500/10 border-green-500/30"
-                                            : "bg-red-500/10 border-red-500/30"
-                                        }`}>
-                                        <div className="flex items-center gap-3 mb-4">
-                                            <span className="text-3xl">
-                                                {result.success ? "✓" : "✕"}
-                                            </span>
-
-                                            <div>
-                                                <h3 className={`font-semibold ${result.success ? "text-green-400" : "text-red-400"
-                                                    }`}>
-                                                    {result.success ? "Tiket Valid" : "Tiket Tidak Valid"}
-                                                </h3>
-                                                <p className="text-sm text-gray-300">{result.message}</p>
-                                            </div>
-                                        </div>
-
-                                        {result.ticket && (
-                                            <div className="border-t border-white/10 pt-4 mt-4 space-y-3 text-sm">
-                                                {[
-                                                    ["Ticket ID", result.ticket.ticket_id],
-                                                    ["Holder", result.ticket.holder],
-                                                    ["Ticket Tier", result.ticket.tier],
-                                                    ["Concert", result.ticket.concert],
-                                                    [
-                                                        "Check-in Time",
-                                                        result.ticket.check_in_at
-                                                            ? new Date(result.ticket.check_in_at).toLocaleString("id-ID")
-                                                            : "-"
-                                                    ]
-                                                ].map(([label, value]) => (
-                                                    <div key={label} className="flex justify-between gap-4">
-                                                        <span className="text-gray-400">{label}</span>
-                                                        <span className="text-right break-all">{value ?? "-"}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        <button
-                                            onClick={resetResult}
-                                            className="w-full mt-5 py-2.5 rounded-lg bg-[#333] hover:bg-[#444] text-sm"
-                                        >
-                                            Scan Tiket Berikutnya
-                                        </button>
+                                ) : attendees.length === 0 ? (
+                                    <div className="text-center py-12 text-gray-500">
+                                        <p className="text-4xl mb-3">♙</p>
+                                        <p className="text-sm">Belum ada tiket untuk ditampilkan.</p>
                                     </div>
                                 ) : (
-                                    <div className="text-center py-16 text-gray-500">
-                                        <p className="text-4xl mb-3">▦</p>
-                                        <p className="text-sm">Belum ada tiket yang dipindai</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm text-left min-w-[700px]">
+                                            <thead>
+                                                <tr className="border-b border-[#444] text-gray-400">
+                                                    <th className="px-4 py-4 font-medium">Ticket ID</th>
+                                                    <th className="px-4 py-4 font-medium">Nama Pemilik</th>
+                                                    <th className="px-4 py-4 font-medium">Email</th>
+                                                    <th className="px-4 py-4 font-medium">Ticket Tier</th>
+                                                    <th className="px-4 py-4 font-medium">Status</th>
+                                                </tr>
+                                            </thead>
 
-                        <div className="bg-[#272727] border border-[#333] rounded-2xl p-5 mt-6">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                                <div>
-                                    <h2 className="text-lg font-semibold">Daftar Attendees</h2>
-                                    <p className="text-sm text-gray-400 mt-1">
-                                        Daftar pemilik tiket konser yang dipilih
-                                    </p>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <span className="text-sm text-gray-400">
-                                        Total: <span className="text-white font-semibold">{totalAttendees}</span> tiket
-                                    </span>
-                                </div>
-                            </div>
-
-                            {attendeeError && (
-                                <p className="text-sm text-red-400 mb-4">{attendeeError}</p>
-                            )}
-
-                            {attendeeLoading ? (
-                                <div className="text-center py-12 text-gray-400">
-                                    Memuat daftar attendees...
-                                </div>
-                            ) : attendees.length === 0 ? (
-                                <div className="text-center py-12 text-gray-500">
-                                    <p className="text-4xl mb-3">♙</p>
-                                    <p className="text-sm">Belum ada tiket untuk konser ini.</p>
-                                </div>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left min-w-[700px]">
-                                        <thead>
-                                            <tr className="border-b border-[#444] text-gray-400">
-                                                <th className="px-4 py-4 font-medium">Ticket ID</th>
-                                                <th className="px-4 py-4 font-medium">Nama Pemilik</th>
-                                                <th className="px-4 py-4 font-medium">Email</th>
-                                                <th className="px-4 py-4 font-medium">Ticket Tier</th>
-                                                <th className="px-4 py-4 font-medium">Status</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                            {attendees.map((ticket) => (
-                                                <tr
-                                                    key={ticket.id}
-                                                    className="border-b border-[#333] hover:bg-[#303030]"
-                                                >
-                                                    <td className="px-4 py-4 text-gray-300">
-                                                        #{ticket.id}
-                                                    </td>
-                                                    <td className="px-4 py-4 font-medium">
-                                                        {ticket.owner?.name || "-"}
-                                                    </td>
-                                                    <td className="px-4 py-4 text-gray-400">
-                                                        {ticket.owner?.email || "-"}
-                                                    </td>
-                                                    <td className="px-4 py-4">
-                                                        {ticket.tier?.name || "-"}
-                                                    </td>
-                                                    <td className="px-4 py-4">
-                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${ticket.status === "used"
+                                            <tbody>
+                                                {attendees.map((ticket) => (
+                                                    <tr
+                                                        key={ticket.id}
+                                                        className="border-b border-[#333] hover:bg-[#303030]"
+                                                    >
+                                                        <td className="px-4 py-4 text-gray-300">
+                                                            #{ticket.id}
+                                                        </td>
+                                                        <td className="px-4 py-4 font-medium">
+                                                            {ticket.owner?.name || "-"}
+                                                        </td>
+                                                        <td className="px-4 py-4 text-gray-400">
+                                                            {ticket.owner?.email || "-"}
+                                                        </td>
+                                                        <td className="px-4 py-4">
+                                                            {ticket.tier?.name || "-"}
+                                                        </td>
+                                                        <td className="px-4 py-4">
+                                                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${ticket.status === "used"
                                                                 ? "bg-green-500/20 text-green-400"
                                                                 : ticket.status === "cancelled"
                                                                     ? "bg-red-500/20 text-red-400"
                                                                     : "bg-yellow-500/20 text-yellow-400"
-                                                            }`}>
-                                                            {ticket.status || "-"}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
+                                                                }`}>
+                                                                {ticket.status || "-"}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
 
+                        </div>
                     </div>
                 </div>
-            </div>
-        </EoGuard>
-    )
-}
+            </EoGuard>
+        )
+    }

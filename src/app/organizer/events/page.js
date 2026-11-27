@@ -113,8 +113,20 @@ export default function OrganizerEvents() {
                                                 {item.title}
                                             </h3>
                                             <div className="space-y-2 text-sm text-gray-400">
-                                                <div>{formatDate(item.date)}</div>
-                                                <div>{item.location}</div>
+                                                <div className="flex gap-1.5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="#FBADCC"
+                                                        fill="currentColor" viewBox="0 0 24 24" >
+                                                        <path d="M19 4h-2V2h-2v2H9V2H7v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2M5 20V8h14V6v14z"></path><path d="M7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"></path>
+                                                    </svg>
+                                                    {formatDate(item.date)}
+                                                </div>
+                                                <div className="flex gap-1.5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="#FBADCC"
+                                                        fill="currentColor" viewBox="0 0 24 24" >
+                                                        <path d="M16 10c0-2.21-1.79-4-4-4s-4 1.79-4 4 1.79 4 4 4 4-1.79 4-4m-6 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2"></path><path d="M11.42 21.81c.17.12.38.19.58.19s.41-.06.58-.19c.3-.22 7.45-5.37 7.42-11.82 0-4.41-3.59-8-8-8s-8 3.59-8 8c-.03 6.44 7.12 11.6 7.42 11.82M12 4c3.31 0 6 2.69 6 6 .02 4.44-4.39 8.43-6 9.74-1.61-1.31-6.02-5.29-6-9.74 0-3.31 2.69-6 6-6"></path>
+                                                    </svg>
+                                                    {item.location}
+                                                </div>
                                             </div>
                                             <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#333]">
                                                 <div>
@@ -123,9 +135,9 @@ export default function OrganizerEvents() {
                                                         {item.sold ?? item.tiers?.reduce((total, tier) => total + Number(tier.sold || 0), 0) ?? 0}
                                                     </p>
                                                 </div>
-                                               
+
                                             </div>
-                                            
+
                                         </div>
                                     </div>
                                 ))}

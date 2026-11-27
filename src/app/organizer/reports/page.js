@@ -347,30 +347,7 @@ export default function ReportsPage() {
                                     </div>
                                 </div>
 
-                                <div className="bg-[#272727] rounded-2xl border border-[#333] p-5 mb-6">
-                                    <h2 className="font-semibold text-lg">Ticket Sales by Category</h2>
-                                    <p className="text-gray-400 text-sm mt-1 mb-5">
-                                        Number of tickets issued for each category
-                                    </p>
-
-                                    <div className="w-full h-[280px]">
-                                        {tierSales.length ? (
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <BarChart data={tierSales} margin={{ top: 10, right: 10, left: -15, bottom: 5 }}>
-                                                    <CartesianGrid strokeDasharray="3 3" stroke="#33333a" vertical={false} />
-                                                    <XAxis dataKey="name" tick={{ fill: "#aaa", fontSize: 12 }} axisLine={false} tickLine={false} />
-                                                    <YAxis tick={{ fill: "#aaa", fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                                                    <Tooltip contentStyle={tooltipStyle} />
-                                                    <Bar dataKey="sold" name="Tickets Issued" fill="#FBADCC" radius={[7, 7, 0, 0]} barSize={42} />
-                                                </BarChart>
-                                            </ResponsiveContainer>
-                                        ) : (
-                                            <div className="h-full flex items-center justify-center text-gray-400 text-sm">
-                                                No ticket sales data
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                            
 
                                 <div className="bg-[#272727] rounded-2xl border border-[#333] p-5">
                                     <h2 className="font-semibold text-lg">Ticket Category Details</h2>

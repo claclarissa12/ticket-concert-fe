@@ -475,14 +475,8 @@ export default function EditEvent() {
                                             </div>
                                             <div className={`w-3 h-3 rounded-full ${concert.status === "published" ? "bg-green-400" : concert.status === "cancelled" ? "bg-red-400" : "bg-[#FBADCC]"}`} />
                                         </div>
-                                        <p className="text-xs text-gray-500 mt-3">Status konser dikelola melalui fitur publikasi konser.</p>
                                     </section>
 
-                                    <section className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                        <h2 className="text-lg font-semibold mb-4">Pricing & Capacity</h2>
-                                        <p className="text-sm text-gray-400 mb-4">Kelola harga tiket dan kapasitas melalui Ticket Tiers.</p>
-                                        <Link href={`/organizer/events/${id}/tickets`} className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm text-[#FBADCC] border border-[#333] flex items-center justify-center">Manage Ticket Tiers</Link>
-                                    </section>
                                 </div>
                             </div>
                         </div>

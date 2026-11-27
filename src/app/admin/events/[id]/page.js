@@ -148,7 +148,11 @@ export default function DetailEvent() {
                                                         fill="currentColor" viewBox="0 0 24 24" >
                                                         <path d="M19 4h-2V2h-2v2H9V2H7v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2M5 20V8h14V6v14z"></path><path d="M7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"></path>
                                                     </svg>
-                                                    {concert.date}</p>
+                                                    {new Date(concert.date).toLocaleDateString("id-ID", {
+                                                        day: "2-digit",
+                                                        month: "long",
+                                                        year: "numeric"
+                                                    })}                                                    </p>
                                                 <p className="flex gap-2">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="#FBADCC"
                                                         fill="currentColor" viewBox="0 0 24 24" >
@@ -158,6 +162,18 @@ export default function DetailEvent() {
                                                 </p>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
+                                    <h2 className="text-lg font-semibold text-white mb-4">
+                                        Description
+                                    </h2>
+
+                                    <div className="rounded-xl border border-white/10 bg-[#222] p-5">
+                                        <p className="text-sm leading-7 text-gray-400 whitespace-pre-line">
+                                            {concert.description || "No description available."}
+                                        </p>
                                     </div>
                                 </div>
 
@@ -179,6 +195,8 @@ export default function DetailEvent() {
                                         <p className="text-gray-400 text-sm">Stage layout belum tersedia.</p>
                                     )}
                                 </div>
+
+
 
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                     <h2 className="text-lg font-semibold mb-4">Venue Location</h2>

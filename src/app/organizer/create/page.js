@@ -219,17 +219,17 @@ export default function CreateEvent() {
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
                                     <h2 className="text-lg font-semibold mb-4">Event Banner URL</h2>
                                     <input type="url" name="banner_url" value={form.banner_url} onChange={handleChange} placeholder="https://example.com/image.jpg" className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none" />
-                                    <p className="text-xs text-gray-500 mt-2">Masukkan link gambar poster dari internet (maks 500 karakter)</p>
+                                    <p className="text-xs text-gray-500 mt-2">Masukkan link gambar poster (maks 500 karakter)</p>
                                 </div>
 
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                    <label className="text-sm text-gray-400 block mb-1.5">Upload Gambar Layout Panggung</label>
+                                    <h2 className="text-lg font-semibold mb-4">Layout</h2>
                                     <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setLayoutFile(e.target.files?.[0] || null)} className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#FBADCC] file:text-black file:text-sm" />
                                     <p className="text-xs text-gray-500 mt-2">JPG / PNG / WEBP, maks 5 MB.</p>
                                 </div>
 
                                 <div className="bg-[#272727] rounded-2xl p-6 border border-[#333]">
-                                    <label className="text-sm text-gray-400 block mb-1.5">Link Google Maps Venue</label>
+                                    <h2 className="text-lg font-semibold mb-4">Link Google Maps Venue</h2>
                                     <input type="url" name="map_url" value={form.map_url} onChange={handleChange} placeholder="https://www.google.com/maps/embed?pb=..." className="w-full px-4 py-3 bg-[#1a1a1a] rounded-xl border border-[#333] focus:border-[#FBADCC] outline-none" />
                                     <p className="text-xs text-gray-500 mt-2">
                                         Buka Google Maps → cari venue → <b>Share</b> → tab <b>Embed a map</b> → <b>Copy HTML</b> → ambil URL di dalam <code>src="..."</code>.
