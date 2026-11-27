@@ -110,9 +110,8 @@ export default function Landing() {
           </a>
 
           <div className="flex items-center gap-3 sm:gap-4">
-
             <a
-              href="/download"
+              href="https://github.com/lephie/Konser-Mobile-"
               className="rounded-full bg-[#E21D8F] px-5 py-2.5 text-xs md:text-sm font-semibold text-white hover:bg-pink-600 transition duration-300 shadow-lg shadow-[#E21D8F]/20 flex items-center gap-2"
             >
               <span>Download Sekarang</span>
@@ -425,16 +424,26 @@ export default function Landing() {
               </p>
             </div>
 
-            <button
-              onClick={() => {
-                setIsOrganizerFormOpen(true);
-                setSubmitSuccess(false);
-                setSubmitError("");
-              }}
-              className="shrink-0 w-full md:w-auto px-6 py-3 bg-[#E21D8F] hover:bg-pink-600 text-white font-semibold text-sm rounded-xl transition duration-300 text-center shadow-lg shadow-[#E21D8F]/20"
-            >
-              Register Sebagai Organizer
-            </button>
+           <div className="flex flex-col items-center gap-3 shrink-0">
+              <button
+                onClick={() => {
+                  setIsOrganizerFormOpen(true);
+                  setSubmitSuccess(false);
+                  setSubmitError("");
+                }}
+                className="px-6 py-3 bg-[#E21D8F] hover:bg-pink-600 text-white font-semibold text-sm rounded-xl transition duration-300 text-center shadow-lg shadow-[#E21D8F]/20"
+              >
+                Register Sebagai Organizer
+              </button>
+
+              <a
+                href="/login"
+                className="px-6 py-3 border border-[#a20762]  text-xs md:text-sm font-semibold hover:bg-[#5d2445] rounded-xl transition duration-300 flex items-center gap-2 whitespace-nowrap"
+              >
+                Masuk Sebagai Admin / EO
+              </a>
+          </div>
+
           </div>
 
           {isOrganizerFormOpen && (
@@ -631,7 +640,6 @@ export default function Landing() {
 
             </div>
           )}
-
           <div className="flex flex-col md:flex-row justify-between gap-12">
             <div className="flex flex-col gap-4 max-w-xs">
               <h1 className="text-xl font-bold text-white">
