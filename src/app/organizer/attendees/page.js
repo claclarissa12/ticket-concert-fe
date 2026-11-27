@@ -229,18 +229,6 @@
                                 </p>
                             </div>
 
-                            <div className="bg-[#272727] border border-[#333] rounded-2xl p-5 mb-6">
-                                <h2 className="font-semibold">Scan Tiket</h2>
-                                <p className="text-sm text-gray-400 mt-1">
-                                    Scan QR tiket tanpa perlu memilih konser terlebih dahulu.
-                                </p>
-                                {lastConcert && (
-                                    <p className="text-sm text-[#FBADCC] mt-3">
-                                        {lastConcert}
-                                    </p>
-                                )}
-                            </div>
-
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 <div className="bg-[#272727] border border-[#333] rounded-2xl p-5">
                                     <div className="flex items-center justify-between mb-5">
