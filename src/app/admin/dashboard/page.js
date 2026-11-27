@@ -157,21 +157,15 @@ export default function SuperAdminDashboard() {
             icon: Users
         },
         {
-            title: "Manage Organizers",
-            description: "Kelola akun event organizer",
-            href: "/admin/organizers",
-            icon: UserRoundCog
-        },
-        {
             title: "Manage Concerts",
             description: "Pantau seluruh konser",
-            href: "/admin/concert",
+            href: "/admin/events",
             icon: CalendarDays
         },
         {
             title: "Manage Orders",
             description: "Pantau transaksi tiket",
-            href: "/admin/orders",
+            href: "/admin/transactions",
             icon: Receipt
         }
     ]
@@ -194,14 +188,6 @@ export default function SuperAdminDashboard() {
                                 </p>
                             </div>
 
-                            <button
-                                onClick={fetchDashboard}
-                                disabled={loading}
-                                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#272727] rounded-xl text-sm hover:bg-[#333] transition-colors border border-[#383838] disabled:opacity-50"
-                            >
-                                <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-                                Refresh
-                            </button>
                         </div>
 
                         {error && (
@@ -421,7 +407,7 @@ export default function SuperAdminDashboard() {
                                         <ArrowUpRight className="text-gray-400" size={20} />
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                                         {quickActions.map((item) => {
                                             const Icon = item.icon
 

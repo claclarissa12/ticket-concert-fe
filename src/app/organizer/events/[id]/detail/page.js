@@ -189,19 +189,29 @@ export default function DetailEvent() {
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-2">
                                                 <h2 className="text-2xl font-bold">{concert.title}</h2>
-                                                <span className={`text-xs px-3 py-1 rounded-full ${
-                                                    concert.status === "published"
-                                                        ? "bg-green-500/20 text-green-400"
-                                                        : concert.status === "cancelled"
-                                                            ? "bg-red-500/20 text-red-400"
-                                                            : "bg-yellow-500/20 text-yellow-400"
-                                                }`}>
+                                                <span className={`text-xs px-3 py-1 rounded-full ${concert.status === "published"
+                                                    ? "bg-green-500/20 text-green-400"
+                                                    : concert.status === "cancelled"
+                                                        ? "bg-red-500/20 text-red-400"
+                                                        : "bg-yellow-500/20 text-yellow-400"
+                                                    }`}>
                                                     {concert.status?.charAt(0).toUpperCase() + concert.status?.slice(1)}
                                                 </span>
                                             </div>
                                             <div className="space-y-1 text-sm text-gray-400">
-                                                <p>📅 {concert.date}</p>
-                                                <p>📍 {concert.venue}, {concert.location}</p>
+                                                <p className="flex gap-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="#FBADCC"
+                                                        fill="currentColor" viewBox="0 0 24 24" >
+                                                        <path d="M19 4h-2V2h-2v2H9V2H7v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2M5 20V8h14V6v14z"></path><path d="M7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"></path>
+                                                    </svg>
+                                                    {concert.date}</p>
+                                                <p className="flex gap-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="#FBADCC"
+                                                        fill="currentColor" viewBox="0 0 24 24" >
+                                                        <path d="M16 10c0-2.21-1.79-4-4-4s-4 1.79-4 4 1.79 4 4 4 4-1.79 4-4m-6 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2"></path><path d="M11.42 21.81c.17.12.38.19.58.19s.41-.06.58-.19c.3-.22 7.45-5.37 7.42-11.82 0-4.41-3.59-8-8-8s-8 3.59-8 8c-.03 6.44 7.12 11.6 7.42 11.82M12 4c3.31 0 6 2.69 6 6 .02 4.44-4.39 8.43-6 9.74-1.61-1.31-6.02-5.29-6-9.74 0-3.31 2.69-6 6-6"></path>
+                                                    </svg>
+                                                    {concert.venue}, {concert.location}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -301,15 +311,14 @@ export default function DetailEvent() {
                                                             </div>
 
                                                             <div className="flex items-center gap-3">
-                                                                <span className={`text-xs px-3 py-1 rounded-full ${
-                                                                    status === "Sold Out"
-                                                                        ? "bg-red-500/20 text-red-400"
-                                                                        : status === "Upcoming"
-                                                                            ? "bg-yellow-500/20 text-yellow-400"
-                                                                            : status === "Ended"
-                                                                                ? "bg-gray-500/20 text-gray-400"
-                                                                                : "bg-green-500/20 text-green-400"
-                                                                }`}>
+                                                                <span className={`text-xs px-3 py-1 rounded-full ${status === "Sold Out"
+                                                                    ? "bg-red-500/20 text-red-400"
+                                                                    : status === "Upcoming"
+                                                                        ? "bg-yellow-500/20 text-yellow-400"
+                                                                        : status === "Ended"
+                                                                            ? "bg-gray-500/20 text-gray-400"
+                                                                            : "bg-green-500/20 text-green-400"
+                                                                    }`}>
                                                                     {status}
                                                                 </span>
                                                                 <div className="w-24">
@@ -386,7 +395,7 @@ export default function DetailEvent() {
                                             <button
                                                 onClick={handleCancel}
                                                 disabled={canceling || publishing || deleting}
-                                                className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] border border-[#333] transition-colors disabled:opacity-50"
+                                                className="w-full px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm hover:bg-[#222] transition-colors border border-[#333] flex items-center gap-2"
                                             >
                                                 {canceling ? "Cancelling..." : "Cancel Event"}
                                             </button>

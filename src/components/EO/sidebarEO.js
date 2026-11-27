@@ -2,9 +2,26 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 
 export default function OrganizerSidebar() {
     const pathname = usePathname()
+    const [user, setUser] = useState(null)
+
+    useEffect(() => {
+        const raw = localStorage.getItem("user")
+        if (raw) return setUser(JSON.parse(raw))
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        })
+            .then(r => r.json())
+            .then(j => setUser(j.data ?? j))
+            .catch(() => { })
+    }, [])
+
+    const name = user?.name || "SuperAdmin"
+    const initials = name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
+
 
     const menuItems = [
         {
@@ -89,7 +106,7 @@ export default function OrganizerSidebar() {
                 <div className="flex items-center gap-2.5">
 
                     <h1 className="text-xl font-semibold text-white">
-                        Ticket<span className="text-[#FBADCC]">.COM</span>
+                        The<span className="text-[#FBADCC]"> Concert's</span>
                     </h1>
                 </div>
             </div>
@@ -119,14 +136,21 @@ export default function OrganizerSidebar() {
                 })}
             </nav>
 
-            <div className="px-3 py-3 border-t border-[#1a1a1a]">
-                <div className="flex items-center gap-3 px-2 py-2 rounded-md">
-                    <div className="w-8 h-8 rounded-full bg-[#FBADCC] flex items-center justify-center text-white font-semibold text-xs">
-                        EO
+            <div className="px-3 py-4 border-t border-[#1a1a1a]">
+                <div className="flex items-center gap-3 px-2 py-2 rounded-lg bg-[#1a1a1a]/40">
+                    <div className="relative shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-[#FBADCC] flex items-center justify-center text-white font-semibold text-sm">
+                            {initials}
+                        </div>
                     </div>
+
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white truncate">Event Organizer</p>
-                        <p className="text-xs text-gray-500 truncate">admin@organizer.com</p>
+                        <p className="text-sm font-medium text-white truncate" title={name}>
+                            {name}
+                        </p>
+                        <p className="text-[11px] text-gray-500 truncate">
+                            Event Organizer
+                        </p>
                     </div>
                 </div>
             </div>

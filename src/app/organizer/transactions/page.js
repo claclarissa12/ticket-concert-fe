@@ -115,21 +115,21 @@ export default function TransactionsPage() {
                                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Transactions</h1>
                                 <p className="text-gray-400 text-sm mt-1">Manage payment transactions for your event</p>
                             </div>
-                           
+
+                            <div className="">
+                                <label className="block text-sm text-gray-400 mb-2">Select Concert</label>
+                                <select value={selectedConcertId} onChange={(e) => changeConcert(e.target.value)} disabled={concertLoading || concerts.length === 0} className="w-full sm:w-96 px-4 py-3 bg-[#272727] rounded-xl border border-[#333] outline-none focus:border-[#FBADCC] text-sm disabled:opacity-50">
+                                    {concertLoading ? (
+                                        <option value="">Loading concerts...</option>
+                                    ) : concerts.length === 0 ? (
+                                        <option value="">No concerts found</option>
+                                    ) : (
+                                        concerts.map(concert => <option key={concert.id} value={String(concert.id)}>{concert.title}</option>)
+                                    )}
+                                </select>
+                            </div>
                         </div>
 
-                        <div className="mb-6">
-                            <label className="block text-sm text-gray-400 mb-2">Select Concert</label>
-                            <select value={selectedConcertId} onChange={(e) => changeConcert(e.target.value)} disabled={concertLoading || concerts.length === 0} className="w-full sm:w-96 px-4 py-3 bg-[#272727] rounded-xl border border-[#333] outline-none focus:border-[#FBADCC] text-sm disabled:opacity-50">
-                                {concertLoading ? (
-                                    <option value="">Loading concerts...</option>
-                                ) : concerts.length === 0 ? (
-                                    <option value="">No concerts found</option>
-                                ) : (
-                                    concerts.map(concert => <option key={concert.id} value={String(concert.id)}>{concert.title}</option>)
-                                )}
-                            </select>
-                        </div>
 
                         {error && <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-sm">{error}</div>}
 

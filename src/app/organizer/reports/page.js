@@ -2,15 +2,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid,
-    Tooltip, ResponsiveContainer, PieChart, Pie, Cell
-} from "recharts"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 import { Wallet, Ticket, Users, CalendarDays } from "lucide-react"
 import EoGuard from "@/components/EO/guardEO"
 import OrganizerSidebar from "@/components/EO/sidebarEO"
 import BackButton from "@/components/cards/back"
 import { organizerApi } from "../../../../lib/api"
+import * as XLSX from "xlsx"
+import { Download } from "lucide-react"
 
 export default function ReportsPage() {
     const [concerts, setConcerts] = useState([])
@@ -27,6 +26,57 @@ export default function ReportsPage() {
         currency: "IDR",
         maximumFractionDigits: 0
     }).format(Number(value || 0))
+
+    const exportExcel = () => {
+        if (!report) return
+
+        const wb = XLSX.utils.book_new()
+
+        const summary = [
+            ["LAPORAN KONSER"],
+            [],
+            ["Nama Konser", report.concert?.title || "-"],
+            ["Tanggal", report.concert?.date ? new Date(report.concert.date).toLocaleDateString("id-ID") : "-"],
+            [],
+            ["RINGKASAN PENJUALAN"],
+            ["Total Pendapatan", Number(report.revenue || 0)],
+            ["Pesanan Lunas", Number(report.paid_orders || 0)],
+            ["Tiket Terbit", ticketsIssued],
+            ["Tiket Check-in", checkedIn],
+            ["Belum Check-in", notCheckedIn],
+            ["Tingkat Kehadiran", `${attendance}%`],
+        ]
+
+        const details = [
+            ["Kategori", "Harga", "Kuota", "Tiket Terbit", "Check-in", "Tersedia", "Dibatalkan", "Pendapatan"],
+            ...(report.tiers || []).map(tier => [
+                tier.name,
+                Number(tier.price || 0),
+                Number(tier.quota || 0),
+                Number(tier.tickets_issued || 0),
+                Number(tier.checked_in || 0),
+                Number(tier.available || 0),
+                Number(tier.cancelled || 0),
+                Number(tier.revenue || 0),
+            ])
+        ]
+
+        const ws1 = XLSX.utils.aoa_to_sheet(summary)
+        const ws2 = XLSX.utils.aoa_to_sheet(details)
+
+        ws1["!cols"] = [{ wch: 25 }, { wch: 25 }]
+        ws2["!cols"] = [
+            { wch: 20 }, { wch: 18 }, { wch: 12 }, { wch: 15 },
+            { wch: 15 }, { wch: 12 }, { wch: 15 }, { wch: 20 }
+        ]
+
+        XLSX.utils.book_append_sheet(wb, ws1, "Ringkasan")
+        XLSX.utils.book_append_sheet(wb, ws2, "Detail Kategori")
+
+        const fileName = `Laporan_${(report.concert?.title || "Konser").replace(/[^a-zA-Z0-9]/g, "_")}.xlsx`
+
+        XLSX.writeFile(wb, fileName)
+    }
 
     useEffect(() => {
         const fetchConcerts = async () => {
@@ -166,6 +216,32 @@ export default function ReportsPage() {
                         ) : report ? (
                             <>
                                 <div className="bg-[#272727] rounded-xl p-5 border border-[#333] mb-6">
+
+                                    <div className="bg-[#272727] rounded-xl p-5 border border-[#333] mb-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                                        <div>
+                                            <p className="text-sm text-gray-400">Concert Report</p>
+                                            <h2 className="text-lg font-semibold mt-1">
+                                                {report.concert?.title || "-"}
+                                            </h2>
+                                            <p className="text-sm text-gray-500 mt-1">
+                                                {report.concert?.date
+                                                    ? new Date(report.concert.date).toLocaleDateString("id-ID", {
+                                                        day: "numeric",
+                                                        month: "long",
+                                                        year: "numeric"
+                                                    })
+                                                    : "-"}
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            onClick={exportExcel}
+                                            className="flex items-center justify-center gap-2 px-4 py-3 bg-[#FBADCC] text-[#131313] rounded-xl text-sm font-semibold hover:bg-[#f895bd] transition"
+                                        >
+                                            <Download size={17} />
+                                            Download Excel
+                                        </button>
+                                    </div>
                                     <p className="text-sm text-gray-400">Concert Report</p>
                                     <h2 className="text-lg font-semibold mt-1">
                                         {report.concert?.title || "-"}

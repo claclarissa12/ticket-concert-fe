@@ -98,14 +98,7 @@ export default function DetailEvent() {
         </AdminGuard>
     )
 
-    const filteredTiers = ticketTiers.filter((tier) => {
-        if (activeTab === "all") return true
-        if (activeTab === "active") return (tier.status || "").toLowerCase() === "active"
-        if (activeTab === "sold out") return (tier.sold || 0) >= (tier.quota || 0)
-        if (activeTab === "upcoming")
-            return tier.sale_start && new Date(tier.sale_start) > new Date()
-        return true
-    })
+
 
     const totalQuota = ticketTiers.reduce((s, t) => s + (Number(t.quota) || 0), 0)
     const totalSold = ticketTiers.reduce((s, t) => s + (Number(t.sold) || 0), 0)
@@ -150,19 +143,19 @@ export default function DetailEvent() {
                                                 <span className="text-xs px-3 py-1 rounded-full bg-green-500/20 text-green-400">Active</span>
                                             </div>
                                             <div className="space-y-1 text-sm text-gray-400">
-                                                <div className="flex items-center gap-2">
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                <p className="flex gap-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="#FBADCC"
+                                                        fill="currentColor" viewBox="0 0 24 24" >
+                                                        <path d="M19 4h-2V2h-2v2H9V2H7v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2M5 20V8h14V6v14z"></path><path d="M7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2zm-8 4h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"></path>
                                                     </svg>
-                                                    <span>{concert.date}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    {concert.date}</p>
+                                                <p className="flex gap-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="#FBADCC"
+                                                        fill="currentColor" viewBox="0 0 24 24" >
+                                                        <path d="M16 10c0-2.21-1.79-4-4-4s-4 1.79-4 4 1.79 4 4 4 4-1.79 4-4m-6 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2"></path><path d="M11.42 21.81c.17.12.38.19.58.19s.41-.06.58-.19c.3-.22 7.45-5.37 7.42-11.82 0-4.41-3.59-8-8-8s-8 3.59-8 8c-.03 6.44 7.12 11.6 7.42 11.82M12 4c3.31 0 6 2.69 6 6 .02 4.44-4.39 8.43-6 9.74-1.61-1.31-6.02-5.29-6-9.74 0-3.31 2.69-6 6-6"></path>
                                                     </svg>
-                                                    <span>{concert.venue}, {concert.location}</span>
-                                                </div>
+                                                    {concert.venue}, {concert.location}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -225,26 +218,10 @@ export default function DetailEvent() {
                                 </div>
 
                                 <div className="bg-[#272727] rounded-2xl border border-[#333] overflow-hidden">
-                                    <div className="flex border-b border-[#333]">
-                                        {["All", "Active", "Sold Out", "Upcoming"].map((tab) => (
-                                            <button
-                                                key={tab}
-                                                onClick={() => setActiveTab(tab.toLowerCase())}
-                                                className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === tab.toLowerCase()
-                                                    ? "border-[#FBADCC] text-[#FBADCC]"
-                                                    : "border-transparent text-gray-400 hover:text-white"
-                                                    }`}
-                                            >
-                                                {tab}
-                                            </button>
-                                        ))}
-                                    </div>
-                                    <div className="p-6 space-y-4">
-                                        {filteredTiers.length === 0 && (
-                                            <p className="text-center text-gray-400 py-8">Belum ada ticket tier.</p>
-                                        )}
 
-                                        {filteredTiers.map((tier) => (
+                                    <div className="p-6 space-y-4">
+                                        <h2 className="text-lg font-semibold mb-4">Ticket Tiers</h2>
+                                        {ticketTiers.map((tier) => (
                                             <div key={tier.id} className="bg-[#1a1a1a] rounded-xl p-5 hover:bg-[#222] transition-colors border border-transparent hover:border-[#333]">
                                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                                     <div className="flex items-center gap-4">

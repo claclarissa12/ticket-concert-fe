@@ -419,14 +419,6 @@ export default function AttendeesPage() {
                                     <span className="text-sm text-gray-400">
                                         Total: <span className="text-white font-semibold">{totalAttendees}</span> tiket
                                     </span>
-
-                                    <button
-                                        onClick={loadAttendees}
-                                        disabled={attendeeLoading || !selectedConcert}
-                                        className="bg-[#FBADCC] text-black px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 disabled:opacity-40"
-                                    >
-                                        {attendeeLoading ? "Memuat..." : "Refresh"}
-                                    </button>
                                 </div>
                             </div>
 
